@@ -1,0 +1,17 @@
+{{log this}}
+{{#if isNPC}}
+<ul class="attributes characteristics flexrow">
+  <li class="flexcol">
+    <h4 class="attribute-name box-title">{{ localize "SYB5E.Manner" }}</h4>
+    <textarea name="{{sybPaths.manner}}">{{data.details.manner}}</textarea>
+  </li>
+  <li class="flexcol">
+    <h4 class="attribute-name box-title">{{ localize "SYB5E.Shadow" }}</h4>
+    {{else}}
+    <label>{{ localize "SYB5E.Shadow" }}</label>
+    {{/if}}
+    <textarea name="{{sybPaths.shadow}}">{{data.details.shadow}}</textarea>
+    {{#if isNPC}}
+  </li>
+</ul>
+{{/if}}
