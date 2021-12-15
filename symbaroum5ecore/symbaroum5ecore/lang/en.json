@@ -2,6 +2,14 @@
   "SYB5E" : {
     "Init" : {
       "SubModule": "Initializing Sub-Module: {name}"
+    },
+    "Sheet" : {
+      "Character": {
+        "Label": "Symbaroum 5e Character"
+      },
+      "NPC": {
+        "Label": "Symbaroum 5e NPC"
+      }
     }
   }
 }

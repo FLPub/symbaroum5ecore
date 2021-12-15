@@ -9,15 +9,15 @@ export class logger {
   static NAME = this.name;
 
   static info(...args) {
-    console.log(`${COMMON?.data?.title || "" }  | `, ...args);
+    console.log(`${COMMON?.DATA?.title || "" }  | `, ...args);
   }
   static debug(...args) {
     if (COMMON.setting('debug'))
       this.info("DEBUG | ", ...args);
   }
   static error(...args) {
-    console.error(`${COMMON?.data?.title || "" } | ERROR | `, ...args);
-    ui.notifications.error(`${COMMON?.data?.title || "" } | ERROR | ${args[0]}`);
+    console.error(`${COMMON?.DATA?.title || "" } | ERROR | `, ...args);
+    ui.notifications.error(`${COMMON?.DATA?.title || "" } | ERROR | ${args[0]}`);
   }
 
   static notify(...args) {
@@ -30,7 +30,7 @@ export class logger {
   }
 
   static settings(){
-    const config = false;
+    const config = true;
     const settingsData = {
       debug : {
         scope: "world", config, default: false, type: Boolean,
