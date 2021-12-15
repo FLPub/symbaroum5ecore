@@ -208,6 +208,20 @@
   font-size: 68pt;
   margin-bottom: 0;
 }
+.symbaroum-dnd5e-mod .centerHead {
+  text-align: center;
+  font-size: 68pt;
+  margin-bottom: 0;
+}
+.symbaroum-dnd5e-mod .h2subHead {
+  font-weight: bold;
+  color:  hsl(19, 70%, 37%);
+  border: 0;
+  margin-bottom: 0;
+  margin-left: 10px;
+  font-family: 'Primitive';
+  font-size: 20pt;
+}
 
 .symbaroum-dnd5e-mod .arpgtable,
 th,
