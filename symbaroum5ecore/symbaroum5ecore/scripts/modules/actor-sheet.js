@@ -147,6 +147,10 @@ export class SheetCommon {
     }
   }
 
+  static _render(){
+    this.element.find('.spell-slots').css('display', 'none');
+  }
+
   /** \COMMON **/
 
   /** HOOKS **/
@@ -263,6 +267,15 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
     logger.debug('getData#context:', context);
     return context;
   }
+
+  /* supressing display of spell slot counts */
+  async _render(...args) {
+    await super._render(...args);
+
+    /* call the common _render by binding (pretend its our own method) */
+    const boundRender = SheetCommon._render.bind(this);
+    boundRender(...args);
+  }
 }
 
 export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
@@ -330,5 +343,14 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
 
     logger.debug('getData#context:', context);
     return context;
+  }
+
+  /* supressing display of spell slot counts */
+  async _render(...args) {
+    await super._render(...args);
+
+    /* call the common _render by binding (pretend its our own method) */
+    const boundRender = SheetCommon._render.bind(this);
+    boundRender(...args);
   }
 }
