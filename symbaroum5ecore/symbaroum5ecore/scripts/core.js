@@ -9,6 +9,7 @@
 import { COMMON } from './common.js';
 import { logger } from './logger.js';
 import { SheetCommon, Syb5eActorSheetCharacter, Syb5eActorSheetNPC } from './modules/actor-sheet.js'
+import { SYB5E } from './config.js'
 
 /**
  * Sub Modules
@@ -20,6 +21,7 @@ import { SheetCommon, Syb5eActorSheetCharacter, Syb5eActorSheetNPC } from './mod
 
 const SUB_MODULES = {
   COMMON,
+  SYB5E,
   logger,
   SheetCommon,
   Syb5eActorSheetCharacter,
