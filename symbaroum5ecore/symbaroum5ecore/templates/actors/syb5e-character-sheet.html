@@ -185,7 +185,7 @@
                 {{!-- Body Attributes --}}
 
                 {{!-- Corruption Row --}}
-                {{> "modules/symbaroum-5e-core/templates/actors/parts/actor-corruption.html"}}
+                {{> "modules/symbaroum5ecore/templates/actors/parts/actor-corruption.html"}}
 
                 {{!-- Resources Row --}}
                 <ul class="attributes flexrow">
@@ -269,6 +269,10 @@
         {{!-- Biography Tab --}}
         <div class="tab flexrow" data-group="primary" data-tab="biography">
             <div class="characteristics flexcol">
+
+                {{!-- Shadow Text Box --}}
+                {{> "modules/symbaroum5ecore/templates/actors/parts/actor-shadow.html"}}
+
                 <label>{{ localize "DND5E.Appearance" }}</label>
                 <textarea name="data.details.appearance">{{data.details.appearance}}</textarea>
                 <label>{{ localize "DND5E.PersonalityTraits" }}</label>

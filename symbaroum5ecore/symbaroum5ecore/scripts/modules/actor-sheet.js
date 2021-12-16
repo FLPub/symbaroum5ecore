@@ -6,6 +6,7 @@ export class SheetCommon {
   /** SETUP **/
   static register() {
     this.patch();
+    this.globals();
   }
 
   static patch() {
@@ -15,8 +16,10 @@ export class SheetCommon {
   static _patchActor() {
 
     COMMON.CLASSES.Actor5e.prototype.getCorruption = function() {
-      let corruption = this.getFlag(COMMON.DATA.name, SheetCommon.FLAGS.corruption)
+      let corruption = this.getFlag(COMMON.DATA.name, SheetCommon.FLAGS.corruption) ?? SheetCommon.DEFAULT_FLAGS[SheetCommon.FLAGS.corruption]
+      
       corruption.value = corruption.temp + corruption.permanent;
+      
       return corruption;
     };
 
@@ -25,14 +28,31 @@ export class SheetCommon {
       await this.setFlag(COMMON.DATA.name, SheetCommon.FLAGS.corruption, corruption);
       return;
     }
+
+    COMMON.CLASSES.Actor5e.prototype.getShadow = function() {
+      const shadow = this.getFlag(COMMON.DATA.name, SheetCommon.FLAGS.shadow) ?? SheetCommon.DEFAULT_FLAGS[SheetCommon.FLAGS.shadow];
+      return shadow;
+    }
+
+    COMMON.CLASSES.Actor5e.prototype.getManner = function() {
+      const shadow = this.getFlag(COMMON.DATA.name, SheetCommon.FLAGS.manner) ?? SheetCommon.DEFAULT_FLAGS[SheetCommon.FLAGS.manner];
+      return shadow;
+    }
+  }
+
+  static globals() {
+    game.syb5e.debug.initActor = this.reInitActor
   }
 
   /** \SETUP **/
 
+  /** DEFAULT DATA AND PATHS **/
   static get FLAGS() {
     return {
       initialized: 'initialized',
-      corruption: 'corruption'
+      corruption: 'corruption',
+      manner: 'manner',
+      shadow: 'shadow'
     }
   }
 
@@ -45,7 +65,9 @@ export class SheetCommon {
             permanent: 0,
             value: 0,
             max: 0
-        }
+        },
+        [this.FLAGS.manner]: '',
+        [this.FLAGS.shadow]: '',
       }
     }
   }
@@ -59,28 +81,9 @@ export class SheetCommon {
         permanent: `${root}.${this.FLAGS.corruption}.permanent`,
         value: undefined, //getter only
         max: `${root}.${this.FLAGS.corruption}.max`
-      }
-    }
-  }
-
-  static _initFlagData(actor, updateData) {
-    
-    /* check if we have already been initialized */
-    const needsInit = !(actor.getFlag(COMMON.DATA.name, SheetCommon.FLAGS.initialized) ?? false)
-    logger.debug(`${actor.name} needs syb init:`, needsInit);
-    
-    if (needsInit) {
-
-      /* get the default flag data */
-      let defaultFlagData = SheetCommon.DEFAULT_FLAGS;[COMMON.DATA.name]
-
-      /* calculate the initial corruption threshold */
-      defaultFlagData[COMMON.DATA.name][SheetCommon.FLAGS.corruption].max = SheetCommon._calcMaxCorruption(actor);
-
-      /* merge our new flag data into the actor's flags */
-      const initializedFlags = mergeObject(actor.data.flags, defaultFlagData, {inplace: false});
-      logger.debug(`Initializing ${actor.name} with default syb data:`, initializedFlags);
-      mergeObject(updateData.flags, initializedFlags);
+      },
+      [this.FLAGS.manner]: `${root}.${this.FLAGS.manner}`,
+      [this.FLAGS.shadow]: `${root}.${this.FLAGS.shadow}`
     }
   }
 
@@ -96,6 +99,60 @@ export class SheetCommon {
     COMMON[sheetClass.NAME].id = `${COMMON[sheetClass.NAME].scope}.${COMMON[sheetClass.NAME].sheetClass.name}`
   }
 
+  /** \DEFAULTS **/
+
+  /** SYB DATA SETUP **/
+
+  /* @param actor : actor document to initialize
+   * @param overwrite : force default values regardless of current flag data
+   */
+  static _flagInitData(actor, overwrite = false) {
+
+    /* get the default flag data */
+    let defaultFlagData = SheetCommon.DEFAULT_FLAGS;
+
+    /* calculate the initial corruption threshold */
+    defaultFlagData[COMMON.DATA.name][SheetCommon.FLAGS.corruption].max = SheetCommon._calcMaxCorruption(actor);
+
+    /* if overwriting, force our default values, otherwise merge our new flag data into the actor's flags */
+    const initializedFlags = overwrite ? defaultFlagData : mergeObject(actor.data.flags, defaultFlagData, {inplace: false});
+    logger.debug(`Initializing ${actor.name} with default syb data:`, initializedFlags);
+
+    return initializedFlags;
+  }
+
+  /* Initializes SYB5E-specific data if this actor has not been initialized before */
+  static _initFlagData(actor, updateData) {
+    
+    /* check if we have already been initialized */
+    const needsInit = !(actor.getFlag(COMMON.DATA.name, SheetCommon.FLAGS.initialized) ?? false)
+    logger.debug(`${actor.name} needs syb init:`, needsInit);
+    
+    if (needsInit) {
+
+      /* gracefully merge */
+      const initializedFlags = SheetCommon._flagInitData(actor, false);
+
+      mergeObject(updateData.flags, initializedFlags);
+    }
+  }
+
+  static async reInitActor(actor, overwrite) {
+    const initializedFlags = SheetCommon._flagInitData(actor, overwrite);
+    
+    /* clear out any old data */
+    await actor.update({[`flags.-=${COMMON.DATA.name}`]: null});
+
+    /* set our default data */
+    await actor.update({flags: initializedFlags});
+
+    return actor.data.flags[COMMON.DATA.name];
+  }
+
+  /** \SYB DATA SETUP **/ 
+
+  /** COMMON SHEET OPS **/ 
+
   /* Common context data between characters and NPCs */
   static _getCommonData(actor) {
 
@@ -105,12 +162,21 @@ export class SheetCommon {
       data: {
         attributes: {
           corruption: actor.getCorruption()
+        },
+        details: {
+          shadow: actor.getShadow()
         }
       }
     }
   }
 
-  /* ensures we have the data needed for the symbaroum system */
+  /** \COMMON **/
+
+  /** HOOKS **/
+
+  /* ensures we have the data needed for the symbaroum system when
+   * the SYB sheet is chosen for the first time
+   */
   static _preUpdateActor(actor, updateData /*, options, user */) {
 
     const sheetClass = COMMON[this.NAME].id;
@@ -124,6 +190,8 @@ export class SheetCommon {
     }
 
   }
+
+  /** \HOOKS **/
 
   static commonListeners(html) {
     
@@ -225,6 +293,16 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
     Hooks.on('preUpdateActor', SheetCommon._preUpdateActor.bind(this));
   }
 
+  static _getNpcData(actor) {
+    return {
+      data: {
+        details: {
+          manner: actor.getManner()
+        }
+      }
+    }
+  }
+
   /** OVERRIDES **/
   activateListeners(html) {
     super.activateListeners(html);
@@ -247,8 +325,11 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
 
   getData() {
     let context = super.getData();
-
     mergeObject(context, SheetCommon._getCommonData(this.actor));
+
+    /* NPCs also have a small 'manner' field describing how they generally act */
+    mergeObject(context, Syb5eActorSheetNPC._getNpcData(this.actor));
+
     logger.debug('getData#context:', context);
     return context;
   }
