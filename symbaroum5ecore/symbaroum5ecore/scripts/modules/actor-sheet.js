@@ -1,5 +1,6 @@
 import { COMMON } from '../common.js'
 import { logger } from '../logger.js';
+import { SYB5E } from '../config.js'
 
 export class SheetCommon {
 
@@ -16,26 +17,30 @@ export class SheetCommon {
   static _patchActor() {
 
     COMMON.CLASSES.Actor5e.prototype.getCorruption = function() {
-      let corruption = this.getFlag(COMMON.DATA.name, SheetCommon.FLAGS.corruption) ?? SheetCommon.DEFAULT_FLAGS[SheetCommon.FLAGS.corruption]
+      const keys = SheetCommon.FLAG_KEY.corruption;
+
+      let corruption = this.getFlag(COMMON.DATA.name, keys.root) ?? SheetCommon.DEFAULT_FLAGS[keys.root]
       
-      corruption.value = corruption.temp + corruption.permanent;
+      corruption.value = corruption[keys.temp] + corruption[keys.permanent];
       
       return corruption;
     };
 
     COMMON.CLASSES.Actor5e.prototype.setCorruption = async function ({temp, permanent, max}) {
-      const corruption = Object.assign(this.getCorruption(), {temp, permanent, max});
-      await this.setFlag(COMMON.DATA.name, SheetCommon.FLAGS.corruption, corruption);
+      const keys = SheetCommon.FLAG_KEY.corruption;
+
+      const corruption = Object.assign(this.getCorruption(), {[keys.temp]: temp, [keys.permanent]: permanent, [keys.max]: max});
+      await this.setFlag(COMMON.DATA.name, SheetCommon.FLAG_KEY.corruption.root, corruption);
       return;
     }
 
     COMMON.CLASSES.Actor5e.prototype.getShadow = function() {
-      const shadow = this.getFlag(COMMON.DATA.name, SheetCommon.FLAGS.shadow) ?? SheetCommon.DEFAULT_FLAGS[SheetCommon.FLAGS.shadow];
+      const shadow = this.getFlag(COMMON.DATA.name, SheetCommon.FLAG_KEY.shadow) ?? SheetCommon.DEFAULT_FLAGS[SheetCommon.FLAG_KEY.shadow];
       return shadow;
     }
 
     COMMON.CLASSES.Actor5e.prototype.getManner = function() {
-      const shadow = this.getFlag(COMMON.DATA.name, SheetCommon.FLAGS.manner) ?? SheetCommon.DEFAULT_FLAGS[SheetCommon.FLAGS.manner];
+      const shadow = this.getFlag(COMMON.DATA.name, SheetCommon.FLAG_KEY.manner) ?? SheetCommon.DEFAULT_FLAGS[SheetCommon.FLAG_KEY.manner];
       return shadow;
     }
   }
@@ -47,44 +52,16 @@ export class SheetCommon {
   /** \SETUP **/
 
   /** DEFAULT DATA AND PATHS **/
-  static get FLAGS() {
-    return {
-      initialized: 'initialized',
-      corruption: 'corruption',
-      manner: 'manner',
-      shadow: 'shadow'
-    }
+  static get FLAG_KEY() {
+    return game.syb5e.CONFIG.FLAG_KEY;
   }
 
   static get DEFAULT_FLAGS() {
-    return {
-      [COMMON.DATA.name]: {
-        [this.FLAGS.initialized]: true,
-        [this.FLAGS.corruption]: {
-            temp: 0,
-            permanent: 0,
-            value: 0,
-            max: 0
-        },
-        [this.FLAGS.manner]: '',
-        [this.FLAGS.shadow]: '',
-      }
-    }
+    return game.syb5e.CONFIG.DEFAULT_FLAGS;
   }
 
-  static get SYB5E_PATHS() {
-    const root = `flags.${COMMON.DATA.name}`;
-    return {
-      [this.FLAGS.initialized]: `${root}.${this.FLAGS.initialized}`,
-      [this.FLAGS.corruption]: {
-        temp: `${root}.${this.FLAGS.corruption}.temp`,
-        permanent: `${root}.${this.FLAGS.corruption}.permanent`,
-        value: undefined, //getter only
-        max: `${root}.${this.FLAGS.corruption}.max`
-      },
-      [this.FLAGS.manner]: `${root}.${this.FLAGS.manner}`,
-      [this.FLAGS.shadow]: `${root}.${this.FLAGS.shadow}`
-    }
+  static get PATHS() {
+    return game.syb5e.CONFIG.PATHS;
   }
 
   static defaults(sheetClass) {
@@ -112,7 +89,7 @@ export class SheetCommon {
     let defaultFlagData = SheetCommon.DEFAULT_FLAGS;
 
     /* calculate the initial corruption threshold */
-    defaultFlagData[COMMON.DATA.name][SheetCommon.FLAGS.corruption].max = SheetCommon._calcMaxCorruption(actor);
+    defaultFlagData[COMMON.DATA.name][SheetCommon.FLAG_KEY.corruption.root].max = SheetCommon._calcMaxCorruption(actor);
 
     /* if overwriting, force our default values, otherwise merge our new flag data into the actor's flags */
     const initializedFlags = overwrite ? defaultFlagData : mergeObject(actor.data.flags, defaultFlagData, {inplace: false});
@@ -125,7 +102,7 @@ export class SheetCommon {
   static _initFlagData(actor, updateData) {
     
     /* check if we have already been initialized */
-    const needsInit = !(actor.getFlag(COMMON.DATA.name, SheetCommon.FLAGS.initialized) ?? false)
+    const needsInit = !(actor.getFlag(COMMON.DATA.name, SheetCommon.FLAG_KEY.initialized) ?? false)
     logger.debug(`${actor.name} needs syb init:`, needsInit);
     
     if (needsInit) {
@@ -158,7 +135,7 @@ export class SheetCommon {
 
     /* Add in our corruption values in 'data.attributes' */
     return {
-      sybPaths: SheetCommon.SYB5E_PATHS,
+      sybPaths: SheetCommon.PATHS,
       data: {
         attributes: {
           corruption: actor.getCorruption()
@@ -168,6 +145,10 @@ export class SheetCommon {
         }
       }
     }
+  }
+
+  static _render(){
+    this.element.find('.spell-slots').css('display', 'none');
   }
 
   /** \COMMON **/
@@ -262,8 +243,38 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
     let context = super.getData();
 
     mergeObject(context, SheetCommon._getCommonData(this.actor));
+
+    /* get max spell level based
+     * on highest class progression
+     * NOTE: this is probably excessive
+     *   but since its a single display value
+     *   we want to show the higest value
+     */
+    const maxLevel = Object.values(context.data.classes).reduce( (acc, cls) => {
+
+      const progression = cls.spellcasting.progression;
+      const spellLevel = SYB5E.CONFIG.SPELL_PROGRESSION[progression][cls.levels];
+      
+      return spellLevel > acc ? spellLevel : acc;
+      
+    },0);
+
+    context.maxSpellLevel = {
+      value: maxLevel,
+      label: SYB5E.CONFIG.LEVEL_SHORT[maxLevel]
+    }
+
     logger.debug('getData#context:', context);
     return context;
+  }
+
+  /* supressing display of spell slot counts */
+  async _render(...args) {
+    await super._render(...args);
+
+    /* call the common _render by binding (pretend its our own method) */
+    const boundRender = SheetCommon._render.bind(this);
+    boundRender(...args);
   }
 }
 
@@ -332,5 +343,14 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
 
     logger.debug('getData#context:', context);
     return context;
+  }
+
+  /* supressing display of spell slot counts */
+  async _render(...args) {
+    await super._render(...args);
+
+    /* call the common _render by binding (pretend its our own method) */
+    const boundRender = SheetCommon._render.bind(this);
+    boundRender(...args);
   }
 }
