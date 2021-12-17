@@ -152,6 +152,10 @@ export class SheetCommon {
     this.element.find('.spell-slots').css('display', 'none');
   }
 
+  static _onItemRoll(event) {
+    logger.debug('SYB Roll');
+  }
+
   /** \COMMON **/
 
   /** HOOKS **/
@@ -240,6 +244,7 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
     });
   }
 
+  /* TODO consider template injection like item-sheet */
   getData() {
     let context = super.getData();
 
@@ -276,6 +281,14 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
     /* call the common _render by binding (pretend its our own method) */
     const boundRender = SheetCommon._render.bind(this);
     boundRender(...args);
+  }
+
+  _onItemRoll(event){
+    const boundOnRoll = SheetCommon._onItemRoll.bind(this);
+
+    boundOnRoll(event);
+
+    return super._onItemRoll(event);
   }
 }
 
@@ -335,6 +348,7 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
     });
   }
 
+  /* TODO consider template injection like item-sheet */
   getData() {
     let context = super.getData();
     mergeObject(context, SheetCommon._getCommonData(this.actor));
@@ -353,5 +367,13 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
     /* call the common _render by binding (pretend its our own method) */
     const boundRender = SheetCommon._render.bind(this);
     boundRender(...args);
+  }
+
+  _onItemRoll(event){
+    const boundOnRoll = SheetCommon._onItemRoll.bind(this);
+
+    boundOnRoll(event);
+
+    return super._onItemRoll(event);
   }
 }
