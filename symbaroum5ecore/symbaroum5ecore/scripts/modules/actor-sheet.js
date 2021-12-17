@@ -14,6 +14,7 @@ export class SheetCommon {
     this._patchActor();
   }
 
+  /* TODO convert to getters (no need for setters) */
   static _patchActor() {
 
     COMMON.CLASSES.Actor5e.prototype.getCorruption = function() {

@@ -5,6 +5,8 @@ import { DND5E } from '../../../systems/dnd5e/module/config.js';
 import ActorSheet5eCharacter from '../../../systems/dnd5e/module/actor/sheets/character.js'
 import ActorSheet5eNPC from '../../../systems/dnd5e/module/actor/sheets/npc.js'
 import Actor5e from '../../../systems/dnd5e/module/actor/entity.js'
+import Item5e from '../../../systems/dnd5e/module/item/entity.js'
+
 /* Common operations and utilities for all
  * core submodules
  */
@@ -27,7 +29,8 @@ export class COMMON {
     DND5E,
     ActorSheet5eCharacter,
     ActorSheet5eNPC,
-    Actor5e
+    Actor5e,
+    Item5e
   };
 
   static NAME = this.name;
@@ -66,6 +69,7 @@ export class COMMON {
       `${COMMON.DATA.path}/templates/actors/parts/actor-shadow.html`,
       `${COMMON.DATA.path}/templates/actors/parts/npc-manner.html`,
       `${COMMON.DATA.path}/templates/actors/parts/character-max-spell.html`,
+      `${COMMON.DATA.path}/templates/items/parts/spell-favored.html`,
     ]);
 
   }
