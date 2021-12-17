@@ -28,7 +28,8 @@ export class SYB5E {
         max: 'max'
       },
       manner: 'manner',
-      shadow: 'shadow'
+      shadow: 'shadow',
+      favored: 'favored'
     };
 
     /* keys for spell progression */
@@ -37,7 +38,7 @@ export class SYB5E {
       half: 'half'
     }
 
-    /* The default values for syb5e data */
+    /* The default values for syb5e actor data */
     const corr_name = this.CONFIG.FLAG_KEY.corruption;
 
     globalThis.game.syb5e.CONFIG.DEFAULT_FLAGS = {
@@ -54,6 +55,14 @@ export class SYB5E {
       }
     }
 
+    /* The default values for syb5e item data */
+    globalThis.game.syb5e.CONFIG.DEFAULT_ITEM = {
+      [COMMON.DATA.name]: {
+        //[this.CONFIG.FLAG_KEY.initialized]: true,
+        [this.CONFIG.FLAG_KEY.favored]: false
+      }
+    }
+
     /* paths for syb flag data */
     const key = this.CONFIG.FLAG_KEY;
     const root = `flags.${COMMON.DATA.name}`;
@@ -67,7 +76,8 @@ export class SYB5E {
         [key.corruption.max]: `${root}.${key.corruption.root}.${key.corruption.max}`
       },
       [key.manner]: `${root}.${key.manner}`,
-      [key.shadow]: `${root}.${key.shadow}`
+      [key.shadow]: `${root}.${key.shadow}`,
+      [key.favored]: `${root}.${key.favored}`
     }
 
     /* spell progression (max spell level) */
