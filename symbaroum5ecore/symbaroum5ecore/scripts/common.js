@@ -95,5 +95,11 @@ export class COMMON {
     });
   }
 
+  static addGetter(object, fieldName, fn) {
+    Object.defineProperty(object, fieldName, {
+      get: fn
+    });
+  }
+
 }
 

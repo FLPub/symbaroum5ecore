@@ -21,16 +21,14 @@ export class Syb5eItemSheet {
   static _patchItem() {
 
     /* isFavored getter */
-    Object.defineProperty(COMMON.CLASSES.Item5e.prototype, 'isFavored', {
-      get: function() {
+    COMMON.addGetter(COMMON.CLASSES.Item5e.prototype, 'isFavored', function() {
         const key = SYB5E.CONFIG.FLAG_KEY.favored;
         const favored = this.getFlag(COMMON.DATA.name, key) ?? SYB5E.CONFIG.DEFAULT_ITEM[COMMON.DATA.name][key]
         return favored;
-      }
     });
   }
 
-  static async _renderItemSheet5e(sheet, html, options) {
+  static async _renderItemSheet5e(sheet, html/*, options*/) {
     /* need to insert checkbox for favored and put a favored 'badge' on the description tab */
     const item = sheet.item;
 

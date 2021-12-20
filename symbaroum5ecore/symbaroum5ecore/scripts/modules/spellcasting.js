@@ -24,10 +24,8 @@ export class Spellcasting {
   }
 
   static _patchItem() {
-    Object.defineProperty(COMMON.CLASSES.Item5e.prototype, 'corruption', {
-      get: function() {
+    COMMON.addGetter(COMMON.CLASSES.Item5e.prototype, 'corruption', function() {
         return Spellcasting._corruptionExpression(this);
-      }
     });
   }
 

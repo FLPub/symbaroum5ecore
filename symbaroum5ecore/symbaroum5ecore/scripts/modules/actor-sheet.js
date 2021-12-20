@@ -14,36 +14,25 @@ export class SheetCommon {
     this._patchActor();
   }
 
-  /* TODO convert to getters (no need for setters) */
   static _patchActor() {
 
-    COMMON.CLASSES.Actor5e.prototype.getCorruption = function() {
+    COMMON.addGetter(COMMON.CLASSES.Actor5e.prototype, 'corruption', function() {
       const keys = SheetCommon.FLAG_KEY.corruption;
-
       let corruption = this.getFlag(COMMON.DATA.name, keys.root) ?? SheetCommon.DEFAULT_FLAGS[keys.root]
-      
       corruption.value = corruption[keys.temp] + corruption[keys.permanent];
-      
       return corruption;
-    };
+    });
 
-    COMMON.CLASSES.Actor5e.prototype.setCorruption = async function ({temp, permanent, max}) {
-      const keys = SheetCommon.FLAG_KEY.corruption;
-
-      const corruption = Object.assign(this.getCorruption(), {[keys.temp]: temp, [keys.permanent]: permanent, [keys.max]: max});
-      await this.setFlag(COMMON.DATA.name, SheetCommon.FLAG_KEY.corruption.root, corruption);
-      return;
-    }
-
-    COMMON.CLASSES.Actor5e.prototype.getShadow = function() {
+    COMMON.addGetter(COMMON.CLASSES.Actor5e.prototype, 'shadow', function() {
       const shadow = this.getFlag(COMMON.DATA.name, SheetCommon.FLAG_KEY.shadow) ?? SheetCommon.DEFAULT_FLAGS[SheetCommon.FLAG_KEY.shadow];
       return shadow;
-    }
+    });
 
-    COMMON.CLASSES.Actor5e.prototype.getManner = function() {
+    COMMON.addGetter(COMMON.CLASSES.Actor5e.prototype, 'manner', function() {
       const shadow = this.getFlag(COMMON.DATA.name, SheetCommon.FLAG_KEY.manner) ?? SheetCommon.DEFAULT_FLAGS[SheetCommon.FLAG_KEY.manner];
       return shadow;
-    }
+    });
+
   }
 
   static globals() {
@@ -139,10 +128,10 @@ export class SheetCommon {
       sybPaths: SheetCommon.PATHS,
       data: {
         attributes: {
-          corruption: actor.getCorruption()
+          corruption: actor.corruption
         },
         details: {
-          shadow: actor.getShadow()
+          shadow: actor.shadow
         }
       }
     }
@@ -322,7 +311,7 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
     return {
       data: {
         details: {
-          manner: actor.getManner()
+          manner: actor.manner
         }
       }
     }
