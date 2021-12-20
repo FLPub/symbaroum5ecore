@@ -5,6 +5,8 @@ import { COMMON } from './common.js'
  */
 export class SYB5E {
 
+  static NAME = "SYB5E_CONFIG";
+
   static register() {
     this.globals();
   }

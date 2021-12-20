@@ -38,13 +38,10 @@ export class COMMON {
 
   /* runtime construction of basic information about this module */
   static build() {
-
-
     COMMON.hooks();
   }
 
   static register() {
-    logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: this.NAME}));
     COMMON.globals();
   }
 

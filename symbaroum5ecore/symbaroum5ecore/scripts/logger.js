@@ -30,7 +30,6 @@ export class logger {
   }
 
   static register(){
-    logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: this.NAME}));
     this.settings()
   }
 

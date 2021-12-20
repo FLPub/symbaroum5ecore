@@ -4,6 +4,8 @@ import { SYB5E } from '../config.js'
 
 export class SheetCommon {
 
+  static NAME = 'SheetCommon';
+
   /** SETUP **/
   static register() {
     this.patch();
@@ -142,7 +144,7 @@ export class SheetCommon {
   }
 
   static _onItemRoll(event) {
-    logger.debug('SYB Roll');
+    logger.debug('SYB Roll', event);
   }
 
   /** \COMMON **/
@@ -189,10 +191,10 @@ export class SheetCommon {
 
 export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharacter {
 
+  static NAME = "Syb5eActorSheetCharacter"
+
   static register(){
     this.defaults();
-
-    logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: this.NAME}));
 
     /* register our sheet */ 
     Actors.registerSheet(COMMON[this.NAME].scope, COMMON[this.NAME].sheetClass, {
@@ -283,10 +285,10 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
 
 export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
 
+  static NAME = "Syb5eActorSheetNPC"
+
   static register(){
     this.defaults();
-
-    logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: this.NAME}));
 
     /* register our sheet */ 
     Actors.registerSheet("dnd5e", Syb5eActorSheetNPC, {
