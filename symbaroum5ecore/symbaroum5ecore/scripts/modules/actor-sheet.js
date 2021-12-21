@@ -249,12 +249,7 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
 
     mergeObject(context, SheetCommon._getCommonData(this.actor));
 
-    const maxLevel = Spellcasting.maxSpellLevel(context.data.classes);
-
-    context.maxSpellLevel = {
-      value: maxLevel,
-      label: SYB5E.CONFIG.LEVEL_SHORT[maxLevel]
-    }
+    context.maxSpellLevel = Spellcasting.maxSpellLevel(context.data.classes);
 
     logger.debug('getData#context:', context);
     return context;

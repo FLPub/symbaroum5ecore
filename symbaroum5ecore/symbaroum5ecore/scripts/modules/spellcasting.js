@@ -41,6 +41,20 @@ export class Spellcasting {
     COMMON.addGetter(COMMON.CLASSES.Item5e.prototype, 'isFavored', function() {
       return Spellcasting._isFavored(this.data);
     });
+
+    const orig_spellChatData = COMMON.CLASSES.Item5e.prototype._spellChatData;
+    COMMON.CLASSES.Item5e.prototype._spellChatData = function(data, labels, props) {
+
+      /* should insert 2 labels -- level and components */
+      orig_spellChatData(data, labels, props);
+
+      /* add ours right after if we are consuming corruption */
+      if(SheetCommon.isSybActor(this.actor.data) && this.corruptionUse){
+        /* cantrips and favored spells have a flat corruption value */
+        const totalString = this.isFavored || (parseInt(this.data.data.level) === 0) ? '' : ` (${this.corruptionUse.total})`;
+        props.push(`${this.corruptionUse.expression}${totalString}`);
+      }
+    }
   }
 
   static _patchAbilityUseDialog() {
@@ -94,13 +108,24 @@ export class Spellcasting {
     const maxLevel = Object.values(classData).reduce( (acc, cls) => {
 
       const progression = cls.spellcasting.progression;
-      const spellLevel = SYB5E.CONFIG.SPELL_PROGRESSION[progression][cls.levels];
+      const progressionArray = SYB5E.CONFIG.SPELL_PROGRESSION[progression] ?? false;
+      if(progressionArray){
+        const spellLevel = SYB5E.CONFIG.SPELL_PROGRESSION[progression][cls.levels] ?? 0;
 
-      return spellLevel > acc ? spellLevel : acc;
+        return spellLevel > acc ? spellLevel : acc;
+      }
+
+      /* nothing to accumulate */
+      return acc;
 
     },0);
 
-    return maxLevel;
+    const result = {
+      value: maxLevel,
+      label: SYB5E.CONFIG.LEVEL_SHORT[maxLevel]
+    }
+
+    return maxLevel === 0 ? false : result;
   }
 
   static _isFavored(itemData) {
@@ -121,6 +146,10 @@ export class Spellcasting {
     /* cantrips have a level of "0" (string) for some reason */
     level = parseInt(level);
 
+    if(isNaN(level)){
+      return false
+    }
+
     if (Spellcasting._isFavored(itemData)) {
       /* favored cantrips cost 0, favored spells cost level */
       return level == 0 ? '0' : `${level}`
@@ -137,6 +166,7 @@ export class Spellcasting {
 
   static _getSpellData(actorData, itemData, returnData) {
     
+    let errors = [];
     /****************
      * Needed Info:
      * - spellLevels: {array} of {level: 1, label: '1st Level (0 Slots)', canCast: true, hasSlots: false}
@@ -148,7 +178,7 @@ export class Spellcasting {
     const maxLevel = Spellcasting.maxSpellLevel(actorData.classes);
     let spellLevels = [];
 
-    for(let level = 1; level<=maxLevel; level++){
+    for(let level = itemData.level; level<=maxLevel.value; level++){
       spellLevels.push({
         level,
         label: COMMON.localize( `DND5E.SpellLevel${level}`)+` (${Spellcasting._corruptionExpression(returnData.item, level)})`,
@@ -156,8 +186,12 @@ export class Spellcasting {
         hasSlots: true
       })
     }
+    
+    if(spellLevels.length < 1){
+      errors.push(COMMON.localize('SYB5E.Error.SpellLevelExceedsMax'))
+    }
 
-    const sybData = {note: '', errors: [], spellLevels, consumeSpellSlot: true, canUse: true}
+    const sybData = {note: '', errors, spellLevels, consumeSpellSlot: true, canUse: true}
     mergeObject(returnData, sybData);
   }
 
@@ -173,7 +207,20 @@ export class Spellcasting {
 
       /* roll for corruption */
       const corruptionExpression = item.corruption;
+      if(!corruptionExpression) {
+        /* for whatever reason, this item did not produce a valid corruption expression.
+         * Assume it is because we cannot actually cast
+         */
+        logger.warning(true, COMMON.localize('SYB5E.Error.ItemInvalidCorruptionExpression'));
+        return false;
+      }
       const gainedCorruption = new Roll(corruptionExpression).evaluate({async:false}).total;
+
+      /* store corruption info in item (temporary) */
+      item.corruptionUse = {
+        expression: corruptionExpression,
+        total: gainedCorruption
+      }
 
       /* field name shortcuts */
       const corruptionKey = SYB5E.CONFIG.FLAG_KEY.corruption;

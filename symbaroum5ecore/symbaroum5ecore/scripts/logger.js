@@ -22,11 +22,15 @@ export class logger {
 
   static warning(notify, ...args) {
     console.warn(`${COMMON?.DATA?.title || "" } | WARNING | `, ...args);
-    if(notify) this.notify(...args)
+    if(notify) this.warn(...args)
   }
 
   static notify(...args) {
     ui.notifications.notify(`${args[0]}`);
+  }
+
+  static warn(...args) {
+    ui.notifications.warn(`${args[0]}`);
   }
 
   static register(){

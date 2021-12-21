@@ -33,7 +33,7 @@ export class Syb5eItemSheet {
       if (sybActor) {
       
         /* if we are consuming a spell slot, treat it as adding corruption instead */
-        usageInfo.consumeCorruption = !!usageInfo.consumeSpellLevel
+        usageInfo.consumeCorruption = !!usageInfo.consumeSpellLevel || parseInt(this.data.data?.level) === 0;
 
         /* We are _never_ consuming spell slots in syb5e */
         usageInfo.consumeSpellLevel = null;
@@ -44,6 +44,11 @@ export class Syb5eItemSheet {
       /* now insert our needed information into the changes to be made to the actor */
       if (sybActor) {
         const sybUpdates = Spellcasting._getUsageUpdates(this, usageInfo);
+        if(!sybUpdates){
+          /* this item cannot be used -- likely due to incorrect max spell level */
+          logger.debug('Item cannot be used.');
+          return false;
+        }
         mergeObject(updates, sybUpdates);
       }
 
