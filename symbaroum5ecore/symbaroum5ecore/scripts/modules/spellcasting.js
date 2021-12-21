@@ -1,6 +1,7 @@
 import { COMMON } from '../common.js'
 import { logger } from '../logger.js';
 import { SYB5E } from '../config.js'
+import { SheetCommon } from './actor-sheet.js'
 
 /* Casting a Spell:
  * To cast a spell you take an appropriate action and gain tem-
@@ -33,12 +34,11 @@ export class Spellcasting {
 
   static _patchItem() {
     COMMON.addGetter(COMMON.CLASSES.Item5e.prototype, 'corruption', function() {
-        return Spellcasting._corruptionExpression(this.data);
+      return Spellcasting._corruptionExpression(this.data);
     });
 
     /* isFavored getter */
     COMMON.addGetter(COMMON.CLASSES.Item5e.prototype, 'isFavored', function() {
-
       return Spellcasting._isFavored(this.data);
     });
   }
@@ -47,16 +47,21 @@ export class Spellcasting {
     const wrapped = game.dnd5e.applications.AbilityUseDialog._getSpellData;
 
     game.dnd5e.applications.AbilityUseDialog._getSpellData = function(actorData, itemData, returnData) {
-      logger.debug(actorData, itemData, returnData);
       wrapped.bind(this)(actorData, itemData, returnData);
 
-      Spellcasting._getSpellData(actorData, itemData, returnData);
+      /* only modify the spell data if this is an syb actor */
+      if (SheetCommon.isSybActor(returnData.item?.document?.actor?.data)){
+        Spellcasting._getSpellData(actorData, itemData, returnData);
+      }
      
       logger.debug("_getSpellData result:", returnData);
     }
   }
 
   static _renderAbilityUseDialog(app, html, data){
+
+    /* only modify syb actors */
+    if(!SheetCommon.isSybActor(app.item?.actor?.data)) return;
 
     /* only modify spell use dialogs */
     if(app.item?.type !== 'spell') return;
@@ -152,7 +157,7 @@ export class Spellcasting {
       })
     }
 
-    const sybData = {note: 'Hello from SYB5E', errors: [], spellLevels, consumeSpellSlot: true, canUse: true}
+    const sybData = {note: '', errors: [], spellLevels, consumeSpellSlot: true, canUse: true}
     mergeObject(returnData, sybData);
   }
 

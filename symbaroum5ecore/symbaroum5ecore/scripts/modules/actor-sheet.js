@@ -40,6 +40,7 @@ export class SheetCommon {
 
   static globals() {
     game.syb5e.debug.initActor = this.reInitActor
+    game.syb5e.sheetClasses = [];
   }
 
   /** \SETUP **/
@@ -60,6 +61,7 @@ export class SheetCommon {
   static defaults(sheetClass) {
     sheetClass['NAME'] = sheetClass.name;
 
+    // TODO is this field in COMMON needed?
     COMMON[sheetClass.NAME] = {
       scope: 'dnd5e',
       sheetClass,
@@ -67,6 +69,9 @@ export class SheetCommon {
 
     /* need to use our own defaults to set our defaults */
     COMMON[sheetClass.NAME].id = `${COMMON[sheetClass.NAME].scope}.${COMMON[sheetClass.NAME].sheetClass.name}`
+
+    /* store this information in a better place */
+    game.syb5e.sheetClasses.push(COMMON[sheetClass.NAME]);
   }
 
   /** \DEFAULTS **/
@@ -123,6 +128,12 @@ export class SheetCommon {
 
   /** COMMON SHEET OPS **/ 
 
+  static isSybActor(actorData = {}) {
+    const sheetClassId = getProperty(actorData, 'flags.core.sheetClass'); 
+    const found = game.syb5e.sheetClasses.find( classInfo => classInfo.id === sheetClassId );
+    return !!found;
+  }
+
   /* Common context data between characters and NPCs */
   static _getCommonData(actor) {
 
@@ -142,10 +153,6 @@ export class SheetCommon {
 
   static _render(){
     this.element.find('.spell-slots').css('display', 'none');
-  }
-
-  static _onItemRoll(event) {
-    logger.debug('SYB Roll', event);
   }
 
   /** \COMMON **/
@@ -261,14 +268,7 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
     const boundRender = SheetCommon._render.bind(this);
     boundRender(...args);
   }
-
-  _onItemRoll(event){
-    const boundOnRoll = SheetCommon._onItemRoll.bind(this);
-
-    boundOnRoll(event);
-
-    return super._onItemRoll(event);
-  }
+  
 }
 
 export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {

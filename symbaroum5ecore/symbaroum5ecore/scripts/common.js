@@ -53,7 +53,7 @@ export class COMMON {
 
     /* register our namespace */
     globalThis.game.syb5e = {
-      debug: {}
+      debug: {},
     };
    
   }
