@@ -23,13 +23,6 @@ export class Syb5eItemSheet {
 
   static _patchItem() {
 
-    /* isFavored getter */
-    COMMON.addGetter(COMMON.CLASSES.Item5e.prototype, 'isFavored', function() {
-        const key = SYB5E.CONFIG.FLAG_KEY.favored;
-        const favored = this.getFlag(COMMON.DATA.name, key) ?? SYB5E.CONFIG.DEFAULT_ITEM[COMMON.DATA.name][key]
-        return favored;
-    });
-
     const wrapped = COMMON.CLASSES.Item5e.prototype._getUsageUpdates;
     COMMON.CLASSES.Item5e.prototype._getUsageUpdates = function(usageInfo) {
 

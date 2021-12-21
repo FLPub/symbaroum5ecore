@@ -19,6 +19,7 @@ export class Spellcasting {
 
   static register() {
     this.patch();
+    this.hooks();
   }
 
   static patch() {
@@ -26,9 +27,19 @@ export class Spellcasting {
     this._patchAbilityUseDialog();
   }
 
+  static hooks() {
+    Hooks.on('renderAbilityUseDialog', this._renderAbilityUseDialog);
+  }
+
   static _patchItem() {
     COMMON.addGetter(COMMON.CLASSES.Item5e.prototype, 'corruption', function() {
-        return Spellcasting._corruptionExpression(this);
+        return Spellcasting._corruptionExpression(this.data);
+    });
+
+    /* isFavored getter */
+    COMMON.addGetter(COMMON.CLASSES.Item5e.prototype, 'isFavored', function() {
+
+      return Spellcasting._isFavored(this.data);
     });
   }
 
@@ -39,13 +50,86 @@ export class Spellcasting {
       logger.debug(actorData, itemData, returnData);
       wrapped.bind(this)(actorData, itemData, returnData);
 
-      const sybResult = Spellcasting._getSpellData(actorData, itemData, returnData);
-      mergeObject(returnData, sybResult);
+      Spellcasting._getSpellData(actorData, itemData, returnData);
+     
       logger.debug("_getSpellData result:", returnData);
     }
   }
 
+  static _renderAbilityUseDialog(app, html, data){
+
+    /* only modify spell use dialogs */
+    if(app.item?.type !== 'spell') return;
+
+    const element = html.find('[name="consumeSlot"]');
+
+    /* get all text elements */
+    const textNodes = element.parent().contents().filter( function() {return this.nodeType === 3} )
+
+    if(textNodes.length !== 1){
+      logger.error(COMMON.localize('SYB5E.Error.HTMLParse'));
+    }
+
+    textNodes[0].textContent = COMMON.localize('SYB5E.GainCorruptionQ');
+
+    return;
+  }
+
   /* MECHANICS HELPERS */
+
+  /* get max spell level based
+   * on highest class progression
+   * NOTE: this is probably excessive
+   *   but since its a single display value
+   *   we want to show the higest value
+   * @param classData {array<classItemData>}
+   */
+  static maxSpellLevel(classData) {
+    
+    const maxLevel = Object.values(classData).reduce( (acc, cls) => {
+
+      const progression = cls.spellcasting.progression;
+      const spellLevel = SYB5E.CONFIG.SPELL_PROGRESSION[progression][cls.levels];
+
+      return spellLevel > acc ? spellLevel : acc;
+
+    },0);
+
+    return maxLevel;
+  }
+
+  static _isFavored(itemData) {
+    const key = SYB5E.CONFIG.FLAG_KEY.favored;
+    
+    const defaultVal = SYB5E.CONFIG.DEFAULT_ITEM[COMMON.DATA.name][key]
+    const favored = getProperty(itemData, SYB5E.CONFIG.PATHS[key]) ?? defaultVal;
+    return favored;
+  }
+
+  static _corruptionExpression(itemData, level = itemData.data.level) {
+
+    /* non-spells can't corrupt */
+    if (itemData.type !== 'spell'){
+      return
+    }
+
+    /* cantrips have a level of "0" (string) for some reason */
+    level = parseInt(level);
+
+    if (Spellcasting._isFavored(itemData)) {
+      /* favored cantrips cost 0, favored spells cost level */
+      return level == 0 ? '0' : `${level}`
+    }
+
+    /* cantrips cost 1, leveled spells are 1d4+level */
+    return level == 0? '1' : `1d4 + ${level}`;
+
+  }
+
+  /** \MECHANICS HELPERS **/
+
+  /** PATCH FUNCTIONS **/
+
   static _getSpellData(actorData, itemData, returnData) {
     
     /****************
@@ -56,8 +140,20 @@ export class Spellcasting {
      * - consumeSpellSlot: {boolean}: always true (consume slot = add corruption)
      * - canUse: {boolean}: always true? exceeding max corruption is a choice
      */
+    const maxLevel = Spellcasting.maxSpellLevel(actorData.classes);
+    let spellLevels = [];
 
-    return {note: 'Hello from SYB5E', errors: []}
+    for(let level = 1; level<=maxLevel; level++){
+      spellLevels.push({
+        level,
+        label: COMMON.localize( `DND5E.SpellLevel${level}`)+` (${Spellcasting._corruptionExpression(returnData.item, level)})`,
+        canCast: true,
+        hasSlots: true
+      })
+    }
+
+    const sybData = {note: 'Hello from SYB5E', errors: [], spellLevels, consumeSpellSlot: true, canUse: true}
+    mergeObject(returnData, sybData);
   }
 
   static _getUsageUpdates(item, {consumeCorruption}) {
@@ -92,26 +188,5 @@ export class Spellcasting {
     return {actorUpdates, itemUpdates, resourceUpdates};
 
   }
-
-  static _corruptionExpression(item) {
-
-    /* non-spells can't corrupt */
-    if (item.type !== 'spell'){
-      return
-    }
-
-    /* cantrips have a level of "0" (string) for some reason */
-    const level = parseInt(item.data.data.level);
-
-    if (item.isFavored) {
-      /* favored cantrips cost 0, favored spells cost level */
-      return level == 0 ? '0' : `${level}`
-    }
-
-    /* cantrips cost 1, leveled spells are 1d4+level */
-    return level == 0? '1' : `1d4 + ${level}`;
-
-  }
-
 
 }

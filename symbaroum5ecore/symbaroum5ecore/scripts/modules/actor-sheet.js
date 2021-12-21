@@ -1,6 +1,7 @@
 import { COMMON } from '../common.js'
 import { logger } from '../logger.js';
 import { SYB5E } from '../config.js'
+import { Spellcasting } from './spellcasting.js'
 
 export class SheetCommon {
 
@@ -241,20 +242,7 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
 
     mergeObject(context, SheetCommon._getCommonData(this.actor));
 
-    /* get max spell level based
-     * on highest class progression
-     * NOTE: this is probably excessive
-     *   but since its a single display value
-     *   we want to show the higest value
-     */
-    const maxLevel = Object.values(context.data.classes).reduce( (acc, cls) => {
-
-      const progression = cls.spellcasting.progression;
-      const spellLevel = SYB5E.CONFIG.SPELL_PROGRESSION[progression][cls.levels];
-      
-      return spellLevel > acc ? spellLevel : acc;
-      
-    },0);
+    const maxLevel = Spellcasting.maxSpellLevel(context.data.classes);
 
     context.maxSpellLevel = {
       value: maxLevel,
