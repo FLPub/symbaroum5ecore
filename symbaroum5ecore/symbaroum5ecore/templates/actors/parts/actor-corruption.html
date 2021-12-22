@@ -1,7 +1,14 @@
 {{!-- TODO cement CSS --}}
 <ul class="attributes flexrow">
   <li class="attribute resource" style="height:auto;">
-    <h4 class="attribute-name box-title">{{ localize "SYB5E.Corruption"}}</h4>
+    <div class="flexrow">
+      <h4 class="attribute-name box-title" style="text-align:right;">{{ localize "SYB5E.Corruption.Label"}}</h4>
+      <div style="text-align:left;">
+        <select name="{{corruptionAbilities.path}}" data-type="String">
+          {{selectOptions corruptionAbilities.abilities selected=corruptionAbilities.current nameAttr="ability" labelAttr="label"}}
+        </select>
+      </div>
+    </div>
     <div class="attribute-value" style="height:auto;">
       {{#if isCharacter}}
       <label class="flexcol">
@@ -23,7 +30,7 @@
       {{/if}}
       <span> / </span>
       <label class="flexcol">
-        <input type="number"  name="{{sybPaths.corruption.max}}" value="{{data.attributes.corruption.max}}" />
+        <input type="number"  name="{{sybPaths.corruption.max}}" value="{{data.attributes.corruption.max}}" {{corruptionAbilities.disabled}} />
 
         <span class="attribute-footer">{{ localize "SYB5E.Threshold"}}</span>
       </label>

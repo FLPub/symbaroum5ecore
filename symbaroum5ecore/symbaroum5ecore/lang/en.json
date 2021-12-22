@@ -10,6 +10,11 @@
       "NPC": {
         "Label": "Symbaroum 5e NPC"
       }
+    },
+    "Corruption": {
+      "Label": "Corruption",
+      "ShortDesc": "Current Corruption: {value}/{max}",
+      "Custom": "Custom"
     }
   }
 }

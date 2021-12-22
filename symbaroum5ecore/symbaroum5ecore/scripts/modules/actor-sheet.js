@@ -23,6 +23,7 @@ export class SheetCommon {
       const keys = SheetCommon.FLAG_KEY.corruption;
       let corruption = this.getFlag(COMMON.DATA.name, keys.root) ?? SheetCommon.DEFAULT_FLAGS[keys.root]
       corruption.value = corruption[keys.temp] + corruption[keys.permanent];
+      corruption.max = SheetCommon._calcMaxCorruption(this);
       return corruption;
     });
 
@@ -139,7 +140,7 @@ export class SheetCommon {
 
     /* Add in our corruption values in 'data.attributes' */
     return {
-      sybPaths: SheetCommon.PATHS,
+      sybPaths: game.syb5e.CONFIG.PATHS,
       data: {
         attributes: {
           corruption: actor.corruption
@@ -186,12 +187,33 @@ export class SheetCommon {
 
   /* Corruption Threshold = (prof * 2) + charisma mod; minimum 2
    * Source: PGpg37
+   * or if full caster (prof + spellcastingMod) * 2
    */
   static _calcMaxCorruption(actor) {
-    const prof = actor.data.data.prof.flat; 
-    const chaMod = actor.data.data.abilities.cha.mod;
+    
+    const CONFIG = game.syb5e.CONFIG;
+    const paths = CONFIG.PATHS;
+    const corruptionAbility = getProperty(actor.data, paths.corruption.ability);
+    /* if we are in a custom max mode, just return the current stored max */
+    if(corruptionAbility === 'custom'){
+      return getProperty(actor.data, paths.corruption.max);
+    }
 
-    return Math.max( chaMod + prof * 2, 2 );
+    const usesSpellcasting = corruptionAbility === 'spellcasting' ? true : false;
+
+    /* otherwise determine corruption calc -- full casters get a special one */
+    const {fullCaster} = Spellcasting.maxSpellLevel(Object.values(actor.classes).map( item => item.data.data ));
+
+    const prof = actor.data.data.prof.flat; 
+
+    const corrAbility = usesSpellcasting ? actor.data.data.attributes.spellcasting : corruptionAbility;
+    const corrMod = actor.data.data.abilities[corrAbility].mod;
+
+    if(fullCaster) {
+      return (prof + corrMod) * 2;
+    }
+
+    return fullCaster ? (prof + corrMod) * 2 : Math.max( corrMod + prof * 2, 2 );
   }
 
   /** \MECHANICS HELPERS **/
@@ -248,8 +270,23 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
     let context = super.getData();
 
     mergeObject(context, SheetCommon._getCommonData(this.actor));
+    const maxLevelResult = Spellcasting.maxSpellLevel(context.data.classes);
+    context.maxSpellLevel = maxLevelResult.level === 0 ? false : maxLevelResult;
 
-    context.maxSpellLevel = Spellcasting.maxSpellLevel(context.data.classes);
+    let corruptionAbilities = Object.entries(context.data.abilities).reduce( (acc, [key, val]) => {
+      acc.push({ability: key, label: val.label}) 
+      return acc;
+    },[{ability: 'spellcasting', label: COMMON.localize('DND5E.Spellcasting')},
+       {ability: 'custom', label: COMMON.localize('SYB5E.Corruption.Custom')}]);
+
+    context.corruptionAbilities = {
+      path: game.syb5e.CONFIG.PATHS.corruption.ability,
+      abilities: corruptionAbilities,
+      current: getProperty(this.actor.data, game.syb5e.CONFIG.PATHS.corruption.ability)
+    }
+
+    /* can only edit max corruption if using a custom value */
+    context.corruptionAbilities.disabled = context.corruptionAbilities.current !== 'custom' ? 'disabled' : '';
 
     logger.debug('getData#context:', context);
     return context;

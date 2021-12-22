@@ -112,20 +112,21 @@ export class Spellcasting {
       if(progressionArray){
         const spellLevel = SYB5E.CONFIG.SPELL_PROGRESSION[progression][cls.levels] ?? 0;
 
-        return spellLevel > acc ? spellLevel : acc;
+        return spellLevel > acc.level ? {level: spellLevel, fullCaster: progression == 'full'} : acc;
       }
 
       /* nothing to accumulate */
       return acc;
 
-    },0);
+    },{level: 0, fullCaster: false});
 
     const result = {
-      value: maxLevel,
-      label: SYB5E.CONFIG.LEVEL_SHORT[maxLevel]
+      level: maxLevel.level,
+      label: SYB5E.CONFIG.LEVEL_SHORT[maxLevel.level],
+      fullCaster: maxLevel.fullCaster
     }
 
-    return maxLevel === 0 ? false : result;
+    return result;
   }
 
   static _isFavored(itemData) {
@@ -178,7 +179,7 @@ export class Spellcasting {
     const maxLevel = Spellcasting.maxSpellLevel(actorData.classes);
     let spellLevels = [];
 
-    for(let level = itemData.level; level<=maxLevel.value; level++){
+    for(let level = itemData.level; level<=maxLevel.level; level++){
       spellLevels.push({
         level,
         label: COMMON.localize( `DND5E.SpellLevel${level}`)+` (${Spellcasting._corruptionExpression(returnData.item, level)})`,
@@ -191,7 +192,11 @@ export class Spellcasting {
       errors.push(COMMON.localize('SYB5E.Error.SpellLevelExceedsMax'))
     }
 
-    const sybData = {note: '', errors, spellLevels, consumeSpellSlot: true, canUse: true}
+    /* generate current corruption status as a reminder */
+    const {value, max} = returnData.item.document.actor.corruption;
+    const note = COMMON.localize('SYB5E.Corruption.ShortDesc',{value, max});
+
+    const sybData = {note, errors, spellLevels, consumeSpellSlot: true, canUse: true}
     mergeObject(returnData, sybData);
   }
 
