@@ -103,7 +103,7 @@ export class Spellcasting {
    *   we want to show the higest value
    * @param classData {array<classItemData>}
    */
-  static maxSpellLevel(classData) {
+  static maxSpellLevelByClass(classData) {
     
     const maxLevel = Object.values(classData).reduce( (acc, cls) => {
 
@@ -125,6 +125,38 @@ export class Spellcasting {
       label: SYB5E.CONFIG.LEVEL_SHORT[maxLevel.level],
       fullCaster: maxLevel.fullCaster
     }
+
+    return result;
+  }
+
+  /* highest spell level for an NPC:
+   * if a leveled caster, use that level as Full Caster
+   * if not and spellcasting stat is != 'none', use CR as full caster
+   * otherwise, no spellcasting
+   *
+   * @param actorData {ActorData} (i.e. actor.data)
+   */
+  static maxSpellLevelNPC(actorData){
+    
+    const spellStat = actorData.data.spellcasting ?? '' === '' ? false : actorData.data.spellcasting;
+    const casterLevel = actorData.data.details.spellLevel ?? 0;
+    const cr = Math.max(actorData.data.details.cr, 1);
+
+    /* has caster levels, assume full caster */
+    let result = {
+      level: 0,
+      label: '',
+      fullCaster: casterLevel > 0
+    }
+
+    /* modify max spell level if full caster or has a casting stat */
+    if (result.fullCaster) {
+      result.level = game.syb5e.CONFIG.SPELL_PROGRESSION['full'][casterLevel]; 
+    } else if (spellStat) {
+      result.level = game.syb5e.CONFIG.SPELL_PROGRESSION['full'][cr];
+    } 
+
+    result.label = game.syb5e.CONFIG.LEVEL_SHORT[result.level];
 
     return result;
   }
@@ -176,7 +208,7 @@ export class Spellcasting {
      * - consumeSpellSlot: {boolean}: always true (consume slot = add corruption)
      * - canUse: {boolean}: always true? exceeding max corruption is a choice
      */
-    const maxLevel = Spellcasting.maxSpellLevel(actorData.classes);
+    const maxLevel = Spellcasting.maxSpellLevelByClass(actorData.classes);
     let spellLevels = [];
 
     for(let level = itemData.level; level<=maxLevel.level; level++){

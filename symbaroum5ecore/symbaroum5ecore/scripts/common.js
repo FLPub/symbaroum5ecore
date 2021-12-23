@@ -1,5 +1,3 @@
-import { logger } from './logger.js';
-
 /* DND5E Class Imports */
 import { DND5E } from '../../../systems/dnd5e/module/config.js';
 import ActorSheet5eCharacter from '../../../systems/dnd5e/module/actor/sheets/character.js'

@@ -1,6 +1,5 @@
 import { COMMON } from '../common.js'
 import { logger } from '../logger.js';
-import { SYB5E } from '../config.js'
 import { Spellcasting } from './spellcasting.js'
 
 export class SheetCommon {
@@ -135,12 +134,41 @@ export class SheetCommon {
     return !!found;
   }
 
-  /* Common context data between characters and NPCs */
-  static _getCommonData(actor) {
+  static _getCorruptionAbilityData(actor, contextAbilities) {
 
+    let defaultEntries = [];
+
+    /* if this actor has any spellcasting, allow it to be selected as corruption stat */
+    if (actor.data.data.attributes.spellcasting?.length > 0) {
+      defaultEntries.push({ability: 'spellcasting', label: COMMON.localize('DND5E.Spellcasting')});
+    }
+
+    defaultEntries.push({ability: 'custom', label: COMMON.localize('SYB5E.Corruption.Custom')});
+
+    const corruptionAbilities = Object.entries(contextAbilities).reduce( (acc, [key, val]) => {
+      acc.push({ability: key, label: val.label}) 
+      return acc;
+    },defaultEntries);
+
+    let corruptionAbilityData = {
+      path: game.syb5e.CONFIG.PATHS.corruption.ability,
+      abilities: corruptionAbilities,
+      current: getProperty(actor.data, game.syb5e.CONFIG.PATHS.corruption.ability)
+    }
+
+    /* can only edit max corruption if using a custom value */
+    corruptionAbilityData.disabled = corruptionAbilityData.current !== 'custom' ? 'disabled' : '';
+
+    return corruptionAbilityData
+  }
+
+  /* Common context data between characters and NPCs */
+  static _getCommonData(actor, context) {
+    
     /* Add in our corruption values in 'data.attributes' */
-    return {
+    const commonData = {
       sybPaths: game.syb5e.CONFIG.PATHS,
+      corruptionAbilities: SheetCommon._getCorruptionAbilityData(actor, context.data.abilities),
       data: {
         attributes: {
           corruption: actor.corruption
@@ -150,6 +178,8 @@ export class SheetCommon {
         }
       }
     }
+
+    mergeObject(context, commonData);
   }
 
   static _render(){
@@ -193,16 +223,20 @@ export class SheetCommon {
     
     const CONFIG = game.syb5e.CONFIG;
     const paths = CONFIG.PATHS;
-    const corruptionAbility = getProperty(actor.data, paths.corruption.ability);
+    const defaultAbility = game.syb5e.CONFIG.DEFAULT_FLAGS[COMMON.DATA.name].corruption.ability;
+    let corruptionAbility = getProperty(actor.data, paths.corruption.ability) ?? defaultAbility;
     /* if we are in a custom max mode, just return the current stored max */
     if(corruptionAbility === 'custom'){
       return getProperty(actor.data, paths.corruption.max);
     }
 
+    /* if corruption is set to use spellcasting, ensure we have a spellcasting stat as well */
+    corruptionAbility = corruptionAbility === 'spellcasting' && !actor.data.data.attributes.spellcasting ? defaultAbility : corruptionAbility;
+
     const usesSpellcasting = corruptionAbility === 'spellcasting' ? true : false;
 
     /* otherwise determine corruption calc -- full casters get a special one */
-    const {fullCaster} = Spellcasting.maxSpellLevel(Object.values(actor.classes).map( item => item.data.data ));
+    const {fullCaster} = actor.type === 'character' ? Spellcasting.maxSpellLevelByClass(Object.values(actor.classes).map( item => item.data.data )) : Spellcasting.maxSpellLevelNPC(actor.data);
 
     const prof = actor.data.data.prof.flat; 
 
@@ -245,6 +279,12 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
     Hooks.on('preUpdateActor', SheetCommon._preUpdateActor.bind(this));
   }
 
+  static _getCharacterData(actor, context) {
+
+    /* handlebars should interpret a level of 0 as 'false' */
+    context.maxSpellLevel = Spellcasting.maxSpellLevelByClass(context.data.classes);
+  }
+
   /** OVERRIDES **/
   activateListeners(html) {
     super.activateListeners(html);
@@ -269,24 +309,9 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
   getData() {
     let context = super.getData();
 
-    mergeObject(context, SheetCommon._getCommonData(this.actor));
-    const maxLevelResult = Spellcasting.maxSpellLevel(context.data.classes);
-    context.maxSpellLevel = maxLevelResult.level === 0 ? false : maxLevelResult;
+    SheetCommon._getCommonData(this.actor, context);
 
-    let corruptionAbilities = Object.entries(context.data.abilities).reduce( (acc, [key, val]) => {
-      acc.push({ability: key, label: val.label}) 
-      return acc;
-    },[{ability: 'spellcasting', label: COMMON.localize('DND5E.Spellcasting')},
-       {ability: 'custom', label: COMMON.localize('SYB5E.Corruption.Custom')}]);
-
-    context.corruptionAbilities = {
-      path: game.syb5e.CONFIG.PATHS.corruption.ability,
-      abilities: corruptionAbilities,
-      current: getProperty(this.actor.data, game.syb5e.CONFIG.PATHS.corruption.ability)
-    }
-
-    /* can only edit max corruption if using a custom value */
-    context.corruptionAbilities.disabled = context.corruptionAbilities.current !== 'custom' ? 'disabled' : '';
+    Syb5eActorSheetCharacter._getCharacterData(this.actor, context);
 
     logger.debug('getData#context:', context);
     return context;
@@ -329,14 +354,16 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
     Hooks.on('preUpdateActor', SheetCommon._preUpdateActor.bind(this));
   }
 
-  static _getNpcData(actor) {
-    return {
+  static _getNpcData(actor, context) {
+    const data = {
       data: {
         details: {
           manner: actor.manner
         }
       }
     }
+
+    mergeObject(context, data);
   }
 
   /** OVERRIDES **/
@@ -362,10 +389,10 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
   /* TODO consider template injection like item-sheet */
   getData() {
     let context = super.getData();
-    mergeObject(context, SheetCommon._getCommonData(this.actor));
+    SheetCommon._getCommonData(this.actor, context);
 
     /* NPCs also have a small 'manner' field describing how they generally act */
-    mergeObject(context, Syb5eActorSheetNPC._getNpcData(this.actor));
+    Syb5eActorSheetNPC._getNpcData(this.actor, context);
 
     logger.debug('getData#context:', context);
     return context;
