@@ -11,6 +11,7 @@ import { logger } from './logger.js';
 import { SheetCommon, Syb5eActorSheetCharacter, Syb5eActorSheetNPC } from './modules/actor-sheet.js'
 import { Syb5eItemSheet } from './modules/item-sheet.js'
 import { SYB5E } from './config.js'
+import { Spellcasting } from './modules/spellcasting.js'
 
 /**
  * Sub Modules
@@ -27,7 +28,8 @@ const SUB_MODULES = {
   SheetCommon,
   Syb5eActorSheetCharacter,
   Syb5eActorSheetNPC,
-  Syb5eItemSheet
+  Syb5eItemSheet,
+  Spellcasting
 }
 
 const SUB_APPS = {
@@ -42,9 +44,12 @@ COMMON.build();
   Initialize all Sub Modules
 */
 Hooks.on(`setup`, () => {
-  Object.values(SUB_MODULES).forEach(cl => cl.register());
+  Object.values(SUB_MODULES).forEach( (cl) => {
+    logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: cl.NAME}));
+    cl.register();
+  });
 
   //GlobalTesting
-  Object.entries(SUB_MODULES).forEach(([key, cl])=> window[key] = cl);
+  //Object.entries(SUB_MODULES).forEach(([key, cl])=> window[key] = cl);
   //Object.entries(SUB_APPS).forEach(([key, cl])=> window[key] = cl);
 });

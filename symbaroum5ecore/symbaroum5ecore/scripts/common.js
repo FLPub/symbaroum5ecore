@@ -1,5 +1,3 @@
-import { logger } from './logger.js';
-
 /* DND5E Class Imports */
 import { DND5E } from '../../../systems/dnd5e/module/config.js';
 import ActorSheet5eCharacter from '../../../systems/dnd5e/module/actor/sheets/character.js'
@@ -38,13 +36,10 @@ export class COMMON {
 
   /* runtime construction of basic information about this module */
   static build() {
-
-
     COMMON.hooks();
   }
 
   static register() {
-    logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: this.NAME}));
     COMMON.globals();
   }
 
@@ -56,7 +51,7 @@ export class COMMON {
 
     /* register our namespace */
     globalThis.game.syb5e = {
-      debug: {}
+      debug: {},
     };
    
   }
@@ -92,6 +87,12 @@ export class COMMON {
           ...data
         }
       );
+    });
+  }
+
+  static addGetter(object, fieldName, fn) {
+    Object.defineProperty(object, fieldName, {
+      get: fn
     });
   }
 

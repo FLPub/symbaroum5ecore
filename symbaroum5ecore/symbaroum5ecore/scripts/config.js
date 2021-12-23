@@ -5,6 +5,8 @@ import { COMMON } from './common.js'
  */
 export class SYB5E {
 
+  static NAME = "SYB5E_CONFIG";
+
   static register() {
     this.globals();
   }
@@ -22,6 +24,7 @@ export class SYB5E {
       initialized: 'initialized',
       corruption: {
         root: 'corruption',
+        ability: 'ability',
         temp: 'temp',
         permanent: 'permanent',
         value: 'value',
@@ -45,6 +48,7 @@ export class SYB5E {
       [COMMON.DATA.name]: {
         [this.CONFIG.FLAG_KEY.initialized]: true,
         [corr_name.root]: {
+          [corr_name.ability]: 'cha',
           [corr_name.temp]: 0,
           [corr_name.permanent]: 0,
           [corr_name.value]: 0,
@@ -70,10 +74,11 @@ export class SYB5E {
     globalThis.game.syb5e.CONFIG.PATHS = {
       [key.initialized]: `${root}.${key.initialized}`,
       [key.corruption.root]: {
+        [key.corruption.ability]: `${root}.${key.corruption.root}.${key.corruption.ability}`,
         [key.corruption.temp]: `${root}.${key.corruption.root}.${key.corruption.temp}`,
         [key.corruption.permanent]: `${root}.${key.corruption.root}.${key.corruption.permanent}`,
         [key.corruption.value]: undefined, //getter only
-        [key.corruption.max]: `${root}.${key.corruption.root}.${key.corruption.max}`
+        [key.corruption.max]: `${root}.${key.corruption.root}.${key.corruption.max}`,
       },
       [key.manner]: `${root}.${key.manner}`,
       [key.shadow]: `${root}.${key.shadow}`,
