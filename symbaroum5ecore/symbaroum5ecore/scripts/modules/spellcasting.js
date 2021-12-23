@@ -89,7 +89,7 @@ export class Spellcasting {
       logger.error(COMMON.localize('SYB5E.Error.HTMLParse'));
     }
 
-    textNodes[0].textContent = COMMON.localize('SYB5E.GainCorruptionQ');
+    textNodes[0].textContent = COMMON.localize('SYB5E.Corruption.GainQuestion');
 
     return;
   }
