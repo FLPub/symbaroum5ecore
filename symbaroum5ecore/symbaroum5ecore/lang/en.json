@@ -17,6 +17,7 @@
         "Label": "Symbaroum 5e NPC"
       }
     },
+<<<<<<< HEAD
     "Spell": {
       "Favored": "Favored",
       "MaxLevel": "Maximum Spell Level"
@@ -45,6 +46,12 @@
       "Seventh": "7th",
       "Eighth": "8th",
       "Nineth": "9th"
+=======
+    "Corruption": {
+      "Label": "Corruption",
+      "ShortDesc": "Current Corruption: {value}/{max}",
+      "Custom": "Custom"
+>>>>>>> 48356ec8e34119de02c2be2d4d335fa99e6dce3e
     }
     
   }

@@ -1,9 +1,13 @@
 import { COMMON } from '../common.js'
 import { logger } from '../logger.js';
 import { SYB5E } from '../config.js'
+import { Spellcasting } from './spellcasting.js'
+import { SheetCommon } from './actor-sheet.js'
 
 /* Initial attempt is via injection only */
 export class Syb5eItemSheet {
+
+  static NAME = "Syb5eItemSheet";
 
   static register() {
     this.patch();
@@ -20,22 +24,48 @@ export class Syb5eItemSheet {
 
   static _patchItem() {
 
-    /* isFavored getter */
-    Object.defineProperty(COMMON.CLASSES.Item5e.prototype, 'isFavored', {
-      get: function() {
-        const key = SYB5E.CONFIG.FLAG_KEY.favored;
-        const favored = this.getFlag(COMMON.DATA.name, key) ?? SYB5E.CONFIG.DEFAULT_ITEM[COMMON.DATA.name][key]
-        return favored;
+    const wrapped = COMMON.CLASSES.Item5e.prototype._getUsageUpdates;
+    COMMON.CLASSES.Item5e.prototype._getUsageUpdates = function(usageInfo) {
+      const sybActor = SheetCommon.isSybActor(this.actor.data)
+
+      /* if we are an syb, modify the current usage updates as to not
+       * confuse the core spellcasting logic */
+      if (sybActor) {
+      
+        /* if we are consuming a spell slot, treat it as adding corruption instead */
+        usageInfo.consumeCorruption = !!usageInfo.consumeSpellLevel || parseInt(this.data.data?.level) === 0;
+
+        /* We are _never_ consuming spell slots in syb5e */
+        usageInfo.consumeSpellLevel = null;
       }
-    });
+      
+      let updates = (wrapped.bind(this))(usageInfo)
+
+      /* now insert our needed information into the changes to be made to the actor */
+      if (sybActor) {
+        const sybUpdates = Spellcasting._getUsageUpdates(this, usageInfo);
+        if(!sybUpdates){
+          /* this item cannot be used -- likely due to incorrect max spell level */
+          logger.debug('Item cannot be used.');
+          return false;
+        }
+        mergeObject(updates, sybUpdates);
+      }
+
+      logger.debug('Usage Info:', usageInfo, '_getUsageUpdates result:',updates, 'This item:', this);
+
+      return updates;
+    }
   }
 
-  static async _renderItemSheet5e(sheet, html, options) {
+
+
+  static async _renderItemSheet5e(sheet, html/*, options*/) {
     /* need to insert checkbox for favored and put a favored 'badge' on the description tab */
     const item = sheet.item;
 
-    /* only concerned with adding favored to spell type items */
-    if (item.type !== 'spell') return;
+    /* only concerned with adding favored to sybactor owned spell type items */
+    if (item.type !== 'spell' || !SheetCommon.isSybActor(item.actor?.data)) return;
 
     const data = {
       isFavored: item.isFavored,

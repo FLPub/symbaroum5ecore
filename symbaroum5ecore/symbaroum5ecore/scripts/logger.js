@@ -20,12 +20,20 @@ export class logger {
     ui.notifications.error(`${COMMON?.DATA?.title || "" } | ERROR | ${args[0]}`);
   }
 
+  static warning(notify, ...args) {
+    console.warn(`${COMMON?.DATA?.title || "" } | WARNING | `, ...args);
+    if(notify) this.warn(...args)
+  }
+
   static notify(...args) {
     ui.notifications.notify(`${args[0]}`);
   }
 
+  static warn(...args) {
+    ui.notifications.warn(`${args[0]}`);
+  }
+
   static register(){
-    logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: this.NAME}));
     this.settings()
   }
 
