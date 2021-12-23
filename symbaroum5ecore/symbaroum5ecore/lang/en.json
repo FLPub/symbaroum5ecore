@@ -1,4 +1,10 @@
 {
+  "setting": {
+    "debug": {
+      "name": "Log Debug Output",
+      "hint": "Prints extended debug information to the console."
+    }
+  },
   "SYB5E" : {
     "Init" : {
       "SubModule": "Initializing Sub-Module: {name}"
@@ -10,6 +16,36 @@
       "NPC": {
         "Label": "Symbaroum 5e NPC"
       }
+    },
+    "Spell": {
+      "Favored": "Favored",
+      "MaxLevel": "Maximum Spell Level"
+    },
+    "Shadow": {
+      "Label": "Shadow"
+    },
+    "Manner": {
+      "Label": "Manner"
+    },
+    "Corruption": {
+      "Label": "Corruption",
+      "Temporary": "Temp",
+      "Permanent": "Permanent",
+      "Current": "Current",
+      "Threshold": "Threshold"
+    },
+    "Level": {
+      "Zeroth": "0th",
+      "First": "1st",
+      "Second": "2nd",
+      "Third": "3rd",
+      "Fourth": "4th",
+      "Fifth": "5th",
+      "Sixth": "6th",
+      "Seventh": "7th",
+      "Eighth": "8th",
+      "Nineth": "9th"
     }
+    
   }
 }
