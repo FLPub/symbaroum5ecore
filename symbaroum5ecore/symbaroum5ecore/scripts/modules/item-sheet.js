@@ -12,6 +12,7 @@ export class Syb5eItemSheet {
   static register() {
     this.patch();
     this.hooks();
+    this.config();
   }
 
   static hooks() {
@@ -20,6 +21,11 @@ export class Syb5eItemSheet {
 
   static patch() {
     this._patchItem();
+  }
+
+  static config() {
+    /* Add in 'Greater Artifact' rarity */
+    game.dnd5e.config.itemRarity.greaterArtifact = COMMON.localize("SYB5E.Sheet.Item.Rarity.GreaterArtifact");
   }
 
   static _patchItem() {

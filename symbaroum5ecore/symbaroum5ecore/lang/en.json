@@ -15,6 +15,11 @@
       },
       "NPC": {
         "Label": "Symbaroum 5e NPC"
+      },
+      "Item": {
+        "Rarity": {
+          "GreaterArtifact": "Greater Artifact"
+        }
       }
     },
     "Spell": {
