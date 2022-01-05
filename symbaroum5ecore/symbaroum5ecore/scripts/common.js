@@ -28,7 +28,7 @@ export class COMMON {
     ActorSheet5eCharacter,
     ActorSheet5eNPC,
     Actor5e,
-    Item5e
+    Item5e,
   };
 
   static NAME = this.name;
@@ -65,6 +65,7 @@ export class COMMON {
       `${COMMON.DATA.path}/templates/actors/parts/npc-manner.html`,
       `${COMMON.DATA.path}/templates/actors/parts/character-max-spell.html`,
       `${COMMON.DATA.path}/templates/items/parts/spell-favored.html`,
+      `${COMMON.DATA.path}/templates/apps/rest.html`,
     ]);
 
   }

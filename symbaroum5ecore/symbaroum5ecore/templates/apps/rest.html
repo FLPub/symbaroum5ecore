@@ -1,0 +1,57 @@
+{{log this}}
+<form id="short-rest-corr" class="dialog-content" onsubmit="event.preventDefault();">
+    <p>{{ localize restHint }}</p>
+    {{#unless isExtended}}
+    <div class="form-group">
+        <div class="sheet" style="flex-grow:2;"> 
+          <label>{{ localize "DND5E.ShortRestSelect" }}</label>
+          {{#unless canRoll}}
+          <p class="notes">{{ localize "DND5E.ShortRestNoHD" }}</p>
+          {{/unless}}
+        </div>
+        <div class="sheet">
+            <div class="flexrow" style="margin-bottom:5px;">
+              <button id="roll-hd" {{#unless canRoll}}disabled{{/unless}}>
+                <i class="fas fa-dice-d20"></i> {{ localize "DND5E.HitPoints" }}
+              </button>
+              <button id="heal-corr" {{#unless canRoll}}disabled{{/unless}}>
+                <i class="fas fa-dice-d20"></i> {{ localize "SYB5E.Corruption.Label" }}
+              </button>
+            </div>
+            <select name="hd">
+                {{#select denomination}}
+                {{#each availableHD as |num denom|}}
+                <option value="{{denom}}">{{denom}} ({{num}} {{ localize "DND5E.available" }})</option>
+                {{/each}}
+                {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <label>{{ localize "SYB5E.Rest.ResultPreview"}}</label>
+      <div class="sheet" style="align-items:center;">
+        {{#unless isShort}}
+        <p><strong>{{localize "DND5E.HitPoints"}}:</strong> {{preview.hp}} / {{preview.maxHp}}</p>
+        {{/unless}}
+        <p><strong>{{localize "SYB5E.Corruption.Label"}}:</strong> {{preview.tempCorr}} ({{preview.totalCorr}}) / {{preview.maxCorr}}</p>
+      </div>
+    </div>
+    {{/unless}}
+
+    {{#if promptNewDay}}
+    <div class="form-group">
+        <label>{{ localize "DND5E.NewDay" }}</label>
+        <input type="checkbox" name="newDay"/>
+        <p class="hint">{{ localize "DND5E.NewDayHint" }}</p>
+    </div>
+    {{/if}}
+
+    <div class="dialog-buttons">
+        {{#each buttons as |button id|}}
+        <button class="dialog-button" data-button="{{id}}">
+            {{{button.icon}}}
+            {{{button.label}}}
+        </button>
+        {{/each}}
+    </div>
+</form>

@@ -12,6 +12,8 @@ import { SheetCommon, Syb5eActorSheetCharacter, Syb5eActorSheetNPC } from './mod
 import { Syb5eItemSheet } from './modules/item-sheet.js'
 import { SYB5E } from './config.js'
 import { Spellcasting } from './modules/spellcasting.js'
+import { Resting } from './modules/resting.js'
+import { SybRestDialog } from './modules/apps/syb-rest-dialog.js'
 
 /**
  * Sub Modules
@@ -29,10 +31,12 @@ const SUB_MODULES = {
   Syb5eActorSheetCharacter,
   Syb5eActorSheetNPC,
   Syb5eItemSheet,
-  Spellcasting
+  Spellcasting,
+  Resting
 }
 
 const SUB_APPS = {
+  SybRestDialog
 }
 
 /*
@@ -51,5 +55,5 @@ Hooks.on(`setup`, () => {
 
   //GlobalTesting
   //Object.entries(SUB_MODULES).forEach(([key, cl])=> window[key] = cl);
-  //Object.entries(SUB_APPS).forEach(([key, cl])=> window[key] = cl);
+  Object.entries(SUB_APPS).forEach(([key, cl])=> window[key] = cl);
 });

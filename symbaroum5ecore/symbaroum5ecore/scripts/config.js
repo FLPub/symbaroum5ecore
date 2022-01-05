@@ -107,6 +107,12 @@ export class SYB5E {
       'SYB5E.Level.Nineth',
     ]
 
+    globalThis.game.syb5e.CONFIG.REST_TYPES = {
+      short: 'short',
+      long: 'long',
+      extended: 'ext'
+    }
+
   }
 
 }

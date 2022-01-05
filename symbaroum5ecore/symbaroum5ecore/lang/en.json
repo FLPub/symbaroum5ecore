@@ -48,7 +48,24 @@
       "Seventh": "7th",
       "Eighth": "8th",
       "Nineth": "9th"
+    },
+    "Rest": {
+      "ShortHint": "Take a short rest? On a short rest you reduce your temporary corruption by your proficiency bonus, regain short rest resources. Additionally, you may spend remaining Hit Dice to heal or further reduce temporary corruption.",
+      "LongHint": "Take a long rest? On a long rest you reduce your temporary corruption by twice your proficiency bonus, recover hit points equal to the maximum value of your Hit Die, and regain any long rest resources and limited use item charges. Additionally, you may spend remaining Hit Dice to heal or further reduce temporary corruption by your proficiency bonus.",
+      "Extended": "Extended Rest",
+      "ExtendedAbbr": "E. Rest",
+      "ExtendedHint": "Take an extended rest? On an extended rest you will reduce your temporary corruption to zero and regain all of your hit points and hit dice.",
+      "ResultPreview": "Results upon completion",
+      "Results": {
+        "ExtendedShort": "{name} takes an extended rest.",
+        "ExtendedFull": "{name} takes an extended rest and recovers {dhp} Hit Points, {dhd} Hit Dice, and {dco} Temporary Corruption.",
+        "ShortFull": "{name} takes a short rest spending {dhd} Hit Dice to recover {dhp} Hit Points and {dco} Temporary Corruption.",
+        "LongFull": "{name} takes a long rest spending {dhd} Hit Dice to recover {dhp} Hit Points and {dco} Temporary Corruption."
+      },
+      "Flavor": {
+        "ExtendedRestOvernight": "Extended Rest (24h+, New Day)",
+        "ExtendedRestNormal": "Extended Rest (24h+)"
+      }
     }
-    
   }
 }

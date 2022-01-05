@@ -183,6 +183,7 @@ export class SheetCommon {
   }
 
   static _render(){
+    /* suppress spell slot display */
     this.element.find('.spell-slots').css('display', 'none');
   }
 
@@ -290,6 +291,7 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
     super.activateListeners(html);
 
     SheetCommon.commonListeners.bind(this,html)();
+
   }
 
   //TODO expand to other modes (like limited)
@@ -324,6 +326,31 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
     /* call the common _render by binding (pretend its our own method) */
     const boundRender = SheetCommon._render.bind(this);
     boundRender(...args);
+
+    /* now modify the sheet for our own uses ( TODO should the whole sheet be injected like this?) */
+    const footer = this.element.find('.hit-dice .attribute-footer');
+    footer.append(`<a class="rest extended-rest" title="${COMMON.localize('SYB5E.Rest.ExtRest')}">${COMMON.localize('SYB5E.Rest.ExtendedAbbr')}</a>`)
+
+    /* activate listener for Extended Rest Button */
+    this.element.find('.extended-rest').click(this._onExtendedRest.bind(this));
+  }
+
+  async _onShortRest(event){
+    event.preventDefault();
+    await this._onSubmit(event);
+    return this.actor.shortRest();
+  }
+
+  async _onLongRest(event){
+    event.preventDefault();
+    await this._onSubmit(event);
+    return this.actor.longRest();
+  }
+
+  async _onExtendedRest(event) {
+    event.preventDefault();
+    await this._onSubmit(event);
+    return this.actor.extendedRest();
   }
   
 }
