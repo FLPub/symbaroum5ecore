@@ -172,7 +172,6 @@
   margin: 0px 20px 0px 10px;
 }
 
-
 .symbaroum-dnd5e-mod .parahead {
   font-weight: bold;
   font-family: 'Fondamento';
@@ -203,7 +202,7 @@
   margin-bottom: 0;
 }
 .symbaroum-dnd5e-mod .newHead {
-  font-family: 'Jim Nightshade'; 
+  font-family: 'Jim Nightshade';
   text-align: center;
   font-size: 68pt;
   margin-bottom: 0;
@@ -215,7 +214,7 @@
 }
 .symbaroum-dnd5e-mod .h2subHead {
   font-weight: bold;
-  color:  hsl(19, 70%, 37%);
+  color: hsl(19, 70%, 37%);
   border: 0;
   margin-bottom: 0;
   margin-left: 10px;
@@ -354,6 +353,19 @@ td {
   break-inside: avoid;
   font-style: normal;
   float: right;
+  border: none;
+  text-align: center;
+}
+.symbaroum-dnd5e-mod .fancytextcenter {
+  max-width: 20%;
+  padding: 10px;
+  margin-top: 73px;
+  float: none;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  break-inside: avoid;
+  font-style: normal;
   border: none;
   text-align: center;
 }
