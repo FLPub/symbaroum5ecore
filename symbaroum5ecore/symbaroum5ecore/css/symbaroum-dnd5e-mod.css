@@ -226,7 +226,7 @@
 th,
 td {
   height: 36px;
-  width: 80%;
+  /* width: 80%; */
   /* border-style: double;
   border-color: greenyellow; */
   margin-left: auto;
@@ -397,12 +397,25 @@ td {
   width: 1%;
   text-align: center;
   border-right: solid 1px;
+  color: hsl(6, 55%, 30%);
 }
 .symbaroum-dnd5e-mod .newstatheader2 {
   height: 15px;
   padding: 0;
   width: 1%;
   text-align: center;
+  color: hsl(6, 55%, 30%);
+}
+.symbaroum-dnd5e-mod .statblock1 {
+  width: 15%;
+  padding: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.symbaroum-dnd5e-mod .statblock2 {
+  color: hsl(6, 55%, 30%);
+  background-color: hsl(45, 13%, 87%);
+  border-top: hsl(6, 55%, 30%) solid 2px;
 }
 .symbaroum-dnd5e-mod .symtitle {
   display: block;
@@ -435,4 +448,29 @@ td {
   height: 297px;
   /* border: 3px solid #73ad21; */
   text-align: left;
+}
+.symbaroum-dnd5e-mod .blockrotate {
+  /* position: relative; */
+  /* left: 45px; */
+  /* width: 85%; */
+  transform: translateX (45px);
+  transform: rotate(-3deg);
+  /* padding-top: 15px; */
+}
+
+.symbaroum-dnd5e-mod .statblockcenter {
+  /* background-image: url(../images/journal/foreground2a.png); */
+  background-color: hsl(0, 0%, 100%);
+  /* max-width: 35%; */
+  padding: 10px;
+  margin-top: 10px;
+  margin-right: auto;
+  margin-bottom: 10px;
+  margin-left: auto;
+  /* break-inside: avoid; */
+  /* font-style: normal; */
+  /* float: center; */
+  /* border: 5px double hsl(0, 0%, 0%); */
+  /* border-radius: 25px; */
+  /* box-shadow: 3px 3px; */
 }
