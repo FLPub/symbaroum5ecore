@@ -134,13 +134,13 @@ export class Spellcasting {
    * if not and spellcasting stat is != 'none', use CR as full caster
    * otherwise, no spellcasting
    *
-   * @param actorData {ActorData} (i.e. actor.data)
+   * @param actor5eData {Object} (i.e. actor.data.data)
    */
-  static maxSpellLevelNPC(actorData){
+  static maxSpellLevelNPC(actor5eData){
     
-    const spellStat = actorData.data.spellcasting ?? '' === '' ? false : actorData.data.spellcasting;
-    const casterLevel = actorData.data.details.spellLevel ?? 0;
-    const cr = Math.max(actorData.data.details.cr, 1);
+    const spellStat = actor5eData.spellcasting ?? '' === '' ? false : actor5eData.spellcasting;
+    const casterLevel = actor5eData.details.spellLevel ?? 0;
+    const cr = Math.max(actor5eData.details.cr, 1);
 
     /* has caster levels, assume full caster */
     let result = {
@@ -208,7 +208,8 @@ export class Spellcasting {
      * - consumeSpellSlot: {boolean}: always true (consume slot = add corruption)
      * - canUse: {boolean}: always true? exceeding max corruption is a choice
      */
-    const maxLevel = Spellcasting.maxSpellLevelByClass(actorData.classes);
+
+    const maxLevel = actorData.details.cr == undefined ? Spellcasting.maxSpellLevelByClass(actorData.classes) : Spellcasting.maxSpellLevelNPC(actorData)
     let spellLevels = [];
 
     for(let level = itemData.level; level<=maxLevel.level; level++){
@@ -261,17 +262,17 @@ export class Spellcasting {
 
       /* field name shortcuts */
       const corruptionKey = SYB5E.CONFIG.FLAG_KEY.corruption;
-      const tempKey = corruptionKey.temp;
+      const fieldKey = item.actor.type == 'character' ? corruptionKey.temp : corruptionKey.permanent;
 
       /* get the current corruption values */
       let corruption = item.actor.corruption;
 
       /* add in our gained corruption to the temp corruption */
-      corruption[tempKey] = corruption[tempKey] + gainedCorruption;
+      corruption[fieldKey] = corruption[fieldKey] + gainedCorruption;
 
       /* insert this update into the actorUpdates */
-      const tempPath = `flags.${COMMON.DATA.name}.${corruptionKey.root}.${tempKey}`;
-      actorUpdates[tempPath] = corruption[tempKey];
+      const corruptionFieldPath = `flags.${COMMON.DATA.name}.${corruptionKey.root}.${fieldKey}`;
+      actorUpdates[corruptionFieldPath] = corruption[fieldKey];
     }
 
     return {actorUpdates, itemUpdates, resourceUpdates};
