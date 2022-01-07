@@ -164,8 +164,8 @@ export class Spellcasting {
   static _isFavored(itemData) {
     const key = SYB5E.CONFIG.FLAG_KEY.favored;
     
-    const defaultVal = SYB5E.CONFIG.DEFAULT_ITEM[COMMON.DATA.name][key]
-    const favored = getProperty(itemData, SYB5E.CONFIG.PATHS[key]) ?? defaultVal;
+    const defaultVal = game.syb5e.CONFIG.DEFAULT_ITEM[key]
+    const favored = getProperty(itemData, game.syb5e.CONFIG.PATHS[key]) ?? defaultVal;
     return favored;
   }
 

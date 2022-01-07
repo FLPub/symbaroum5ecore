@@ -36,15 +36,11 @@ export class COMMON {
 
   /* runtime construction of basic information about this module */
   static build() {
-    COMMON.hooks();
+
   }
 
   static register() {
     COMMON.globals();
-  }
-
-  static hooks() {
-    Hooks.on('init', COMMON._init);
   }
 
   static globals() {
@@ -95,6 +91,13 @@ export class COMMON {
     Object.defineProperty(object, fieldName, {
       get: fn
     });
+  }
+
+  static translateObject(obj) {
+    /* translate in place */
+    Object.keys(obj).forEach( key => obj[key] = COMMON.localize(obj[key]));
+
+    return obj;
   }
 
 }

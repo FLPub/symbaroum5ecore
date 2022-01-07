@@ -12,7 +12,6 @@ export class Syb5eItemSheet {
   static register() {
     this.patch();
     this.hooks();
-    this.config();
   }
 
   static hooks() {
@@ -23,12 +22,21 @@ export class Syb5eItemSheet {
     this._patchItem();
   }
 
-  static config() {
-    /* Add in 'Greater Artifact' rarity */
-    game.dnd5e.config.itemRarity.greaterArtifact = COMMON.localize("SYB5E.Sheet.Item.Rarity.GreaterArtifact");
-  }
-
   static _patchItem() {
+
+    /* Armor will also have item properties similar to Weapons */
+    COMMON.addGetter(COMMON.CLASSES.Item5e.prototype, 'properties', function() {
+
+      /* is armor type? return syb armor props or the default object
+       * if no flag data exists yet */
+      if (Syb5eItemSheet.isArmor(this.data)) {
+        const propKey = game.syb5e.CONFIG.FLAG_KEY.armorProps;
+        return this.getFlag(COMMON.DATA.name, propKey) ?? game.syb5e.CONFIG.DEFAULT_ITEM[propKey];
+      }
+
+      /* all others, fall back to core data */
+      return this.data.data.properties ?? {}
+    });
 
     const wrapped = COMMON.CLASSES.Item5e.prototype._getUsageUpdates;
     COMMON.CLASSES.Item5e.prototype._getUsageUpdates = function(usageInfo) {
@@ -64,29 +72,61 @@ export class Syb5eItemSheet {
     }
   }
 
-
-
+  /* Handles injection of new SYB5E properties that are NOT handled
+   * implicitly by a game.dnd5e.config object
+   */
   static async _renderItemSheet5e(sheet, html/*, options*/) {
     /* need to insert checkbox for favored and put a favored 'badge' on the description tab */
     const item = sheet.item;
 
-    /* only concerned with adding favored to sybactor owned spell type items */
-    if (item.type !== 'spell' || !SheetCommon.isSybActor(item.actor?.data)) return;
-
-    const data = {
-      isFavored: item.isFavored,
-      favoredPath: SYB5E.CONFIG.PATHS[SYB5E.CONFIG.FLAG_KEY.favored]
+    /* if this is an owned item, owner needs to be a SYB sheet actor
+     * if this is an unowned item, show always
+     */
+    if( item.parent && !SheetCommon.isSybActor(item.parent.data) ) {
+      logger.debug(`Item [${item.id}] with parent actor [${item.parent.id}] is not an SYB5E item`);
+      return;
     }
 
-    const favoredCheckbox = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/spell-favored.html`, data);
-    const favoredBadge = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/spell-favored-badge.html`, data);
+    /* only concerned with adding favored to sybactor owned spell type items */
+    if (item.type == 'spell'){
 
-    /* insert our favored checkbox */
-    const preparedCheckbox = html.find('label.checkbox.prepared');
-    preparedCheckbox.before(favoredCheckbox);
+      const data = {
+        isFavored: item.isFavored,
+        favoredPath: SYB5E.CONFIG.PATHS[SYB5E.CONFIG.FLAG_KEY.favored]
+      }
 
-    /* insert our favored badge */
-    const itemPropBadges = html.find('.properties-list li');
-    itemPropBadges.last().after(favoredBadge);
+      const favoredCheckbox = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/spell-favored.html`, data);
+      const favoredBadge = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/spell-favored-badge.html`, data);
+
+      /* insert our favored checkbox */
+      const preparedCheckbox = html.find('label.checkbox.prepared');
+      preparedCheckbox.before(favoredCheckbox);
+
+      /* insert our favored badge */
+      const itemPropBadges = html.find('.properties-list li');
+      itemPropBadges.last().after(favoredBadge);
+    }
+
+    /* only concerned with adding armor props to armor type items */
+    if (Syb5eItemSheet.isArmor(item.data)){
+      const data = {
+        armorProps: item.properties,
+        propRoot: game.syb5e.CONFIG.PATHS[game.syb5e.CONFIG.FLAG_KEY.armorProps],
+        propLabels: game.syb5e.CONFIG.ARMOR_PROPS
+      }
+
+      const propCheckboxes = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/armor-properties.html`, data);
+
+      const equipmentDetails = html.find('[name="data.proficient"]').parents('.form-group').last();
+
+      equipmentDetails.after(propCheckboxes);
+
+    }
+  }
+
+  static isArmor(itemData) {
+
+    return itemData.type == 'equipment' && game.dnd5e.config.armorTypes[itemData.data.armor?.type ?? ''];
+
   }
 }

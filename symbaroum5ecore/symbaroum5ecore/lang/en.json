@@ -15,11 +15,37 @@
       },
       "NPC": {
         "Label": "Symbaroum 5e NPC"
+      }
+    },
+    "Proficiency": {
+      "WeaponAlchemical": "Alchemical Weapons"
+    },
+    "Item": {
+      "Rarity": {
+        "GreaterArtifact": "Greater Artifact"
       },
-      "Item": {
-        "Rarity": {
-          "GreaterArtifact": "Greater Artifact"
-        }
+      "WeaponProps": {
+        "AreaEffect": "Area Effect",
+        "Balanced": "Balanced",
+        "Crewed": "Crewed",
+        "Concealed": "Concealed",
+        "DeepImpact": "Deep Impact",
+        "Ensnaring": "Ensnaring",
+        "Immobile": "Immobile",
+        "Massive": "Massive",
+        "ReloadCrew": "Reload (Crew)",
+        "Restraining": "Restraining",
+        "Siege": "Siege"
+      },
+      "ArmorProps": {
+        "Label": "Armor Properties",
+        "Concealable": "Concealable",
+        "Cumbersome": "Cumbersome",
+        "Noisy": "Noisy",
+        "Weighty": "Weighty"
+      },
+      "Subtype": {
+        "Alchemical": "Alchemical"
       }
     },
     "Spell": {
