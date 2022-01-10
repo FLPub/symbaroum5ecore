@@ -151,9 +151,9 @@ export class Spellcasting {
 
     /* modify max spell level if full caster or has a casting stat */
     if (result.fullCaster) {
-      result.level = game.syb5e.CONFIG.SPELL_PROGRESSION['full'][casterLevel]; 
+      result.level = game.syb5e.CONFIG.SPELL_PROGRESSION.full[casterLevel]; 
     } else if (spellStat) {
-      result.level = game.syb5e.CONFIG.SPELL_PROGRESSION['full'][cr];
+      result.level = game.syb5e.CONFIG.SPELL_PROGRESSION.full[cr];
     } 
 
     result.label = game.syb5e.CONFIG.LEVEL_SHORT[result.level];
@@ -162,10 +162,7 @@ export class Spellcasting {
   }
 
   static _isFavored(itemData) {
-    const key = SYB5E.CONFIG.FLAG_KEY.favored;
-    
-    const defaultVal = game.syb5e.CONFIG.DEFAULT_ITEM[key]
-    const favored = getProperty(itemData, game.syb5e.CONFIG.PATHS[key]) ?? defaultVal;
+    const favored = getProperty(itemData, game.syb5e.CONFIG.PATHS.favored) ?? game.syb5e.CONFIG.DEFAULT_ITEM.favored;
     return favored;
   }
 
@@ -261,8 +258,7 @@ export class Spellcasting {
       }
 
       /* field name shortcuts */
-      const corruptionKey = SYB5E.CONFIG.FLAG_KEY.corruption;
-      const fieldKey = item.actor.type == 'character' ? corruptionKey.temp : corruptionKey.permanent;
+      const fieldKey = item.actor.type == 'character' ? 'temp' : 'permanent';
 
       /* get the current corruption values */
       let corruption = item.actor.corruption;
@@ -271,7 +267,7 @@ export class Spellcasting {
       corruption[fieldKey] = corruption[fieldKey] + gainedCorruption;
 
       /* insert this update into the actorUpdates */
-      const corruptionFieldPath = `flags.${COMMON.DATA.name}.${corruptionKey.root}.${fieldKey}`;
+      const corruptionFieldPath = `flags.${COMMON.DATA.name}.corruption.${fieldKey}`;
       actorUpdates[corruptionFieldPath] = corruption[fieldKey];
     }
 

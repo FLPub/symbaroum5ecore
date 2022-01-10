@@ -26,21 +26,28 @@ export class SheetCommon {
   static _patchActor() {
 
     COMMON.addGetter(COMMON.CLASSES.Actor5e.prototype, 'corruption', function() {
-      const keys = SheetCommon.FLAG_KEY.corruption;
-      let corruption = this.getFlag(COMMON.DATA.name, keys.root) ?? SheetCommon.DEFAULT_FLAGS[keys.root]
-      corruption.value = corruption[keys.temp] + corruption[keys.permanent];
+      /* current value */
+      let corruption = this.getFlag(COMMON.DATA.name, 'corruption') ?? {};
+
+      /* correct bad values and merge in needed defaults */
+      const defaults = SheetCommon.DEFAULT_FLAGS.corruption;
+      Object.keys(defaults).forEach( (key) => {
+        corruption[key] = (typeof corruption[key] == typeof defaults[key]) ? corruption[key] : defaults[key];
+      });
+
+      corruption.value = corruption.temp + corruption.permanent;
       corruption.max = SheetCommon._calcMaxCorruption(this);
       return corruption;
     });
 
     COMMON.addGetter(COMMON.CLASSES.Actor5e.prototype, 'shadow', function() {
-      const shadow = this.getFlag(COMMON.DATA.name, SheetCommon.FLAG_KEY.shadow) ?? SheetCommon.DEFAULT_FLAGS[SheetCommon.FLAG_KEY.shadow];
+      const shadow = this.getFlag(COMMON.DATA.name, 'shadow') ?? SheetCommon.DEFAULT_FLAGS.shadow;
       return shadow;
     });
 
     COMMON.addGetter(COMMON.CLASSES.Actor5e.prototype, 'manner', function() {
-      const shadow = this.getFlag(COMMON.DATA.name, SheetCommon.FLAG_KEY.manner) ?? SheetCommon.DEFAULT_FLAGS[SheetCommon.FLAG_KEY.manner];
-      return shadow;
+      const manner = this.getFlag(COMMON.DATA.name, 'manner') ?? SheetCommon.DEFAULT_FLAGS.manner;
+      return manner;
     });
 
   }
@@ -100,52 +107,45 @@ export class SheetCommon {
   /* @param actor : actor document to initialize
    * @param overwrite : force default values regardless of current flag data
    */
-  static _flagInitData(actor, overwrite = false) {
+  //static _flagInitData(actor, overwrite = false) {
 
-    /* get the default flag data */
-    let defaultFlagData = SheetCommon.DEFAULT_FLAGS;
+  //  /* get the default flag data */
+  //  let defaultFlagData = duplicate(SheetCommon.DEFAULT_FLAGS);
 
-    /* calculate the initial corruption threshold */
-    defaultFlagData[COMMON.DATA.name][SheetCommon.FLAG_KEY.corruption.root].max = SheetCommon._calcMaxCorruption(actor);
+  //  /* calculate the initial corruption threshold */
+  //  defaultFlagData.corruption.max = SheetCommon._calcMaxCorruption(actor);
 
-    /* if overwriting, force our default values, otherwise merge our new flag data into the actor's flags */
-    const initializedFlags = overwrite ? defaultFlagData : mergeObject(actor.data.flags, defaultFlagData, {inplace: false});
-    logger.debug(`Initializing ${actor.name} with default syb data:`, initializedFlags);
+  //  /* if overwriting, force our default values, otherwise merge our new flag data into the actor's flags */
+  //  const initializedFlags = overwrite ? defaultFlagData : mergeObject(actor.data.flags, defaultFlagData, {inplace: false});
+  //  logger.debug(`Initializing ${actor.name} with default syb data:`, initializedFlags);
 
-    return initializedFlags;
-  }
+  //  return initializedFlags;
+  //}
 
   /* -------------------------------------------- */
 
   /* Initializes SYB5E-specific data if this actor has not been initialized before */
-  static _initFlagData(actor, updateData) {
-    
-    /* check if we have already been initialized */
-    const needsInit = !(actor.getFlag(COMMON.DATA.name, SheetCommon.FLAG_KEY.initialized) ?? false)
-    logger.debug(`${actor.name} needs syb init:`, needsInit);
-    
-    if (needsInit) {
+  //static _initFlagData(actor, updateData) {
 
-      /* gracefully merge */
-      const initializedFlags = SheetCommon._flagInitData(actor, false);
+  //  /* gracefully merge */
+  //  const initializedFlags = SheetCommon._flagInitData(actor, false);
 
-      mergeObject(updateData.flags, initializedFlags);
-    }
-  }
+  //  mergeObject(updateData.flags, initializedFlags);
+  //}
 
   /* -------------------------------------------- */
 
-  static async reInitActor(actor, overwrite) {
-    const initializedFlags = SheetCommon._flagInitData(actor, overwrite);
-    
-    /* clear out any old data */
-    await actor.update({[`flags.-=${COMMON.DATA.name}`]: null});
+  //static async reInitActor(actor, overwrite) {
+  //  const initializedFlags = SheetCommon._flagInitData(actor, overwrite);
+  //  
+  //  /* clear out any old data */
+  //  await actor.update({[`flags.-=${COMMON.DATA.name}`]: null});
 
-    /* set our default data */
-    await actor.update({flags: initializedFlags});
+  //  /* set our default data */
+  //  await actor.update({flags: {[COMMON.DATA.name]: initializedFlags}});
 
-    return actor.data.flags[COMMON.DATA.name];
-  }
+  //  return actor.data.flags[COMMON.DATA.name];
+  //}
 
   /** \SYB DATA SETUP **/ 
 
@@ -227,19 +227,19 @@ export class SheetCommon {
   /* ensures we have the data needed for the symbaroum system when
    * the SYB sheet is chosen for the first time
    */
-  static _preUpdateActor(actor, updateData /*, options, user */) {
+  //static _preUpdateActor(actor, updateData /*, options, user */) {
 
-    const sheetClass = COMMON[this.NAME].id;
+  //  const sheetClass = COMMON[this.NAME].id;
 
-    if (getProperty(updateData, 'flags.core.sheetClass') == sheetClass) {
+  //  if (getProperty(updateData, 'flags.core.sheetClass') == sheetClass) {
 
-      /* we are updating to OUR sheet. Ensure that we have the flag
-       * data initialized
-       */
-      SheetCommon._initFlagData(actor, updateData);
-    }
+  //    /* we are updating to OUR sheet. Ensure that we have the flag
+  //     * data initialized
+  //     */
+  //    SheetCommon._initFlagData(actor, updateData);
+  //  }
 
-  }
+  //}
 
   /** \HOOKS **/
 
@@ -261,11 +261,11 @@ export class SheetCommon {
     
     const CONFIG = game.syb5e.CONFIG;
     const paths = CONFIG.PATHS;
-    const defaultAbility = game.syb5e.CONFIG.DEFAULT_FLAGS[COMMON.DATA.name].corruption.ability;
+    const defaultAbility = game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.ability;
     let corruptionAbility = getProperty(actor.data, paths.corruption.ability) ?? defaultAbility;
     /* if we are in a custom max mode, just return the current stored max */
     if(corruptionAbility === 'custom'){
-      return getProperty(actor.data, paths.corruption.max);
+      return getProperty(actor.data, paths.corruption.max) ?? game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.max;
     }
 
     /* if corruption is set to use spellcasting, ensure we have a spellcasting stat as well */
@@ -308,20 +308,12 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
       makeDefault: true,
       label: COMMON.localize('SYB5E.Sheet.Character.Label'),
     });
-
-    this.hooks();
   }
 
   /* -------------------------------------------- */
 
   static defaults() {
     SheetCommon.defaults(this); 
-  }
-
-  /* -------------------------------------------- */
-
-  static hooks() {
-    Hooks.on('preUpdateActor', SheetCommon._preUpdateActor.bind(this));
   }
 
   /* -------------------------------------------- */
@@ -433,8 +425,6 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
       makeDefault: true,
       label: COMMON.localize('SYB5E.Sheet.NPC.Label'),
     });
-
-    this.hooks();
   }
 
   /* -------------------------------------------- */
@@ -442,12 +432,6 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
 
   static defaults() {
     SheetCommon.defaults(this);
-  }
-
-  /* -------------------------------------------- */
-
-  static hooks() {
-    Hooks.on('preUpdateActor', SheetCommon._preUpdateActor.bind(this));
   }
 
   /* -------------------------------------------- */

@@ -30,8 +30,7 @@ export class Syb5eItemSheet {
       /* is armor type? return syb armor props or the default object
        * if no flag data exists yet */
       if (Syb5eItemSheet.isArmor(this.data)) {
-        const propKey = game.syb5e.CONFIG.FLAG_KEY.armorProps;
-        return this.getFlag(COMMON.DATA.name, propKey) ?? game.syb5e.CONFIG.DEFAULT_ITEM[propKey];
+        return this.getFlag(COMMON.DATA.name, 'armorProps') ?? game.syb5e.CONFIG.DEFAULT_ITEM.armorProps
       }
 
       /* all others, fall back to core data */
@@ -92,7 +91,7 @@ export class Syb5eItemSheet {
 
       const data = {
         isFavored: item.isFavored,
-        favoredPath: SYB5E.CONFIG.PATHS[SYB5E.CONFIG.FLAG_KEY.favored]
+        favoredPath: SYB5E.CONFIG.PATHS.favored
       }
 
       const favoredCheckbox = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/spell-favored.html`, data);
@@ -111,7 +110,7 @@ export class Syb5eItemSheet {
     if (Syb5eItemSheet.isArmor(item.data)){
       const data = {
         armorProps: item.properties,
-        propRoot: game.syb5e.CONFIG.PATHS[game.syb5e.CONFIG.FLAG_KEY.armorProps],
+        propRoot: game.syb5e.CONFIG.PATHS.armorProps,
         propLabels: game.syb5e.CONFIG.ARMOR_PROPS
       }
 

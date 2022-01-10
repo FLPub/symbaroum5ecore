@@ -36,29 +36,6 @@ export class SYB5E {
   static globals() {
     globalThis.game.syb5e.CONFIG = {};
 
-    /* The keys for the syb5e data flags */
-    globalThis.game.syb5e.CONFIG.FLAG_KEY = {
-      initialized: 'initialized',
-      corruption: {
-        root: 'corruption',
-        ability: 'ability',
-        temp: 'temp',
-        permanent: 'permanent',
-        value: 'value',
-        max: 'max'
-      },
-      manner: 'manner',
-      shadow: 'shadow',
-      favored: 'favored',
-      armorProps: 'armorProps'
-    };
-
-    /* keys for spell progression */
-    globalThis.game.syb5e.CONFIG.SPELL_PROG_KEY = {
-      full: 'full',
-      half: 'half'
-    }
-
     /* Spell Level translations (unfortunately dnd5e does not provide these) */
     globalThis.game.syb5e.CONFIG.LEVEL_SHORT = [
       'SYB5E.Level.Zeroth',
@@ -116,58 +93,48 @@ export class SYB5E {
     });
 
     /* The default values for syb5e actor data */
-    const corr_name = this.CONFIG.FLAG_KEY.corruption;
-
     globalThis.game.syb5e.CONFIG.DEFAULT_FLAGS = {
-      [COMMON.DATA.name]: {
-        [this.CONFIG.FLAG_KEY.initialized]: true,
-        [corr_name.root]: {
-          [corr_name.ability]: 'cha',
-          [corr_name.temp]: 0,
-          [corr_name.permanent]: 0,
-          [corr_name.value]: 0,
-          [corr_name.max]: 0
-        },
-        [this.CONFIG.FLAG_KEY.manner]: '',
-        [this.CONFIG.FLAG_KEY.shadow]: '',
-      }
+      corruption: {
+        ability: 'cha',
+        temp: 0,
+        permanent: 0,
+        value: 0,
+        max: 0
+      },
+      manner: '',
+      shadow: '',
     }
 
     /* The default values for syb5e item data */
     globalThis.game.syb5e.CONFIG.DEFAULT_ITEM = {
         //[this.CONFIG.FLAG_KEY.initialized]: true,
-        [this.CONFIG.FLAG_KEY.favored]: false,
-        [this.CONFIG.FLAG_KEY.armorProps]: Object.keys(game.syb5e.CONFIG.ARMOR_PROPS).reduce( (acc, key) => {
+        favored: false,
+        armorProps: Object.keys(game.syb5e.CONFIG.ARMOR_PROPS).reduce( (acc, key) => {
           acc[key]=false;
           return acc;
         }, {}),
     }
 
     /* paths for syb flag data */
-    const key = this.CONFIG.FLAG_KEY;
     const root = `flags.${COMMON.DATA.name}`;
 
     globalThis.game.syb5e.CONFIG.PATHS = {
-      [key.initialized]: `${root}.${key.initialized}`,
-      [key.corruption.root]: {
-        [key.corruption.ability]: `${root}.${key.corruption.root}.${key.corruption.ability}`,
-        [key.corruption.temp]: `${root}.${key.corruption.root}.${key.corruption.temp}`,
-        [key.corruption.permanent]: `${root}.${key.corruption.root}.${key.corruption.permanent}`,
-        [key.corruption.value]: undefined, //getter only
-        [key.corruption.max]: `${root}.${key.corruption.root}.${key.corruption.max}`,
+      corruption: {
+        ability: `${root}.corruption.ability`,
+        temp: `${root}.corruption.temp`,
+        permanent: `${root}.corruption.permanent`,
+        value: undefined, //getter only
+        max: `${root}.corruption.max`,
       },
-      [key.manner]: `${root}.${key.manner}`,
-      [key.shadow]: `${root}.${key.shadow}`,
-      [key.favored]: `${root}.${key.favored}`,
-      [key.armorProps]: `${root}.${key.armorProps}`
+      manner: `${root}.manner`,
+      shadow: `${root}.shadow`,
+      favored: `${root}.favored`,
+      armorProps: `${root}.armorProps`
     }
 
-    /* spell progression (max spell level) */
-    const keys = this.CONFIG.SPELL_PROG_KEY;
-
     globalThis.game.syb5e.CONFIG.SPELL_PROGRESSION = {
-      [keys.full]: [0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,9,9],
-      [keys.half]: [0,1,1,2,2,2,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4]
+      full: [0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,9,9],
+      half: [0,1,1,2,2,2,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4]
     }
 
   }
