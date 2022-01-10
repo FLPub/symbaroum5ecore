@@ -1,0 +1,14 @@
+{{!-- Based on dnd5e/templates/actors/parts/actor-inventory.html --}}
+{{log this}}
+<ol class="currency flexrow">
+  <h3>
+    {{localize "DND5E.Currency"}}
+    <a class="currency-convert rollable" title="{{localize 'DND5E.CurrencyConvert'}}">
+      <i class="fas fa-coins"></i>
+    </a>
+  </h3>
+  {{#each labels as |label denom|}}
+  <label class="denomination {{denom}}">{{ label }}</label>
+  <input type="text" name="data.currency.{{denom}}" value="{{ lookup ../currency denom}}" data-dtype="Number"/>
+  {{/each}}
+</ol>

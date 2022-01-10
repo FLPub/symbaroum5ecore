@@ -48,6 +48,11 @@
         "Alchemical": "Alchemical"
       }
     },
+    "Currency": {
+      "Thaler": "Thaler",
+      "Shilling": "Shilling",
+      "Orteg": "Orteg"
+    },
     "Spell": {
       "Favored": "Favored",
       "MaxLevel": "Maximum Spell Level"

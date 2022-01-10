@@ -278,7 +278,7 @@ export class Resting {
         name: actor.name,
         dhd,
         dhp,
-        dco
+        dco: Math.abs(dco)
       })
     };
     ChatMessage.applyRollMode(chatData, game.settings.get("core", "rollMode"));

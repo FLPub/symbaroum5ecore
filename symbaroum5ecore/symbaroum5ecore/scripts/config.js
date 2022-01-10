@@ -23,6 +23,8 @@ export class SYB5E {
       `${COMMON.DATA.path}/templates/actors/parts/actor-shadow.html`,
       `${COMMON.DATA.path}/templates/actors/parts/npc-manner.html`,
       `${COMMON.DATA.path}/templates/actors/parts/character-max-spell.html`,
+      `${COMMON.DATA.path}/templates/actors/parts/actor-currency.html`,
+
       /* Item partials */
       `${COMMON.DATA.path}/templates/items/parts/spell-favored.html`,
       `${COMMON.DATA.path}/templates/items/parts/armor-properties.html`,
@@ -91,6 +93,18 @@ export class SYB5E {
       noi: "SYB5E.Item.ArmorProps.Noisy",
       wei: "SYB5E.Item.ArmorProps.Weighty"
     });
+
+    globalThis.game.syb5e.CONFIG.CURRENCY = COMMON.translateObject({
+      gp: 'SYB5E.Currency.Thaler', 
+      sp: 'SYB5E.Currency.Shilling', 
+      cp: 'SYB5E.Currency.Orteg'
+    });
+
+    globalThis.game.syb5e.CONFIG.CURRENCY_CONVERSION = {
+      cp: {into: 'sp', each: 10},
+      sp: {into: 'gp', each: 10},
+      gp: {into: 'gp', each: 1}
+    }
 
     /* The default values for syb5e actor data */
     globalThis.game.syb5e.CONFIG.DEFAULT_FLAGS = {

@@ -50,6 +50,28 @@ export class SheetCommon {
       return manner;
     });
 
+    /**
+     * Convert all carried currency to the highest possible denomination to reduce the number of raw coins being
+     * carried by an Actor.
+     * @returns {Promise<Actor5e>}
+     */
+    COMMON.CLASSES.Actor5e.prototype.convertSybCurrency = function() {
+      const conversion = Object.entries(game.syb5e.CONFIG.CURRENCY_CONVERSION);
+      const current = duplicate(this.data.data.currency);
+      
+      for( const [denom, data] of conversion ) {
+
+        /* get full coin conversion to next step */
+        const denomUp = Math.floor(current[denom] / data.each);
+
+        /* subtract converted coins and add converted coins */
+        current[denom] -= (denomUp * data.each);
+        current[data.into] += denomUp;
+      }
+
+      return this.update({'data.currency': current});
+    }
+
   }
 
   /* -------------------------------------------- */
@@ -101,55 +123,6 @@ export class SheetCommon {
   /** \DEFAULTS **/
 
   /** SYB DATA SETUP **/
-
-  /* -------------------------------------------- */
-
-  /* @param actor : actor document to initialize
-   * @param overwrite : force default values regardless of current flag data
-   */
-  //static _flagInitData(actor, overwrite = false) {
-
-  //  /* get the default flag data */
-  //  let defaultFlagData = duplicate(SheetCommon.DEFAULT_FLAGS);
-
-  //  /* calculate the initial corruption threshold */
-  //  defaultFlagData.corruption.max = SheetCommon._calcMaxCorruption(actor);
-
-  //  /* if overwriting, force our default values, otherwise merge our new flag data into the actor's flags */
-  //  const initializedFlags = overwrite ? defaultFlagData : mergeObject(actor.data.flags, defaultFlagData, {inplace: false});
-  //  logger.debug(`Initializing ${actor.name} with default syb data:`, initializedFlags);
-
-  //  return initializedFlags;
-  //}
-
-  /* -------------------------------------------- */
-
-  /* Initializes SYB5E-specific data if this actor has not been initialized before */
-  //static _initFlagData(actor, updateData) {
-
-  //  /* gracefully merge */
-  //  const initializedFlags = SheetCommon._flagInitData(actor, false);
-
-  //  mergeObject(updateData.flags, initializedFlags);
-  //}
-
-  /* -------------------------------------------- */
-
-  //static async reInitActor(actor, overwrite) {
-  //  const initializedFlags = SheetCommon._flagInitData(actor, overwrite);
-  //  
-  //  /* clear out any old data */
-  //  await actor.update({[`flags.-=${COMMON.DATA.name}`]: null});
-
-  //  /* set our default data */
-  //  await actor.update({flags: {[COMMON.DATA.name]: initializedFlags}});
-
-  //  return actor.data.flags[COMMON.DATA.name];
-  //}
-
-  /** \SYB DATA SETUP **/ 
-
-  /** COMMON SHEET OPS **/ 
 
   /* -------------------------------------------- */
 
@@ -211,42 +184,54 @@ export class SheetCommon {
     mergeObject(context, commonData);
   }
 
+  static async renderCurrencyRow(actor) {
+   
+    const data = {
+      currency: actor.data.data.currency,
+      labels: game.syb5e.CONFIG.CURRENCY,
+    }
+
+    COMMON.translateObject(data.labels);
+
+    const rendered = await renderTemplate(`${COMMON.DATA.path}/templates/actors/parts/actor-currency.html`, data);
+
+    return rendered;
+  }
+
   /* -------------------------------------------- */
 
-  static _render(){
+  static async _render(){
     /* suppress spell slot display */
     this.element.find('.spell-slots').css('display', 'none');
+
+    const currencyRow = await SheetCommon.renderCurrencyRow(this.actor);
+
+    switch (this.actor.type) {
+      case 'character':
+    /* characters have a currency row already that we need to replace */
+        this.element.find('.currency').replaceWith(currencyRow);
+        break;
+
+    /* NPCs have none and we want to put it at the top of features */
+      case 'npc':
+        this.element.find('.features .inventory-filters').prepend(currencyRow);
+        break;
+    }
+
+    //if ( !this.isEditable ) return false;
+    
+    //currency conversion
+    this.element.find('.currency-convert').click( SheetCommon._onSybCurrencyConvert.bind(this) );
   }
 
   /** \COMMON **/
 
-  /** HOOKS **/
-
   /* -------------------------------------------- */
 
-  /* ensures we have the data needed for the symbaroum system when
-   * the SYB sheet is chosen for the first time
-   */
-  //static _preUpdateActor(actor, updateData /*, options, user */) {
-
-  //  const sheetClass = COMMON[this.NAME].id;
-
-  //  if (getProperty(updateData, 'flags.core.sheetClass') == sheetClass) {
-
-  //    /* we are updating to OUR sheet. Ensure that we have the flag
-  //     * data initialized
-  //     */
-  //    SheetCommon._initFlagData(actor, updateData);
-  //  }
-
-  //}
-
-  /** \HOOKS **/
-
-  /* -------------------------------------------- */
-
-  static commonListeners(html) {
-    
+  static async _onSybCurrencyConvert(event) {
+    event.preventDefault();
+    await this._onSubmit(event);
+    return this.actor.convertSybCurrency();
   }
 
   /** MECHANICS HELPERS **/
@@ -328,15 +313,6 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
 
   /* -------------------------------------------- */
 
-  activateListeners(html) {
-    super.activateListeners(html);
-
-    SheetCommon.commonListeners.bind(this,html)();
-
-  }
-
-  /* -------------------------------------------- */
-
   //TODO expand to other modes (like limited)
   get template() {
     return `${COMMON.DATA.path}/templates/actors/syb5e-character-sheet.html`
@@ -371,7 +347,7 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
     await super._render(...args);
 
     /* call the common _render by binding (pretend its our own method) */
-    const boundRender = SheetCommon._render.bind(this);
+    const boundRender = await SheetCommon._render.bind(this);
     boundRender(...args);
 
     /* Inject the extended rest button and listener ( TODO should the whole sheet be injected like this?) */
@@ -407,7 +383,17 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
   }
 
   /* -------------------------------------------- */
+
+  async _onExtendedRest(event) {
+    event.preventDefault();
+    await this._onSubmit(event);
+    return this.actor.extendedRest();
+  }
+
+  /* -------------------------------------------- */
   
+
+
 }
 
 export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
@@ -452,14 +438,6 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
 
   /* -------------------------------------------- */
 
-  activateListeners(html) {
-    super.activateListeners(html);
-
-    SheetCommon.commonListeners.bind(this,html)();
-  }
-
-  /* -------------------------------------------- */
-
   //TODO expand to other modes (like limited)
   get template() {
     return `${COMMON.DATA.path}/templates/actors/syb5e-npc-sheet.html`
@@ -496,19 +474,8 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
     await super._render(...args);
 
     /* call the common _render by binding (pretend its our own method) */
-    const boundRender = SheetCommon._render.bind(this);
+    const boundRender = await SheetCommon._render.bind(this);
     boundRender(...args);
   }
 
-  /* -------------------------------------------- *
-
-  _onItemRoll(event){
-    const boundOnRoll = SheetCommon._onItemRoll.bind(this);
-
-    boundOnRoll(event);
-
-    return super._onItemRoll(event);
-  }
-
-  /* -------------------------------------------- */
 }
