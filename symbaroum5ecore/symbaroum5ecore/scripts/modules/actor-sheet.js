@@ -51,11 +51,34 @@ export class SheetCommon {
     });
 
     /**
+     * Wrap Actor5e#getRollData and insert our SYB specific fields
+     */
+    const _getRollData = COMMON.CLASSES.Actor5e.prototype.getRollData;
+    COMMON.CLASSES.Actor5e.prototype.getRollData = function() {
+      const data = _getRollData.call(this);
+
+      if (SheetCommon.isSybActor(this.data)) {
+        data.attributes.corruption = this.corruption;
+        data.details.shadow = this.shadow;
+        data.details.manner = this.manner;
+      }
+
+      return data;
+    }
+
+    /**
      * Convert all carried currency to the highest possible denomination to reduce the number of raw coins being
      * carried by an Actor.
      * @returns {Promise<Actor5e>}
      */
     COMMON.CLASSES.Actor5e.prototype.convertSybCurrency = function() {
+
+      /* dont convert syb currency if not an syb actor */
+      if (SheetCommon.isSybActor(this.data)) {
+        logger.info(COMMON.localize("SYB5E.error.notSybActor"));
+        return;
+      }
+
       const conversion = Object.entries(game.syb5e.CONFIG.CURRENCY_CONVERSION);
       const current = duplicate(this.data.data.currency);
       

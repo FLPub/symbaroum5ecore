@@ -42,11 +42,11 @@ export class Spellcasting {
       return Spellcasting._isFavored(this.data);
     });
 
-    const orig_spellChatData = COMMON.CLASSES.Item5e.prototype._spellChatData;
+    const __spellChatData = COMMON.CLASSES.Item5e.prototype._spellChatData;
     COMMON.CLASSES.Item5e.prototype._spellChatData = function(data, labels, props) {
 
       /* should insert 2 labels -- level and components */
-      orig_spellChatData(data, labels, props);
+      __spellChatData.call(this, data, labels, props);
 
       /* add ours right after if we are consuming corruption */
       if(SheetCommon.isSybActor(this.actor.data) && this.corruptionUse){
@@ -58,10 +58,11 @@ export class Spellcasting {
   }
 
   static _patchAbilityUseDialog() {
-    const wrapped = game.dnd5e.applications.AbilityUseDialog._getSpellData;
+
+    const __getSpellData = game.dnd5e.applications.AbilityUseDialog._getSpellData;
 
     game.dnd5e.applications.AbilityUseDialog._getSpellData = function(actorData, itemData, returnData) {
-      wrapped.bind(this)(actorData, itemData, returnData);
+      __getSpellData.call(this, actorData, itemData, returnData);
 
       /* only modify the spell data if this is an syb actor */
       if (SheetCommon.isSybActor(returnData.item?.document?.actor?.data)){
@@ -166,13 +167,7 @@ export class Spellcasting {
     return favored;
   }
 
-  static _corruptionExpression(itemData, level = itemData.data.level) {
-
-    /* non-spells can't corrupt */
-    if (itemData.type !== 'spell'){
-      return
-    }
-
+  static _generateCorruptionExpression(level, favored) {
     /* cantrips have a level of "0" (string) for some reason */
     level = parseInt(level);
 
@@ -180,14 +175,25 @@ export class Spellcasting {
       return false
     }
 
-    if (Spellcasting._isFavored(itemData)) {
+    if (favored) {
       /* favored cantrips cost 0, favored spells cost level */
       return level == 0 ? '0' : `${level}`
     }
 
     /* cantrips cost 1, leveled spells are 1d4+level */
-    return level == 0? '1' : `1d4 + ${level}`;
+    return level == 0 ? '1' : `1d4 + ${level}`;
 
+  }
+
+  static _corruptionExpression(itemData, level = itemData.data.level) {
+
+    /* non-spells can't corrupt */
+    if (itemData.type !== 'spell'){
+      return
+    }
+
+    return Spellcasting._generateCorruptionExpression(level, Spellcasting._isFavored(itemData));
+  
   }
 
   /** \MECHANICS HELPERS **/

@@ -114,7 +114,7 @@ export class Resting {
       const initCorr = this.corruption.temp;
 
       if(!SheetCommon.isSybActor(this.data)){
-        return _longRest.bind(this)({dialog, chat, newDay}); 
+        return _longRest.call(this, {dialog, chat, newDay}); 
       }
 
       // Maybe present a confirmation dialog
@@ -139,7 +139,7 @@ export class Resting {
       const initCorr = this.corruption.temp;
 
       if(!SheetCommon.isSybActor(this.data)){
-        return _shortRest.bind(this)({dialog, chat, autoHD, autoHDThreshold}); 
+        return _shortRest.call(this, {dialog, chat, autoHD, autoHDThreshold}); 
       }
 
       // Maybe present a confirmation dialog

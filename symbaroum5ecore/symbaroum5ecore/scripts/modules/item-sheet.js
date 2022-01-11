@@ -4,6 +4,7 @@ import { SYB5E } from '../config.js'
 import { Spellcasting } from './spellcasting.js'
 import { SheetCommon } from './actor-sheet.js'
 
+
 /* Initial attempt is via injection only */
 export class Syb5eItemSheet {
 
@@ -24,8 +25,9 @@ export class Syb5eItemSheet {
 
   static _patchItem() {
 
-    /* Armor will also have item properties similar to Weapons */
+    /* Item5e#properties */
     COMMON.addGetter(COMMON.CLASSES.Item5e.prototype, 'properties', function() {
+      /* Armor will also have item properties similar to Weapons */
 
       /* is armor type? return syb armor props or the default object
        * if no flag data exists yet */
@@ -37,7 +39,36 @@ export class Syb5eItemSheet {
       return this.data.data.properties ?? {}
     });
 
-    const wrapped = COMMON.CLASSES.Item5e.prototype._getUsageUpdates;
+    /* Item5e#getRollData */
+    const _getRollData = COMMON.CLASSES.Item5e.prototype.getRollData
+    COMMON.CLASSES.Item5e.prototype.getRollData = function() {
+      const data = _getRollData.call(this);
+      
+      /* if owned by an SYB actor, insert our
+       * SYB5E specific fields
+       */
+      if( 
+        !!data && 
+        (!this.parent || SheetCommon.isSybActor(this.parent.data))
+      ){
+        logger.debug('Item/rollData', this, data);
+        data.item.properties = this.properties;
+        data.item.favored = this.isFavored;
+        data.item.type = this.type;
+        if(this.type == 'spell') {
+          /* add in corruption expression */
+          COMMON.addGetter(data.item, 'corruption', function(){
+             return Spellcasting._generateCorruptionExpression(this.level, this.favored)
+          });
+        }
+
+      }
+
+      return data;
+    }
+
+    /* Item5e#_getUsageUpdates */
+    const __getUsageUpdates = COMMON.CLASSES.Item5e.prototype._getUsageUpdates;
     COMMON.CLASSES.Item5e.prototype._getUsageUpdates = function(usageInfo) {
       const sybActor = SheetCommon.isSybActor(this.actor.data)
 
@@ -52,7 +83,7 @@ export class Syb5eItemSheet {
         usageInfo.consumeSpellLevel = null;
       }
       
-      let updates = (wrapped.bind(this))(usageInfo)
+      let updates = __getUsageUpdates.call(this,usageInfo);
 
       /* now insert our needed information into the changes to be made to the actor */
       if (sybActor) {
