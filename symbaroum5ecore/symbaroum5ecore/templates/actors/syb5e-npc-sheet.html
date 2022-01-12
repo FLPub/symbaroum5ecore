@@ -140,7 +140,10 @@
 
             <section class="center-pane flexcol">
                 {{!-- Corruption --}}
-                {{> "modules/symbaroum-5e-core/templates/actors/parts/actor-corruption.html"}}
+                {{> "modules/symbaroum5ecore/templates/actors/parts/actor-corruption.html"}}
+
+                {{!-- Manner/Shadow Text Box --}}
+                {{> "modules/symbaroum5ecore/templates/actors/parts/actor-shadow.html"}}
 
                 {{!-- Legendary Actions --}}
                 <div class="counters">
@@ -197,7 +200,8 @@
 
         {{!-- Biography Tab --}}
         <div class="tab biography flexcol" data-group="primary" data-tab="biography">
-            {{editor content=data.details.biography.value target="data.details.biography.value" button=true owner=owner editable=editable rollData=rollData}}
+
+          {{editor content=data.details.biography.value target="data.details.biography.value" button=true owner=owner editable=editable rollData=rollData}}
         </div>
     </section>
 </form>

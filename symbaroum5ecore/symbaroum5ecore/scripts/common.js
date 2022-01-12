@@ -1,17 +1,17 @@
-import { logger } from './logger.js';
-
 /* DND5E Class Imports */
 import { DND5E } from '../../../systems/dnd5e/module/config.js';
 import ActorSheet5eCharacter from '../../../systems/dnd5e/module/actor/sheets/character.js'
 import ActorSheet5eNPC from '../../../systems/dnd5e/module/actor/sheets/npc.js'
 import Actor5e from '../../../systems/dnd5e/module/actor/entity.js'
+import Item5e from '../../../systems/dnd5e/module/item/entity.js'
+
 /* Common operations and utilities for all
  * core submodules
  */
 
-const NAME = 'symbaroum-5e-core';
+const NAME = 'symbaroum5ecore';
 const TITLE = 'Symbaroum 5E Ruins of Symbaroum - Core System';
-const PATH = `/modules/${NAME}`;
+const PATH = `modules/${NAME}`;
 
 export class COMMON {
 
@@ -27,7 +27,8 @@ export class COMMON {
     DND5E,
     ActorSheet5eCharacter,
     ActorSheet5eNPC,
-    Actor5e
+    Actor5e,
+    Item5e,
   };
 
   static NAME = this.name;
@@ -35,22 +36,32 @@ export class COMMON {
 
   /* runtime construction of basic information about this module */
   static build() {
-    COMMON.hooks();
+
   }
 
   static register() {
-    logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: this.NAME}));
+    COMMON.globals();
   }
 
-  static hooks() {
-    Hooks.on('init', COMMON._init);
+  static globals() {
+
+    /* register our namespace */
+    globalThis.game.syb5e = {
+      debug: {},
+    };
+   
   }
 
   static _init() {
 
     return loadTemplates([
       /* Actor partials */
-      "modules/symbaroum-5e-core/templates/actors/parts/actor-corruption.html"
+      `${COMMON.DATA.path}/templates/actors/parts/actor-corruption.html`,
+      `${COMMON.DATA.path}/templates/actors/parts/actor-shadow.html`,
+      `${COMMON.DATA.path}/templates/actors/parts/npc-manner.html`,
+      `${COMMON.DATA.path}/templates/actors/parts/character-max-spell.html`,
+      `${COMMON.DATA.path}/templates/items/parts/spell-favored.html`,
+      `${COMMON.DATA.path}/templates/apps/rest.html`,
     ]);
 
   }
@@ -74,6 +85,19 @@ export class COMMON {
         }
       );
     });
+  }
+
+  static addGetter(object, fieldName, fn) {
+    Object.defineProperty(object, fieldName, {
+      get: fn
+    });
+  }
+
+  static translateObject(obj) {
+    /* translate in place */
+    Object.keys(obj).forEach( key => obj[key] = COMMON.localize(obj[key]));
+
+    return obj;
   }
 
 }
