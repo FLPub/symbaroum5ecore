@@ -176,7 +176,7 @@ export class SheetCommon {
     let corruptionAbilityData = {
       path: game.syb5e.CONFIG.PATHS.corruption.ability,
       abilities: corruptionAbilities,
-      current: getProperty(actor.data, game.syb5e.CONFIG.PATHS.corruption.ability)
+      current: actor.corruption.ability
     }
 
     /* can only edit max corruption if using a custom value */

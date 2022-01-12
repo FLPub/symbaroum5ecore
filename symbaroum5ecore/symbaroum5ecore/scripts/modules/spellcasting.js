@@ -139,7 +139,7 @@ export class Spellcasting {
    */
   static maxSpellLevelNPC(actor5eData){
     
-    const spellStat = actor5eData.spellcasting ?? '' === '' ? false : actor5eData.spellcasting;
+    //const spellStat = actor5eData.spellcasting ?? '' === '' ? false : actor5eData.spellcasting;
     const casterLevel = actor5eData.details.spellLevel ?? 0;
     const cr = Math.max(actor5eData.details.cr, 1);
 
@@ -152,8 +152,12 @@ export class Spellcasting {
 
     /* modify max spell level if full caster or has a casting stat */
     if (result.fullCaster) {
+      /* if we are a full caster, use our caster level */
       result.level = game.syb5e.CONFIG.SPELL_PROGRESSION.full[casterLevel]; 
-    } else if (spellStat) {
+    } else {
+      /* if we are using spellcasting as our stat, but
+       * dont have a caster level, assume cr = level
+       */
       result.level = game.syb5e.CONFIG.SPELL_PROGRESSION.full[cr];
     } 
 
