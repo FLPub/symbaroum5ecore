@@ -100,13 +100,45 @@
   box-shadow: 0 0 8px hsl(0, 0%, 50%);
 }
 
-.symbaroum-dnd5e-mod .entity-link-I {
+.symbaroum-dnd5e-mod .content-link {
   color: hsl(39, 77%, 83%);
   background: transparent;
   font-size: 15pt;
   border: 0;
 }
 
+.symbaroum-dnd5e-mod .inline-link .content-link {
+  background-color: transparent;
+  color: hsl(0, 0%, 0%);
+  font-size: 12pt;
+  border: 0;
+  font-family: 'Fondamento';
+}
+
+.symbaroum-dnd5e-mod .inline-link2 .content-link {
+  background-color: transparent;
+  color: hsl(6, 56%, 30%);
+  font-size: 16pt;
+  border: 0;
+  font-family: 'Fondamento';
+}
+
+.symbaroum-dnd5e-mod .noSpellLink {
+  background-color: transparent;
+  color: hsl(6, 56%, 30%);
+  font-size: 16pt;
+  border: 0;
+  font-family: 'Fondamento';
+}
+
+.symbaroum-dnd5e-mod h2 .content-link {
+  background-color: hsl(6, 56%, 30%);
+  color: hsl(130, 65%, 51%);
+  font-size: 12pt;
+  border: 0;
+  /* font-family: 'Fondamento'; */
+  font-family: 'Primitive';
+}
 .symbaroum-dnd5e-mod p {
   background: transparent;
   font-size: 12pt;
@@ -172,7 +204,6 @@
   margin: 0px 20px 0px 10px;
 }
 
-
 .symbaroum-dnd5e-mod .parahead {
   font-weight: bold;
   font-family: 'Fondamento';
@@ -203,7 +234,7 @@
   margin-bottom: 0;
 }
 .symbaroum-dnd5e-mod .newHead {
-  font-family: 'Jim Nightshade'; 
+  font-family: 'Jim Nightshade';
   text-align: center;
   font-size: 68pt;
   margin-bottom: 0;
@@ -215,7 +246,7 @@
 }
 .symbaroum-dnd5e-mod .h2subHead {
   font-weight: bold;
-  color:  hsl(19, 70%, 37%);
+  color: hsl(19, 70%, 37%);
   border: 0;
   margin-bottom: 0;
   margin-left: 10px;
@@ -275,7 +306,7 @@ td {
 .symbaroum-dnd5e-mod .tdstyle2D {
   width: 50%;
   height: 18px;
-  text-align: center;
+  /* text-align: center; */
 }
 
 .symbaroum-dnd5e-mod .blockquoteright {
@@ -357,6 +388,19 @@ td {
   border: none;
   text-align: center;
 }
+.symbaroum-dnd5e-mod .fancytextcenter {
+  max-width: 20%;
+  padding: 10px;
+  margin-top: 73px;
+  float: none;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  break-inside: avoid;
+  font-style: normal;
+  border: none;
+  text-align: center;
+}
 .symbaroum-dnd5e-mod .fancyheader {
   display: inline-block;
   background-image: url('../images/journal/fancytextheader.png');
@@ -385,12 +429,25 @@ td {
   width: 1%;
   text-align: center;
   border-right: solid 1px;
+  color: hsl(6, 55%, 30%);
 }
 .symbaroum-dnd5e-mod .newstatheader2 {
   height: 15px;
   padding: 0;
   width: 1%;
   text-align: center;
+  color: hsl(6, 55%, 30%);
+}
+.symbaroum-dnd5e-mod .statblock1 {
+  width: 15%;
+  padding: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.symbaroum-dnd5e-mod .statblock2 {
+  color: hsl(6, 55%, 30%);
+  background-color: hsl(45, 13%, 87%);
+  border-top: hsl(6, 55%, 30%) solid 2px;
 }
 .symbaroum-dnd5e-mod .symtitle {
   display: block;
@@ -423,4 +480,29 @@ td {
   height: 297px;
   /* border: 3px solid #73ad21; */
   text-align: left;
+}
+.symbaroum-dnd5e-mod .blockrotate {
+  /* position: relative; */
+  /* left: 45px; */
+  /* width: 85%; */
+  transform: translateX (45px);
+  transform: rotate(-3deg);
+  /* padding-top: 15px; */
+}
+
+.symbaroum-dnd5e-mod .statblockcenter {
+  /* background-image: url(../images/journal/foreground2a.png); */
+  background-color: hsl(0, 0%, 100%);
+  /* max-width: 35%; */
+  padding: 10px;
+  margin-top: 10px;
+  margin-right: auto;
+  margin-bottom: 10px;
+  margin-left: auto;
+  /* break-inside: avoid; */
+  /* font-style: normal; */
+  /* float: center; */
+  /* border: 5px double hsl(0, 0%, 0%); */
+  /* border-radius: 25px; */
+  /* box-shadow: 3px 3px; */
 }
