@@ -49,7 +49,7 @@ export class Spellcasting {
       __spellChatData.call(this, data, labels, props);
 
       /* add ours right after if we are consuming corruption */
-      if(SheetCommon.isSybActor(this.actor.data) && this.corruptionUse){
+      if(this.actor.isSybActor() && this.corruptionUse){
         /* cantrips and favored spells have a flat corruption value */
         const totalString = this.isFavored || (parseInt(this.data.data.level) === 0) ? '' : ` (${this.corruptionUse.total})`;
         props.push(`${this.corruptionUse.expression}${totalString}`);
@@ -64,8 +64,10 @@ export class Spellcasting {
     game.dnd5e.applications.AbilityUseDialog._getSpellData = function(actorData, itemData, returnData) {
       __getSpellData.call(this, actorData, itemData, returnData);
 
+      const actor = returnData.item?.document?.actor;
+
       /* only modify the spell data if this is an syb actor */
-      if (SheetCommon.isSybActor(returnData.item?.document?.actor?.data)){
+      if (actor?.isSybActor() ?? false){
         Spellcasting._getSpellData(actorData, itemData, returnData);
       }
      
@@ -75,8 +77,10 @@ export class Spellcasting {
 
   static _renderAbilityUseDialog(app, html, data){
 
+    const actor = app.item?.actor
+
     /* only modify syb actors */
-    if(!SheetCommon.isSybActor(app.item?.actor?.data)) return;
+    if(actor && actor.isSybActor()) return;
 
     /* only modify spell use dialogs */
     if(app.item?.type !== 'spell') return;
@@ -169,6 +173,21 @@ export class Spellcasting {
   static _isFavored(itemData) {
     const favored = getProperty(itemData, game.syb5e.CONFIG.PATHS.favored) ?? game.syb5e.CONFIG.DEFAULT_ITEM.favored;
     return favored;
+  }
+
+  static spellProgression(actorData) {
+
+    const result = actorData.type == 'character' ? Spellcasting.maxSpellLevelByClass(actorData.data.classes) : Spellcasting.maxSpellLevelNPC(actorData.data)
+
+    return result;
+
+  }
+
+  static modifyDerivedProgression(actorData) {
+
+    const progression = Spellcasting.spellProgression(actorData);
+
+
   }
 
   static _generateCorruptionExpression(level, favored) {

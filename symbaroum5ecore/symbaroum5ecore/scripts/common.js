@@ -2,7 +2,6 @@
 import { DND5E } from '../../../systems/dnd5e/module/config.js';
 import ActorSheet5eCharacter from '../../../systems/dnd5e/module/actor/sheets/character.js'
 import ActorSheet5eNPC from '../../../systems/dnd5e/module/actor/sheets/npc.js'
-import Actor5e from '../../../systems/dnd5e/module/actor/entity.js'
 import Item5e from '../../../systems/dnd5e/module/item/entity.js'
 
 /* Common operations and utilities for all
@@ -27,7 +26,6 @@ export class COMMON {
     DND5E,
     ActorSheet5eCharacter,
     ActorSheet5eNPC,
-    Actor5e,
     Item5e,
   };
 

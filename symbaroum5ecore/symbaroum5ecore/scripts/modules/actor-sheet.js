@@ -1,6 +1,7 @@
 import { COMMON } from '../common.js'
 import { logger } from '../logger.js';
 import { Spellcasting } from './spellcasting.js'
+import { ActorSyb5e } from './actor.js'
 
 export class SheetCommon {
 
@@ -11,90 +12,7 @@ export class SheetCommon {
   /* -------------------------------------------- */
 
   static register() {
-    this.patch();
     this.globals();
-  }
-
-  /* -------------------------------------------- */
-
-  static patch() {
-    this._patchActor();
-  }
-
-  /* -------------------------------------------- */
-
-  static _patchActor() {
-
-    COMMON.addGetter(COMMON.CLASSES.Actor5e.prototype, 'corruption', function() {
-      /* current value */
-      let corruption = this.getFlag(COMMON.DATA.name, 'corruption') ?? {};
-
-      /* correct bad values and merge in needed defaults */
-      const defaults = SheetCommon.DEFAULT_FLAGS.corruption;
-      Object.keys(defaults).forEach( (key) => {
-        corruption[key] = (typeof corruption[key] == typeof defaults[key]) ? corruption[key] : defaults[key];
-      });
-
-      corruption.value = corruption.temp + corruption.permanent;
-      corruption.max = SheetCommon._calcMaxCorruption(this);
-      return corruption;
-    });
-
-    COMMON.addGetter(COMMON.CLASSES.Actor5e.prototype, 'shadow', function() {
-      const shadow = this.getFlag(COMMON.DATA.name, 'shadow') ?? SheetCommon.DEFAULT_FLAGS.shadow;
-      return shadow;
-    });
-
-    COMMON.addGetter(COMMON.CLASSES.Actor5e.prototype, 'manner', function() {
-      const manner = this.getFlag(COMMON.DATA.name, 'manner') ?? SheetCommon.DEFAULT_FLAGS.manner;
-      return manner;
-    });
-
-    /**
-     * Wrap Actor5e#getRollData and insert our SYB specific fields
-     */
-    const _getRollData = COMMON.CLASSES.Actor5e.prototype.getRollData;
-    COMMON.CLASSES.Actor5e.prototype.getRollData = function() {
-      const data = _getRollData.call(this);
-
-      if (SheetCommon.isSybActor(this.data)) {
-        data.attributes.corruption = this.corruption;
-        data.details.shadow = this.shadow;
-        data.details.manner = this.manner;
-      }
-
-      return data;
-    }
-
-    /**
-     * Convert all carried currency to the highest possible denomination to reduce the number of raw coins being
-     * carried by an Actor.
-     * @returns {Promise<Actor5e>}
-     */
-    COMMON.CLASSES.Actor5e.prototype.convertSybCurrency = function() {
-
-      /* dont convert syb currency if not an syb actor */
-      if (SheetCommon.isSybActor(this.data)) {
-        logger.info(COMMON.localize("SYB5E.error.notSybActor"));
-        return;
-      }
-
-      const conversion = Object.entries(game.syb5e.CONFIG.CURRENCY_CONVERSION);
-      const current = duplicate(this.data.data.currency);
-      
-      for( const [denom, data] of conversion ) {
-
-        /* get full coin conversion to next step */
-        const denomUp = Math.floor(current[denom] / data.each);
-
-        /* subtract converted coins and add converted coins */
-        current[denom] -= (denomUp * data.each);
-        current[data.into] += denomUp;
-      }
-
-      return this.update({'data.currency': current});
-    }
-
   }
 
   /* -------------------------------------------- */
@@ -149,10 +67,8 @@ export class SheetCommon {
 
   /* -------------------------------------------- */
 
-  static isSybActor(actorData = {}) {
-    const sheetClassId = getProperty(actorData, 'flags.core.sheetClass'); 
-    const found = game.syb5e.sheetClasses.find( classInfo => classInfo.id === sheetClassId );
-    return !!found;
+  static _computeSybSpellcastingProgression(actorData) {
+
   }
 
   /* -------------------------------------------- */

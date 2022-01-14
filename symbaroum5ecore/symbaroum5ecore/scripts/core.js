@@ -14,6 +14,8 @@ import { SYB5E } from './config.js'
 import { Spellcasting } from './modules/spellcasting.js'
 import { Resting } from './modules/resting.js'
 import { SybRestDialog } from './modules/apps/syb-rest-dialog.js'
+import { ActorSyb5e } from './modules/actor.js'
+import { ItemSyb5e } from './modules/item.js'
 
 /**
  * Sub Modules
@@ -27,6 +29,8 @@ const SUB_MODULES = {
   COMMON,
   SYB5E,
   logger,
+  ActorSyb5e,
+  ItemSyb5e,
   SheetCommon,
   Syb5eActorSheetCharacter,
   Syb5eActorSheetNPC,
@@ -54,6 +58,6 @@ Hooks.on('init', () => {
   });
 
   //GlobalTesting
-  //Object.entries(SUB_MODULES).forEach(([key, cl])=> window[key] = cl);
+  Object.entries(SUB_MODULES).forEach(([key, cl])=> window[key] = cl);
   //Object.entries(SUB_APPS).forEach(([key, cl])=> window[key] = cl);
 });

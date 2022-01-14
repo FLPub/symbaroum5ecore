@@ -10,6 +10,7 @@
       "SubModule": "Initializing Sub-Module: {name}"
     },
     "Sheet" : {
+      "Origin": "Origin",
       "Character": {
         "Label": "Symbaroum 5e Character"
       },
@@ -46,6 +47,9 @@
       },
       "Subtype": {
         "Alchemical": "Alchemical"
+      },
+      "Class": {
+        "Approach": "Approach"
       }
     },
     "Currency": {
