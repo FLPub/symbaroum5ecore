@@ -113,10 +113,13 @@ export class ActorSyb5e {
     ActorSyb5e.parent.prepareDerivedData.call(this, ...args); 
 
     if (this.isSybActor()){
-      /* check for half caster and "fix" for syb5e half-caster progression */
-      logger.debug('derived data:', this.data)
+      logger.debug('core derived data:', this.data)
+
+      /* prepare derived corruption data */
+      setProperty(this.data, game.syb5e.CONFIG.PATHS.corruption.root,this.corruption);
       
-      //TODO 
+      
+      /* check for half caster and "fix" for syb5e half-caster progression */
       Spellcasting._modifyDerivedProgression(this.data);
     }
   }
@@ -175,14 +178,13 @@ export class ActorSyb5e {
   /* -------------------------------------------- */
 
   static _prepareCommonData(actor) {
-    actor.data.data.attributes.corruption = actor.corruption;
-    actor.data.data.details.shadow = actor.shadow;
+    setProperty(actor.data, game.syb5e.CONFIG.PATHS.shadow, actor.shadow);
   }
 
   /* -------------------------------------------- */
 
   static _prepareNpcData(actor) {
-    actor.data.data.details.manner = actor.manner;
+    setProperty(actor.data,game.syb5e.CONFIG.PATHS.manner,actor.manner);
   }
 
   /* -------------------------------------------- */
@@ -192,10 +194,7 @@ export class ActorSyb5e {
     let corruption = this.getFlag(COMMON.DATA.name, 'corruption') ?? {};
 
     /* correct bad values and merge in needed defaults */
-    const defaults = game.syb5e.CONFIG.DEFAULT_FLAGS;
-    Object.keys(defaults).forEach( (key) => {
-      corruption[key] = (typeof corruption[key] == typeof defaults[key]) ? corruption[key] : defaults[key];
-    });
+    corruption = mergeObject(game.syb5e.CONFIG.DEFAULT_FLAGS.corruption, corruption, {inplace: false});
 
     corruption.value = corruption.temp + corruption.permanent;
     corruption.max = ActorSyb5e._calcMaxCorruption(this);
@@ -205,12 +204,12 @@ export class ActorSyb5e {
   /* -------------------------------------------- */
 
   static getShadow() {
-    const shadow = this.getFlag(COMMON.DATA.name, 'shadow') ?? SheetCommon.DEFAULT_FLAGS.shadow;
+    const shadow = this.getFlag(COMMON.DATA.name, 'shadow') ?? game.syb5e.CONFIG.DEFAULT_FLAGS.shadow;
     return shadow;
   }
 
   static getManner() {
-    const manner = this.getFlag(COMMON.DATA.name, 'manner') ?? SheetCommon.DEFAULT_FLAGS.manner;
+    const manner = this.getFlag(COMMON.DATA.name, 'manner') ?? game.syb5e.CONFIG.DEFAULT_FLAGS.manner;
     return manner;
   }
 
@@ -258,8 +257,9 @@ export class ActorSyb5e {
     const defaultAbility = game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.ability;
     let corruptionAbility = getProperty(actor.data, paths.corruption.ability) ?? defaultAbility;
     /* if we are in a custom max mode, just return the current stored max */
+    const currentMax = getProperty(actor.data, paths.corruption.max) ?? game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.max
     if(corruptionAbility === 'custom'){
-      return getProperty(actor.data, paths.corruption.max) ?? game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.max;
+      return currentMax;
     }
 
     /* if corruption is set to use spellcasting, ensure we have a spellcasting stat as well */
@@ -270,13 +270,17 @@ export class ActorSyb5e {
     /* otherwise determine corruption calc -- full casters get a special one */
     const {fullCaster} = actor.type === 'character' ? Spellcasting._maxSpellLevelByClass(Object.values(actor.classes).map( item => item.data.data )) : Spellcasting._maxSpellLevelNPC(actor.data.data);
 
-    const prof = actor.data.data.attributes.prof
+    const prof = actor.data.data.attributes.prof ?? actor.data.data.prof?.flat ?? currentMax;
+    if (prof == null) {
+      logger.error('SYB5E.Error.NoProf');
+    }
 
     const corrAbility = usesSpellcasting ? actor.data.data.attributes.spellcasting : corruptionAbility;
     const corrMod = actor.data.data.abilities[corrAbility].mod;
 
-    if(fullCaster) {
-      return (prof + corrMod) * 2;
+    if (corrMod == null) {
+      /* we havent prepped enough data used the stored value */
+      return currentMax
     }
 
     return fullCaster ? (prof + corrMod) * 2 : Math.max( corrMod + prof * 2, 2 );
@@ -286,7 +290,11 @@ export class ActorSyb5e {
 
   static isSybActor() {
     
-    const sheetClassId = getProperty(this.data, 'flags.core.sheetClass'); 
+    let sheetClassId = getProperty(this.data, 'flags.core.sheetClass'); 
+    if (!sheetClassId) {
+      /* find the default sheet class */
+      sheetClassId = Object.values(sheetClassId = CONFIG.Actor.sheetClasses[this.type]).find( info => info.default )?.id;
+    }
     const found = game.syb5e.sheetClasses.find( classInfo => classInfo.id === sheetClassId );
     return !!found;
 

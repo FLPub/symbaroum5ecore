@@ -80,7 +80,7 @@ export class Spellcasting {
     const actor = app.item?.actor
 
     /* only modify syb actors */
-    if(actor && actor.isSybActor()) return;
+    if(!actor || !actor.isSybActor()) return;
 
     /* only modify spell use dialogs */
     if(app.item?.type !== 'spell') return;
@@ -108,9 +108,9 @@ export class Spellcasting {
    *   we want to show the higest value
    * @param classData {array<classItemData>}
    */
-  static _maxSpellLevelByClass(classData) {
+  static _maxSpellLevelByClass(classData = []) {
     
-    const maxLevel = Object.values(classData).reduce( (acc, cls) => {
+    const maxLevel = classData.reduce( (acc, cls) => {
 
       const progression = cls.spellcasting.progression;
       const progressionArray = SYB5E.CONFIG.SPELL_PROGRESSION[progression] ?? false;
@@ -170,7 +170,7 @@ export class Spellcasting {
 
   static spellProgression(actorData) {
 
-    const result = actorData.type == 'character' ? Spellcasting._maxSpellLevelByClass(actorData.data.classes) : Spellcasting._maxSpellLevelNPC(actorData.data)
+    const result = actorData.type == 'character' ? Spellcasting._maxSpellLevelByClass(Object.values(actorData.data.classes)) : Spellcasting._maxSpellLevelNPC(actorData.data)
 
     return result;
 
@@ -236,20 +236,28 @@ export class Spellcasting {
      * - canUse: {boolean}: always true? exceeding max corruption is a choice
      */
 
-    const maxLevel = actorData.details.cr == undefined ? Spellcasting._maxSpellLevelByClass(actorData.classes) : Spellcasting._maxSpellLevelNPC(actorData)
+    const maxLevel = actorData.details.cr == undefined ? Spellcasting._maxSpellLevelByClass(Object.values(actorData.classes)) : Spellcasting._maxSpellLevelNPC(actorData)
     let spellLevels = [];
 
-    for(let level = itemData.level; level<=maxLevel.level; level++){
+    const addSpellLevel = (level) => {
       spellLevels.push({
         level,
         label: COMMON.localize( `DND5E.SpellLevel${level}`)+` (${Spellcasting._corruptionExpression(returnData.item, level)})`,
         canCast: true,
         hasSlots: true
-      })
+      });
     }
+
+    for(let level = itemData.level; level<=maxLevel.level; level++){
+      addSpellLevel(level);
+    }
+    
     
     if(spellLevels.length < 1){
       errors.push(COMMON.localize('SYB5E.Error.SpellLevelExceedsMax'))
+
+      /* Add an entry for this spell in particular */
+      addSpellLevel(itemData.level);
     }
 
     /* generate current corruption status as a reminder */

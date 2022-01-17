@@ -133,6 +133,7 @@ export class SYB5E {
 
     globalThis.game.syb5e.CONFIG.PATHS = {
       corruption: {
+        root: `${root}.corruption`,
         ability: `${root}.corruption.ability`,
         temp: `${root}.corruption.temp`,
         permanent: `${root}.corruption.permanent`,

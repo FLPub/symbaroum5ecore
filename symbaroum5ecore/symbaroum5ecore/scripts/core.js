@@ -51,13 +51,13 @@ COMMON.build();
 /*
   Initialize all Sub Modules
 */
-Hooks.on('setup', () => {
+Hooks.on('ready', () => {
   Object.values(SUB_MODULES).forEach( (cl) => {
     logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: cl.NAME}));
     cl.register();
   });
 
   //GlobalTesting
-  Object.entries(SUB_MODULES).forEach(([key, cl])=> window[key] = cl);
+  //Object.entries(SUB_MODULES).forEach(([key, cl])=> window[key] = cl);
   //Object.entries(SUB_APPS).forEach(([key, cl])=> window[key] = cl);
 });

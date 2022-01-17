@@ -1,5 +1,6 @@
 import { COMMON } from '../common.js'
 import { logger } from '../logger.js';
+import { Spellcasting } from './spellcasting.js'
 
 export class ItemSyb5e {
 
@@ -94,7 +95,7 @@ export class ItemSyb5e {
       usageInfo.consumeSpellLevel = null;
     }
 
-    let updates = __getUsageUpdates.call(this,usageInfo);
+    let updates = ItemSyb5e.parent._getUsageUpdates.call(this, usageInfo);
 
     /* now insert our needed information into the changes to be made to the actor */
     if (sybActor) {

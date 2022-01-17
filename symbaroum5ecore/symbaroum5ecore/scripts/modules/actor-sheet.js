@@ -88,6 +88,14 @@ export class SheetCommon {
     const commonData = {
       sybPaths: game.syb5e.CONFIG.PATHS,
       corruptionAbilities: SheetCommon._getCorruptionAbilityData(actor, context.data.abilities),
+      data: {
+        attributes: {
+          corruption: actor.corruption
+        },
+        details: {
+          shadow: actor.shadow
+        }
+      }
     }
 
     mergeObject(context, commonData);
