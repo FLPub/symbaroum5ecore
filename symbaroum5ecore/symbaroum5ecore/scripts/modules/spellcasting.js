@@ -108,7 +108,7 @@ export class Spellcasting {
    *   we want to show the higest value
    * @param classData {array<classItemData>}
    */
-  static maxSpellLevelByClass(classData) {
+  static _maxSpellLevelByClass(classData) {
     
     const maxLevel = Object.values(classData).reduce( (acc, cls) => {
 
@@ -141,11 +141,9 @@ export class Spellcasting {
    *
    * @param actor5eData {Object} (i.e. actor.data.data)
    */
-  static maxSpellLevelNPC(actor5eData){
+  static _maxSpellLevelNPC(actor5eData){
     
-    //const spellStat = actor5eData.spellcasting ?? '' === '' ? false : actor5eData.spellcasting;
     const casterLevel = actor5eData.details.spellLevel ?? 0;
-    const cr = Math.max(actor5eData.details.cr, 1);
 
     /* has caster levels, assume full caster */
     let result = {
@@ -158,11 +156,6 @@ export class Spellcasting {
     if (result.fullCaster) {
       /* if we are a full caster, use our caster level */
       result.level = game.syb5e.CONFIG.SPELL_PROGRESSION.full[casterLevel]; 
-    } else {
-      /* if we are using spellcasting as our stat, but
-       * dont have a caster level, assume cr = level
-       */
-      result.level = game.syb5e.CONFIG.SPELL_PROGRESSION.full[cr];
     } 
 
     result.label = game.syb5e.CONFIG.LEVEL_SHORT[result.level];
@@ -177,17 +170,25 @@ export class Spellcasting {
 
   static spellProgression(actorData) {
 
-    const result = actorData.type == 'character' ? Spellcasting.maxSpellLevelByClass(actorData.data.classes) : Spellcasting.maxSpellLevelNPC(actorData.data)
+    const result = actorData.type == 'character' ? Spellcasting._maxSpellLevelByClass(actorData.data.classes) : Spellcasting._maxSpellLevelNPC(actorData.data)
 
     return result;
 
   }
 
-  static modifyDerivedProgression(actorData) {
+  static _modifyDerivedProgression(actorData) {
 
     const progression = Spellcasting.spellProgression(actorData);
 
+    /* insert our maximum spell level into the spell object */
+    actorData.data.spells.maxLevel = progression.level;
 
+    /* ensure that all spell levels <= maxLevel have a non-zero max */
+    const levels = Array.from({length:progression.level}, (_, index) => `spell${index+1}`)
+
+    for( const slot of levels ){
+      actorData.data.spells[slot].max = Math.max(actorData.data.spells[slot].max, 1)
+    }
   }
 
   static _generateCorruptionExpression(level, favored) {
@@ -235,7 +236,7 @@ export class Spellcasting {
      * - canUse: {boolean}: always true? exceeding max corruption is a choice
      */
 
-    const maxLevel = actorData.details.cr == undefined ? Spellcasting.maxSpellLevelByClass(actorData.classes) : Spellcasting.maxSpellLevelNPC(actorData)
+    const maxLevel = actorData.details.cr == undefined ? Spellcasting._maxSpellLevelByClass(actorData.classes) : Spellcasting._maxSpellLevelNPC(actorData)
     let spellLevels = [];
 
     for(let level = itemData.level; level<=maxLevel.level; level++){

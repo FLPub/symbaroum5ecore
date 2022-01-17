@@ -18,7 +18,6 @@ export class SheetCommon {
   /* -------------------------------------------- */
 
   static globals() {
-    game.syb5e.debug.initActor = this.reInitActor
     game.syb5e.sheetClasses = [];
   }
 
@@ -27,21 +26,6 @@ export class SheetCommon {
   /* -------------------------------------------- */
 
   /** DEFAULT DATA AND PATHS **/
-  static get FLAG_KEY() {
-    return game.syb5e.CONFIG.FLAG_KEY;
-  }
-
-  /* -------------------------------------------- */
-
-  static get DEFAULT_FLAGS() {
-    return game.syb5e.CONFIG.DEFAULT_FLAGS;
-  }
-
-  /* -------------------------------------------- */
-
-  static get PATHS() {
-    return game.syb5e.CONFIG.PATHS;
-  }
 
   /* -------------------------------------------- */
 
@@ -64,12 +48,6 @@ export class SheetCommon {
   /** \DEFAULTS **/
 
   /** SYB DATA SETUP **/
-
-  /* -------------------------------------------- */
-
-  static _computeSybSpellcastingProgression(actorData) {
-
-  }
 
   /* -------------------------------------------- */
 
@@ -110,14 +88,6 @@ export class SheetCommon {
     const commonData = {
       sybPaths: game.syb5e.CONFIG.PATHS,
       corruptionAbilities: SheetCommon._getCorruptionAbilityData(actor, context.data.abilities),
-      data: {
-        attributes: {
-          corruption: actor.corruption
-        },
-        details: {
-          shadow: actor.shadow
-        }
-      }
     }
 
     mergeObject(context, commonData);
@@ -173,48 +143,6 @@ export class SheetCommon {
     return this.actor.convertSybCurrency();
   }
 
-  /** MECHANICS HELPERS **/
-
-  /* -------------------------------------------- */
-
-  /* Corruption Threshold = (prof * 2) + charisma mod; minimum 2
-   * Source: PGpg37
-   * or if full caster (prof + spellcastingMod) * 2
-   */
-  static _calcMaxCorruption(actor) {
-    
-    const CONFIG = game.syb5e.CONFIG;
-    const paths = CONFIG.PATHS;
-    const defaultAbility = game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.ability;
-    let corruptionAbility = getProperty(actor.data, paths.corruption.ability) ?? defaultAbility;
-    /* if we are in a custom max mode, just return the current stored max */
-    if(corruptionAbility === 'custom'){
-      return getProperty(actor.data, paths.corruption.max) ?? game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.max;
-    }
-
-    /* if corruption is set to use spellcasting, ensure we have a spellcasting stat as well */
-    corruptionAbility = corruptionAbility === 'spellcasting' && !actor.data.data.attributes.spellcasting ? defaultAbility : corruptionAbility;
-
-    const usesSpellcasting = corruptionAbility === 'spellcasting' ? true : false;
-
-    /* otherwise determine corruption calc -- full casters get a special one */
-    const {fullCaster} = actor.type === 'character' ? Spellcasting.maxSpellLevelByClass(Object.values(actor.classes).map( item => item.data.data )) : Spellcasting.maxSpellLevelNPC(actor.data.data);
-
-    const prof = actor.data.data.prof.flat; 
-
-    const corrAbility = usesSpellcasting ? actor.data.data.attributes.spellcasting : corruptionAbility;
-    const corrMod = actor.data.data.abilities[corrAbility].mod;
-
-    if(fullCaster) {
-      return (prof + corrMod) * 2;
-    }
-
-    return fullCaster ? (prof + corrMod) * 2 : Math.max( corrMod + prof * 2, 2 );
-  }
-
-  /* -------------------------------------------- */
-
-  /** \MECHANICS HELPERS **/
 }
 
 export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharacter {
@@ -242,12 +170,6 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
 
   /* -------------------------------------------- */
 
-  static _getCharacterData(actor, context) {
-
-    /* handlebars should interpret a level of 0 as 'false' */
-    context.maxSpellLevel = Spellcasting.maxSpellLevelByClass(context.data.classes);
-  }
-
   /** OVERRIDES **/
 
   /* -------------------------------------------- */
@@ -267,13 +189,10 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
 
   /* -------------------------------------------- */
 
-  /* TODO consider template injection like item-sheet */
   getData() {
     let context = super.getData();
 
     SheetCommon._getCommonData(this.actor, context);
-
-    Syb5eActorSheetCharacter._getCharacterData(this.actor, context);
 
     logger.debug('getData#context:', context);
     return context;
@@ -331,8 +250,6 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
 
   /* -------------------------------------------- */
   
-
-
 }
 
 export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
@@ -353,25 +270,12 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
   }
 
   /* -------------------------------------------- */
-  
 
   static defaults() {
     SheetCommon.defaults(this);
   }
 
   /* -------------------------------------------- */
-
-  static _getNpcData(actor, context) {
-    const data = {
-      data: {
-        details: {
-          manner: actor.manner
-        }
-      }
-    }
-
-    mergeObject(context, data);
-  }
 
   /** OVERRIDES **/
 
@@ -394,13 +298,9 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
 
   /* -------------------------------------------- */
 
-  /* TODO consider template injection like item-sheet */
   getData() {
     let context = super.getData();
     SheetCommon._getCommonData(this.actor, context);
-
-    /* NPCs also have a small 'manner' field describing how they generally act */
-    Syb5eActorSheetNPC._getNpcData(this.actor, context);
 
     logger.debug('getData#context:', context);
     return context;

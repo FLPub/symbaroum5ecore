@@ -19,43 +19,36 @@ export class ActorSyb5e {
     /* original super function information */
     const superFn = {
       getRollData: {
-        source: 'getRollData', 
         value: ActorSyb5e.getRollData
       },
       convertSybCurrency: {
-        source: 'convertSybCurrency',
         value: ActorSyb5e.convertSybCurrency
       },
       isSybActor: {
-        source: 'isSybActor',
         value: ActorSyb5e.isSybActor
       },
+      prepareBaseData: {
+        value: ActorSyb5e.prepareBaseData
+      },
       prepareDerivedData: {
-        source: 'prepareDerivedData',
         value: ActorSyb5e.prepareDerivedData
       },
       extendedRest: {
-        source: 'extendedRest',
         value: ActorSyb5e.extendedRest
       },
       longRest: {
-        source: 'longRest',
         value: ActorSyb5e.longRest
       },
       shortRest: {
-        source: 'shortRest',
         value: ActorSyb5e.shortRest
       },
       corruption: {
-        source: 'corruption',
         get: ActorSyb5e.getCorruption
       },
       shadow: {
-        source: 'shadow',
         get: ActorSyb5e.getShadow
       },
       manner: {
-        source: 'manner',
         get: ActorSyb5e.getManner
       }
 
@@ -96,6 +89,24 @@ export class ActorSyb5e {
   /* -------------------------------------------- */
 
   /* @override */
+  static prepareBaseData(...args) {
+    ActorSyb5e.parent.prepareBaseData.call(this, ...args);
+
+    if (this.isSybActor()) {
+      ActorSyb5e._prepareCommonData(this);
+      switch (this.type) {
+        case "character":
+          break;
+        case "npc":
+          ActorSyb5e._prepareNpcData(this);
+          break;
+      }
+    }
+  }
+
+  /* -------------------------------------------- */
+
+  /* @override */
   static prepareDerivedData(...args) {
 
     /* perform normal steps */
@@ -106,7 +117,7 @@ export class ActorSyb5e {
       logger.debug('derived data:', this.data)
       
       //TODO 
-      Spellcasting.modifyDerivedProgression(this.data);
+      Spellcasting._modifyDerivedProgression(this.data);
     }
   }
 
@@ -136,6 +147,8 @@ export class ActorSyb5e {
     await Resting._sybRest(this, game.syb5e.CONFIG.REST_TYPES.long, chat, newDay, this.data.data.attributes.hd - initHd, this.data.data.attributes.hp.value - initHp, this.corruption.temp - initCorr)
   }
 
+  /* -------------------------------------------- */
+
   static async shortRest({dialog=true, chat=true, autoHD=false, autoHDThreshold=3} = {}) {
 
     const initHd = this.data.data.attributes.hd;
@@ -161,18 +174,31 @@ export class ActorSyb5e {
 
   /* -------------------------------------------- */
 
+  static _prepareCommonData(actor) {
+    actor.data.data.attributes.corruption = actor.corruption;
+    actor.data.data.details.shadow = actor.shadow;
+  }
+
+  /* -------------------------------------------- */
+
+  static _prepareNpcData(actor) {
+    actor.data.data.details.manner = actor.manner;
+  }
+
+  /* -------------------------------------------- */
+
   static getCorruption() {
     /* current value */
     let corruption = this.getFlag(COMMON.DATA.name, 'corruption') ?? {};
 
     /* correct bad values and merge in needed defaults */
-    const defaults = SheetCommon.DEFAULT_FLAGS.corruption;
+    const defaults = game.syb5e.CONFIG.DEFAULT_FLAGS;
     Object.keys(defaults).forEach( (key) => {
       corruption[key] = (typeof corruption[key] == typeof defaults[key]) ? corruption[key] : defaults[key];
     });
 
     corruption.value = corruption.temp + corruption.permanent;
-    corruption.max = SheetCommon._calcMaxCorruption(this);
+    corruption.max = ActorSyb5e._calcMaxCorruption(this);
     return corruption;
   }
 
@@ -217,6 +243,43 @@ export class ActorSyb5e {
     }
 
     return this.update({'data.currency': current});
+  }
+
+  /* -------------------------------------------- */
+
+  /* Corruption Threshold = (prof * 2) + charisma mod; minimum 2
+   * Source: PGpg37
+   * or if full caster (prof + spellcastingMod) * 2
+   */
+  static _calcMaxCorruption(actor) {
+    
+    const CONFIG = game.syb5e.CONFIG;
+    const paths = CONFIG.PATHS;
+    const defaultAbility = game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.ability;
+    let corruptionAbility = getProperty(actor.data, paths.corruption.ability) ?? defaultAbility;
+    /* if we are in a custom max mode, just return the current stored max */
+    if(corruptionAbility === 'custom'){
+      return getProperty(actor.data, paths.corruption.max) ?? game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.max;
+    }
+
+    /* if corruption is set to use spellcasting, ensure we have a spellcasting stat as well */
+    corruptionAbility = corruptionAbility === 'spellcasting' && !actor.data.data.attributes.spellcasting ? defaultAbility : corruptionAbility;
+
+    const usesSpellcasting = corruptionAbility === 'spellcasting' ? true : false;
+
+    /* otherwise determine corruption calc -- full casters get a special one */
+    const {fullCaster} = actor.type === 'character' ? Spellcasting._maxSpellLevelByClass(Object.values(actor.classes).map( item => item.data.data )) : Spellcasting._maxSpellLevelNPC(actor.data.data);
+
+    const prof = actor.data.data.attributes.prof
+
+    const corrAbility = usesSpellcasting ? actor.data.data.attributes.spellcasting : corruptionAbility;
+    const corrMod = actor.data.data.abilities[corrAbility].mod;
+
+    if(fullCaster) {
+      return (prof + corrMod) * 2;
+    }
+
+    return fullCaster ? (prof + corrMod) * 2 : Math.max( corrMod + prof * 2, 2 );
   }
 
   /* -------------------------------------------- */

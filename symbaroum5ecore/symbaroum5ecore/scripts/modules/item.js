@@ -23,9 +23,6 @@ export class ItemSyb5e {
       _getUsageUpdates: {
         value: ItemSyb5e._getUsageUpdates
       },
-//      isArmor: {
-//        value: ItemSyb5e.isArmor
-//      }
     }
 
     Object.entries(superFn).forEach( ([fn, override]) => {
@@ -116,9 +113,4 @@ export class ItemSyb5e {
 
   }
 
-  //static isArmor() {
-
-  //  return item.type == 'equipment' && game.dnd5e.config.armorTypes[item.data.data.armor?.type ?? ''];
-
-  //}
 }
