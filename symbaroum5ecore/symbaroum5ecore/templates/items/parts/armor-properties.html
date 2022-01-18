@@ -1,9 +1,9 @@
 {{!-- Armor Properties (based on dnd5e/templates/items/weapon) --}}
-<div class="form-group stacked weapon-properties">
+<div class="form-group stacked">
   <label>{{ localize "SYB5E.Item.ArmorProps.Label" }}</label>
   {{#each propLabels as |name prop|}}
-  <label class="checkbox">
-    <input type="checkbox" name="{{../propRoot}}.{{prop}}" {{checked (lookup ../armorProps prop)}}/> {{ name }}
+  <label class="checkbox" {{edit}}>
+    <input type="checkbox" name="{{../propRoot}}.{{prop}}" {{checked (lookup ../armorProps prop)}} {{../edit}}/> {{ name }}
   </label>
   {{/each}}
 </div>

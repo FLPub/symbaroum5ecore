@@ -25,6 +25,9 @@ export class Syb5eItemSheet {
     /* need to insert checkbox for favored and put a favored 'badge' on the description tab */
     const item = sheet.item;
 
+    const commonData = {
+      edit: item.isEditable ? "" : "disabled"
+    }
     /* if this is an owned item, owner needs to be a SYB sheet actor
      * if this is an unowned item, show always
      */
@@ -37,6 +40,7 @@ export class Syb5eItemSheet {
     if (item.type == 'spell'){
 
       const data = {
+        ...commonData,
         isFavored: item.isFavored,
         favoredPath: SYB5E.CONFIG.PATHS.favored,
         favoredValue: getProperty(item.data, SYB5E.CONFIG.PATHS.favored) ?? 0,
@@ -57,6 +61,12 @@ export class Syb5eItemSheet {
       /* insert our favored badge */
       const itemPropBadges = html.find('.properties-list li');
       itemPropBadges.last().after(favoredBadge);
+
+      /* find the "Cost (GP)" label (if it exists) */
+      const costLabel = html.find('[name="data.materials.cost"]').prev();
+      if(costLabel.length > 0) {
+        costLabel.text(COMMON.localize("SYB5E.Currency.CostThaler"));
+      }
     }
 
     /* need to rename "subclass" to "approach" */
@@ -90,6 +100,7 @@ export class Syb5eItemSheet {
     /* only concerned with adding armor props to armor type items */
     if (item.isArmor){
       const data = {
+        ...commonData,
         armorProps: item.properties,
         propRoot: game.syb5e.CONFIG.PATHS.armorProps,
         propLabels: game.syb5e.CONFIG.ARMOR_PROPS

@@ -56,7 +56,8 @@
     "Currency": {
       "Thaler": "Thaler",
       "Shilling": "Shilling",
-      "Orteg": "Orteg"
+      "Orteg": "Orteg",
+      "CostThaler": "Cost (Th)"
     },
     "Spell": {
       "Favored": "Favored",
