@@ -38,7 +38,13 @@ export class Syb5eItemSheet {
 
       const data = {
         isFavored: item.isFavored,
-        favoredPath: SYB5E.CONFIG.PATHS.favored
+        favoredPath: SYB5E.CONFIG.PATHS.favored,
+        favoredValue: getProperty(item.data, SYB5E.CONFIG.PATHS.favored) ?? 0,
+        favoredStates: {
+          [COMMON.localize("Yes")]: 1,
+          [COMMON.localize("No")]: 0,
+          [COMMON.localize("SYB5E.Never")]: -1
+        }
       }
 
       const favoredCheckbox = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/spell-favored.html`, data);

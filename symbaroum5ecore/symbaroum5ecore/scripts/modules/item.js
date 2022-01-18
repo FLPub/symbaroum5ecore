@@ -24,6 +24,15 @@ export class ItemSyb5e {
       _getUsageUpdates: {
         value: ItemSyb5e._getUsageUpdates
       },
+      corruption: {
+        get: ItemSyb5e.getCorruption
+      },
+      isFavored: {
+        get: ItemSyb5e.getIsFavored
+      },
+      _spellChatData: {
+        value: ItemSyb5e._spellChatData
+      }
     }
 
     Object.entries(superFn).forEach( ([fn, override]) => {
@@ -40,6 +49,29 @@ export class ItemSyb5e {
       Object.defineProperty(game.dnd5e.entities.Item5e.prototype, fn, mergeObject(original ?? {}, override));
 
     })
+  }
+
+  static getCorruption() {
+    return Spellcasting._corruptionExpression(this.data);
+  }
+  
+  static getIsFavored() {
+    return Spellcasting._isFavored(this.data);
+  }
+
+  /* @override */
+  static _spellChatData(data, labels, props) {
+
+    /* should insert 2 labels -- level and components */
+    ItemSyb5e.parent._spellChatData.call(this, data, labels, props)
+
+    /* add ours right after if we are consuming corruption */
+    if(this.actor.isSybActor && this.corruptionUse){
+      /* cantrips and favored spells have a flat corruption value */
+      const totalString = this.isFavored || (parseInt(this.data.data.level) === 0) ? '' : ` (${this.corruptionUse.total})`;
+      props.push(`${this.corruptionUse.expression}${totalString}`);
+    }
+    
   }
 
   static getProperties() {

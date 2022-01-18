@@ -1,4 +1,6 @@
 <label class="checkbox prepared">
   {{localize "SYB5E.Spell.Favored"}}
-  <input type="checkbox" name="{{favoredPath}}" {{checked isFavored}}/>
+  <select class="prepared" name="{{favoredPath}}">
+    {{selectOptions favoredStates selected=favoredValue inverted=true}}
+  </select>
 </label>

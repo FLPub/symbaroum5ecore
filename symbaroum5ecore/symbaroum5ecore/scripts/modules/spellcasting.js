@@ -24,37 +24,11 @@ export class Spellcasting {
   }
 
   static patch() {
-    this._patchItem();
     this._patchAbilityUseDialog();
   }
 
   static hooks() {
     Hooks.on('renderAbilityUseDialog', this._renderAbilityUseDialog);
-  }
-
-  static _patchItem() {
-    COMMON.addGetter(COMMON.CLASSES.Item5e.prototype, 'corruption', function() {
-      return Spellcasting._corruptionExpression(this.data);
-    });
-
-    /* isFavored getter */
-    COMMON.addGetter(COMMON.CLASSES.Item5e.prototype, 'isFavored', function() {
-      return Spellcasting._isFavored(this.data);
-    });
-
-    const __spellChatData = COMMON.CLASSES.Item5e.prototype._spellChatData;
-    COMMON.CLASSES.Item5e.prototype._spellChatData = function(data, labels, props) {
-
-      /* should insert 2 labels -- level and components */
-      __spellChatData.call(this, data, labels, props);
-
-      /* add ours right after if we are consuming corruption */
-      if(this.actor.isSybActor() && this.corruptionUse){
-        /* cantrips and favored spells have a flat corruption value */
-        const totalString = this.isFavored || (parseInt(this.data.data.level) === 0) ? '' : ` (${this.corruptionUse.total})`;
-        props.push(`${this.corruptionUse.expression}${totalString}`);
-      }
-    }
   }
 
   static _patchAbilityUseDialog() {
@@ -165,7 +139,7 @@ export class Spellcasting {
 
   static _isFavored(itemData) {
     const favored = getProperty(itemData, game.syb5e.CONFIG.PATHS.favored) ?? game.syb5e.CONFIG.DEFAULT_ITEM.favored;
-    return favored;
+    return favored > 0;
   }
 
   static spellProgression(actorData) {

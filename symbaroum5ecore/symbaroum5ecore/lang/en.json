@@ -6,6 +6,7 @@
     }
   },
   "SYB5E" : {
+    "Never": "Never",
     "Init" : {
       "SubModule": "Initializing Sub-Module: {name}"
     },

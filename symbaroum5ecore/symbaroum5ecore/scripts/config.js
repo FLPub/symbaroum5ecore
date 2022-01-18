@@ -121,7 +121,7 @@ export class SYB5E {
     /* The default values for syb5e item data */
     globalThis.game.syb5e.CONFIG.DEFAULT_ITEM = {
         //[this.CONFIG.FLAG_KEY.initialized]: true,
-        favored: false,
+        favored: 0,
         armorProps: Object.keys(game.syb5e.CONFIG.ARMOR_PROPS).reduce( (acc, key) => {
           acc[key]=false;
           return acc;
