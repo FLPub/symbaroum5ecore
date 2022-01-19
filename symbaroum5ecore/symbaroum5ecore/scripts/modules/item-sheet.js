@@ -26,7 +26,7 @@ export class Syb5eItemSheet {
     const item = sheet.item;
 
     const commonData = {
-      edit: item.isEditable ? "" : "disabled"
+      edit: item.isEditable ?? true ? "" : "disabled"
     }
     /* if this is an owned item, owner needs to be a SYB sheet actor
      * if this is an unowned item, show always
