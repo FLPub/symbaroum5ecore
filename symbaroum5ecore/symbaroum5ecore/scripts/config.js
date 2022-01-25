@@ -80,7 +80,6 @@ export class SYB5E {
       ens: "SYB5E.Item.WeaponProps.Ensnaring",
       imm: "SYB5E.Item.WeaponProps.Immobile",
       msv: "SYB5E.Item.WeaponProps.Massive",
-      rlc: "SYB5E.Item.WeaponProps.ReloadCrew",
       res: "SYB5E.Item.WeaponProps.Restraining",
       sge: "SYB5E.Item.WeaponProps.Siege",
     }));
