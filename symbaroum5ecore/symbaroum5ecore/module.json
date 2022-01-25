@@ -3,7 +3,7 @@
     "title": "Symbaroum 5E Ruins of Symbaroum - Core System",
     "description": "A Module containing all the data from the 5E Ruins of Symbaroum Books.",
     "author": "Matthew Haentschke, Paul Watson",
-    "version": "0.1.1",
+    "version": "0.2.2",
     "minimumCoreVersion": "9",
     "compatibleCoreVersion": "9",
     "system": [

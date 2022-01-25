@@ -293,7 +293,7 @@ export class ActorSyb5e {
     let sheetClassId = getProperty(this.data, 'flags.core.sheetClass'); 
     if (!sheetClassId) {
       /* find the default sheet class */
-      sheetClassId = Object.values(sheetClassId = CONFIG.Actor.sheetClasses[this.type]).find( info => info.default )?.id;
+      sheetClassId = Object.values(CONFIG.Actor.sheetClasses[this.type] ?? []).find( info => info.default )?.id;
     }
     const found = game.syb5e.sheetClasses.find( classInfo => classInfo.id === sheetClassId );
     return !!found;

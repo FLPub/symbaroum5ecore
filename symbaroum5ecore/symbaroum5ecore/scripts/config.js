@@ -85,6 +85,14 @@ export class SYB5E {
       sge: "SYB5E.Item.WeaponProps.Siege",
     }));
 
+    /* extend dnd5e damage types
+     * -> This supports both the damage and healing types 
+     */
+    mergeObject(globalThis.game.dnd5e.config.damageTypes, COMMON.translateObject({
+      permc: "SYB5E.Corruption.PermDamage",
+      tempc: "SYB5E.Corruption.TempDamage",
+    }));
+
     /* Store new armor properties */
     globalThis.game.syb5e.CONFIG.ARMOR_PROPS = COMMON.translateObject({
       con: "SYB5E.Item.ArmorProps.Concealable",

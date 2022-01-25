@@ -77,7 +77,9 @@
       "Threshold": "Threshold",
       "ShortDesc": "Current Corruption: {value}/{max}",
       "Custom": "Custom",
-      "GainQuestion": "Suffer Corruption"
+      "GainQuestion": "Suffer Corruption",
+      "PermDamage": "Permanent Corruption",
+      "TempDamage": "Temporary Corruption"
     },
     "Level": {
       "Zeroth": "0th",

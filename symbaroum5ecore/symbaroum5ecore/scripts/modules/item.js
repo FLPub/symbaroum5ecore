@@ -32,6 +32,9 @@ export class ItemSyb5e {
       },
       _spellChatData: {
         value: ItemSyb5e._spellChatData
+      },
+      hasDamage: {
+        get: ItemSyb5e.hasDamage
       }
     }
 
@@ -49,6 +52,8 @@ export class ItemSyb5e {
       Object.defineProperty(game.dnd5e.entities.Item5e.prototype, fn, mergeObject(original ?? {}, override));
 
     })
+
+     
   }
 
   static getCorruption() {
@@ -88,29 +93,46 @@ export class ItemSyb5e {
   }
 
   static getRollData() {
-      const data = ItemSyb5e.parent.getRollData.call(this);
-      
-      /* if owned by an SYB actor, insert our
-       * SYB5E specific fields
-       */
-      if( 
-        !!data && 
-        (!this.parent || this.parent.isSybActor())
-      ){
-        logger.debug('Item/rollData', this, data);
-        data.item.properties = this.properties;
-        data.item.favored = this.isFavored;
-        data.item.type = this.type;
-        if(this.type == 'spell') {
-          /* add in corruption expression */
-          COMMON.addGetter(data.item, 'corruption', function(){
-             return Spellcasting._generateCorruptionExpression(this.level, this.favored)
-          });
-        }
+    const data = ItemSyb5e.parent.getRollData.call(this);
 
+    /* Patch for core dnd5e - items without attacks do not get ammo damage added
+     * -> insert needed information here. Resource reduction handled by above getUsageUpdates call
+     */
+
+    /* if this item is consuming ammo, but does not have an attack roll insert ammo info */
+    const consumptionInfo = this.data.data.consume
+    if (consumptionInfo?.type === 'ammo' && !this.hasAttack) {
+      this._ammo = this.actor.items.get(consumptionInfo.target);
+    }
+
+    /* if owned by an SYB actor, insert our
+     * SYB5E specific fields
+     */
+    if( 
+      !!data && 
+      (!this.parent || this.parent.isSybActor())
+    ){
+      logger.debug('Item/rollData', this, data);
+      data.item.properties = this.properties;
+      data.item.favored = this.isFavored;
+      data.item.type = this.type;
+      if(this.type == 'spell') {
+        /* add in corruption expression */
+        COMMON.addGetter(data.item, 'corruption', function(){
+          return Spellcasting._generateCorruptionExpression(this.level, this.favored)
+        });
       }
 
-      return data;
+    }
+
+    return data;
+  }
+
+  static hasDamage() {
+    /* core logic */
+    return !!(this.data.data.damage && this.data.data.damage.parts.length) ||
+      (this.data.data.consume.type === 'ammo' && this.actor.items.get(this.data.data.consume.target).hasDamage)
+
   }
 
   static _getUsageUpdates(usageInfo) {
@@ -128,6 +150,7 @@ export class ItemSyb5e {
     }
 
     let updates = ItemSyb5e.parent._getUsageUpdates.call(this, usageInfo);
+
 
     /* now insert our needed information into the changes to be made to the actor */
     if (sybActor) {
