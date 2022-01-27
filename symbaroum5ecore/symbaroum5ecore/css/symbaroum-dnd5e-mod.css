@@ -354,13 +354,6 @@ td {
   border-radius: 25px;
   box-shadow: 3px 3px;
 }
-.symbaroum-dnd5e-mod .blockquoteplain {
-  max-width: 50%;
-  break-inside: avoid;
-  font-style: normal;
-  float: left;
-  border: none;
-}
 
 .symbaroum-dnd5e-mod .fancytextleft {
   max-width: 20%;
