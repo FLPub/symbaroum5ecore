@@ -134,7 +134,7 @@ export class ActorSyb5e {
     const initCorr = this.corruption.temp;
 
     if(!this.isSybActor()){
-      return _longRest.call(this, {dialog, chat, newDay}); 
+      return ActorSyb5e.parent.longRest.call(this, {dialog, chat, newDay}); 
     }
 
     // Maybe present a confirmation dialog
@@ -159,7 +159,7 @@ export class ActorSyb5e {
     const initCorr = this.corruption.temp;
 
     if(!this.isSybActor()){
-      return _shortRest.call(this, {dialog, chat, autoHD, autoHDThreshold}); 
+      return ActorSyb5e.parent.shortRest.call(this, {dialog, chat, autoHD, autoHDThreshold}); 
     }
 
     // Maybe present a confirmation dialog

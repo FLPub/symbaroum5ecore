@@ -51,7 +51,7 @@ COMMON.build();
 /*
   Initialize all Sub Modules
 */
-Hooks.on('init', () => {
+Hooks.on('setup', () => {
   Object.values(SUB_MODULES).forEach( (cl) => {
     logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: cl.NAME}));
     cl.register();
