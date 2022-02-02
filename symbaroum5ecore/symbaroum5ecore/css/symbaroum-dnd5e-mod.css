@@ -254,9 +254,7 @@
   font-size: 20pt;
 }
 
-.symbaroum-dnd5e-mod .arpgtable,
-th,
-td {
+.symbaroum-dnd5e-mod .arpgtable {
   height: 36px;
   width: 80%;
   /* border-style: double;
@@ -269,9 +267,7 @@ td {
   background-color: transparent;
 }
 
-.symbaroum-dnd5e-mod .timetable,
-th,
-td {
+.symbaroum-dnd5e-mod .timetable {
   background-color: transparent;
   height: 36px;
   width: 89%;
