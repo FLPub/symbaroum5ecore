@@ -22,7 +22,6 @@ export class SYB5E {
       `${COMMON.DATA.path}/templates/actors/parts/actor-corruption.html`,
       `${COMMON.DATA.path}/templates/actors/parts/actor-shadow.html`,
       `${COMMON.DATA.path}/templates/actors/parts/npc-manner.html`,
-      `${COMMON.DATA.path}/templates/actors/parts/character-max-spell.html`,
       `${COMMON.DATA.path}/templates/actors/parts/actor-currency.html`,
 
       /* Item partials */
@@ -81,9 +80,16 @@ export class SYB5E {
       ens: "SYB5E.Item.WeaponProps.Ensnaring",
       imm: "SYB5E.Item.WeaponProps.Immobile",
       msv: "SYB5E.Item.WeaponProps.Massive",
-      rlc: "SYB5E.Item.WeaponProps.ReloadCrew",
       res: "SYB5E.Item.WeaponProps.Restraining",
       sge: "SYB5E.Item.WeaponProps.Siege",
+    }));
+
+    /* extend dnd5e damage types
+     * -> This supports both the damage and healing types 
+     */
+    mergeObject(globalThis.game.dnd5e.config.damageTypes, COMMON.translateObject({
+      permc: "SYB5E.Corruption.PermDamage",
+      tempc: "SYB5E.Corruption.TempDamage",
     }));
 
     /* Store new armor properties */
@@ -122,7 +128,7 @@ export class SYB5E {
     /* The default values for syb5e item data */
     globalThis.game.syb5e.CONFIG.DEFAULT_ITEM = {
         //[this.CONFIG.FLAG_KEY.initialized]: true,
-        favored: false,
+        favored: 0,
         armorProps: Object.keys(game.syb5e.CONFIG.ARMOR_PROPS).reduce( (acc, key) => {
           acc[key]=false;
           return acc;
@@ -134,6 +140,7 @@ export class SYB5E {
 
     globalThis.game.syb5e.CONFIG.PATHS = {
       corruption: {
+        root: `${root}.corruption`,
         ability: `${root}.corruption.ability`,
         temp: `${root}.corruption.temp`,
         permanent: `${root}.corruption.permanent`,
@@ -147,6 +154,7 @@ export class SYB5E {
     }
 
     globalThis.game.syb5e.CONFIG.SPELL_PROGRESSION = {
+      none: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       full: [0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,9,9],
       half: [0,1,1,2,2,2,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4]
     }

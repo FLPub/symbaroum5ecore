@@ -69,93 +69,14 @@ import { SybRestDialog } from './apps/syb-rest-dialog.js'
 export class Resting {
 
   static register() {
-    this.patch();
-    this.hooks();
   }
 
   static patch() {
-    this._patchActor();
   }
 
   static hooks() {
-
   }
 
-  /* -------------------------------------------- */
-
-  static _patchActor() {
-
-    /** Actor5e#extendedRest **/
-    COMMON.CLASSES.Actor5e.prototype.extendedRest = async function({dialog=true, chat=true, newDay=true} = {}) {
-
-      if(!SheetCommon.isSybActor(this.data)){
-        return false;
-      }
-      
-      // Maybe present a confirmation dialog
-      if ( dialog ) {
-        try {
-          newDay = await SybRestDialog.restDialog({actor: this, type: game.syb5e.CONFIG.REST_TYPES.extended});
-        } catch(err) {
-          return;
-        }
-      }
-
-      //do extended rest
-      await Resting._sybRest(this, game.syb5e.CONFIG.REST_TYPES.extended, chat, newDay)
-    }
-
-    /** Actor5e#longRest **/
-    const _longRest = COMMON.CLASSES.Actor5e.prototype.longRest 
-    COMMON.CLASSES.Actor5e.prototype.longRest = async function({dialog=true, chat=true, newDay=true} = {}) {
-
-      const initHd = this.data.data.attributes.hd;
-      const initHp = this.data.data.attributes.hp.value;
-      const initCorr = this.corruption.temp;
-
-      if(!SheetCommon.isSybActor(this.data)){
-        return _longRest.call(this, {dialog, chat, newDay}); 
-      }
-
-      // Maybe present a confirmation dialog
-      if ( dialog ) {
-        try {
-          newDay = await SybRestDialog.restDialog({actor: this, type: game.syb5e.CONFIG.REST_TYPES.long});
-        } catch(err) {
-          return;
-        }
-      }
-
-      //do long rest
-      await Resting._sybRest(this, game.syb5e.CONFIG.REST_TYPES.long, chat, newDay, this.data.data.attributes.hd - initHd, this.data.data.attributes.hp.value - initHp, this.corruption.temp - initCorr)
-    }
-
-    /** Actor5e#shortRest **/
-    const _shortRest = COMMON.CLASSES.Actor5e.prototype.shortRest; 
-    COMMON.CLASSES.Actor5e.prototype.shortRest = async function({dialog=true, chat=true, autoHD=false, autoHDThreshold=3} = {}) {
-
-      const initHd = this.data.data.attributes.hd;
-      const initHp = this.data.data.attributes.hp.value;
-      const initCorr = this.corruption.temp;
-
-      if(!SheetCommon.isSybActor(this.data)){
-        return _shortRest.call(this, {dialog, chat, autoHD, autoHDThreshold}); 
-      }
-
-      // Maybe present a confirmation dialog
-      if ( dialog ) {
-        try {
-          await SybRestDialog.restDialog({actor: this, type: game.syb5e.CONFIG.REST_TYPES.short});
-        } catch(err) {
-          return;
-        }
-      }
-
-      //do extended rest
-      await Resting._sybRest(this, game.syb5e.CONFIG.REST_TYPES.short, chat, false, this.data.data.attributes.hd - initHd, this.data.data.attributes.hp.value - initHp, this.corruption.temp - initCorr);
-    }
-
-  }
 
 /* -------------------------------------------- */
 

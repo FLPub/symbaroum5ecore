@@ -1,6 +1,7 @@
 import { COMMON } from '../common.js'
 import { logger } from '../logger.js';
 import { Spellcasting } from './spellcasting.js'
+import { ActorSyb5e } from './actor.js'
 
 export class SheetCommon {
 
@@ -11,96 +12,12 @@ export class SheetCommon {
   /* -------------------------------------------- */
 
   static register() {
-    this.patch();
     this.globals();
   }
 
   /* -------------------------------------------- */
 
-  static patch() {
-    this._patchActor();
-  }
-
-  /* -------------------------------------------- */
-
-  static _patchActor() {
-
-    COMMON.addGetter(COMMON.CLASSES.Actor5e.prototype, 'corruption', function() {
-      /* current value */
-      let corruption = this.getFlag(COMMON.DATA.name, 'corruption') ?? {};
-
-      /* correct bad values and merge in needed defaults */
-      const defaults = SheetCommon.DEFAULT_FLAGS.corruption;
-      Object.keys(defaults).forEach( (key) => {
-        corruption[key] = (typeof corruption[key] == typeof defaults[key]) ? corruption[key] : defaults[key];
-      });
-
-      corruption.value = corruption.temp + corruption.permanent;
-      corruption.max = SheetCommon._calcMaxCorruption(this);
-      return corruption;
-    });
-
-    COMMON.addGetter(COMMON.CLASSES.Actor5e.prototype, 'shadow', function() {
-      const shadow = this.getFlag(COMMON.DATA.name, 'shadow') ?? SheetCommon.DEFAULT_FLAGS.shadow;
-      return shadow;
-    });
-
-    COMMON.addGetter(COMMON.CLASSES.Actor5e.prototype, 'manner', function() {
-      const manner = this.getFlag(COMMON.DATA.name, 'manner') ?? SheetCommon.DEFAULT_FLAGS.manner;
-      return manner;
-    });
-
-    /**
-     * Wrap Actor5e#getRollData and insert our SYB specific fields
-     */
-    const _getRollData = COMMON.CLASSES.Actor5e.prototype.getRollData;
-    COMMON.CLASSES.Actor5e.prototype.getRollData = function() {
-      const data = _getRollData.call(this);
-
-      if (SheetCommon.isSybActor(this.data)) {
-        data.attributes.corruption = this.corruption;
-        data.details.shadow = this.shadow;
-        data.details.manner = this.manner;
-      }
-
-      return data;
-    }
-
-    /**
-     * Convert all carried currency to the highest possible denomination to reduce the number of raw coins being
-     * carried by an Actor.
-     * @returns {Promise<Actor5e>}
-     */
-    COMMON.CLASSES.Actor5e.prototype.convertSybCurrency = function() {
-
-      /* dont convert syb currency if not an syb actor */
-      if (SheetCommon.isSybActor(this.data)) {
-        logger.info(COMMON.localize("SYB5E.error.notSybActor"));
-        return;
-      }
-
-      const conversion = Object.entries(game.syb5e.CONFIG.CURRENCY_CONVERSION);
-      const current = duplicate(this.data.data.currency);
-      
-      for( const [denom, data] of conversion ) {
-
-        /* get full coin conversion to next step */
-        const denomUp = Math.floor(current[denom] / data.each);
-
-        /* subtract converted coins and add converted coins */
-        current[denom] -= (denomUp * data.each);
-        current[data.into] += denomUp;
-      }
-
-      return this.update({'data.currency': current});
-    }
-
-  }
-
-  /* -------------------------------------------- */
-
   static globals() {
-    game.syb5e.debug.initActor = this.reInitActor
     game.syb5e.sheetClasses = [];
   }
 
@@ -109,21 +26,6 @@ export class SheetCommon {
   /* -------------------------------------------- */
 
   /** DEFAULT DATA AND PATHS **/
-  static get FLAG_KEY() {
-    return game.syb5e.CONFIG.FLAG_KEY;
-  }
-
-  /* -------------------------------------------- */
-
-  static get DEFAULT_FLAGS() {
-    return game.syb5e.CONFIG.DEFAULT_FLAGS;
-  }
-
-  /* -------------------------------------------- */
-
-  static get PATHS() {
-    return game.syb5e.CONFIG.PATHS;
-  }
 
   /* -------------------------------------------- */
 
@@ -149,14 +51,6 @@ export class SheetCommon {
 
   /* -------------------------------------------- */
 
-  static isSybActor(actorData = {}) {
-    const sheetClassId = getProperty(actorData, 'flags.core.sheetClass'); 
-    const found = game.syb5e.sheetClasses.find( classInfo => classInfo.id === sheetClassId );
-    return !!found;
-  }
-
-  /* -------------------------------------------- */
-
   static _getCorruptionAbilityData(actor, contextAbilities) {
 
     let defaultEntries = [];
@@ -176,7 +70,7 @@ export class SheetCommon {
     let corruptionAbilityData = {
       path: game.syb5e.CONFIG.PATHS.corruption.ability,
       abilities: corruptionAbilities,
-      current: getProperty(actor.data, game.syb5e.CONFIG.PATHS.corruption.ability)
+      current: actor.corruption.ability
     }
 
     /* can only edit max corruption if using a custom value */
@@ -257,48 +151,6 @@ export class SheetCommon {
     return this.actor.convertSybCurrency();
   }
 
-  /** MECHANICS HELPERS **/
-
-  /* -------------------------------------------- */
-
-  /* Corruption Threshold = (prof * 2) + charisma mod; minimum 2
-   * Source: PGpg37
-   * or if full caster (prof + spellcastingMod) * 2
-   */
-  static _calcMaxCorruption(actor) {
-    
-    const CONFIG = game.syb5e.CONFIG;
-    const paths = CONFIG.PATHS;
-    const defaultAbility = game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.ability;
-    let corruptionAbility = getProperty(actor.data, paths.corruption.ability) ?? defaultAbility;
-    /* if we are in a custom max mode, just return the current stored max */
-    if(corruptionAbility === 'custom'){
-      return getProperty(actor.data, paths.corruption.max) ?? game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.max;
-    }
-
-    /* if corruption is set to use spellcasting, ensure we have a spellcasting stat as well */
-    corruptionAbility = corruptionAbility === 'spellcasting' && !actor.data.data.attributes.spellcasting ? defaultAbility : corruptionAbility;
-
-    const usesSpellcasting = corruptionAbility === 'spellcasting' ? true : false;
-
-    /* otherwise determine corruption calc -- full casters get a special one */
-    const {fullCaster} = actor.type === 'character' ? Spellcasting.maxSpellLevelByClass(Object.values(actor.classes).map( item => item.data.data )) : Spellcasting.maxSpellLevelNPC(actor.data.data);
-
-    const prof = actor.data.data.prof.flat; 
-
-    const corrAbility = usesSpellcasting ? actor.data.data.attributes.spellcasting : corruptionAbility;
-    const corrMod = actor.data.data.abilities[corrAbility].mod;
-
-    if(fullCaster) {
-      return (prof + corrMod) * 2;
-    }
-
-    return fullCaster ? (prof + corrMod) * 2 : Math.max( corrMod + prof * 2, 2 );
-  }
-
-  /* -------------------------------------------- */
-
-  /** \MECHANICS HELPERS **/
 }
 
 export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharacter {
@@ -326,12 +178,6 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
 
   /* -------------------------------------------- */
 
-  static _getCharacterData(actor, context) {
-
-    /* handlebars should interpret a level of 0 as 'false' */
-    context.maxSpellLevel = Spellcasting.maxSpellLevelByClass(context.data.classes);
-  }
-
   /** OVERRIDES **/
 
   /* -------------------------------------------- */
@@ -351,13 +197,10 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
 
   /* -------------------------------------------- */
 
-  /* TODO consider template injection like item-sheet */
   getData() {
     let context = super.getData();
 
     SheetCommon._getCommonData(this.actor, context);
-
-    Syb5eActorSheetCharacter._getCharacterData(this.actor, context);
 
     logger.debug('getData#context:', context);
     return context;
@@ -415,8 +258,6 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
 
   /* -------------------------------------------- */
   
-
-
 }
 
 export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
@@ -437,25 +278,12 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
   }
 
   /* -------------------------------------------- */
-  
 
   static defaults() {
     SheetCommon.defaults(this);
   }
 
   /* -------------------------------------------- */
-
-  static _getNpcData(actor, context) {
-    const data = {
-      data: {
-        details: {
-          manner: actor.manner
-        }
-      }
-    }
-
-    mergeObject(context, data);
-  }
 
   /** OVERRIDES **/
 
@@ -478,13 +306,9 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
 
   /* -------------------------------------------- */
 
-  /* TODO consider template injection like item-sheet */
   getData() {
     let context = super.getData();
     SheetCommon._getCommonData(this.actor, context);
-
-    /* NPCs also have a small 'manner' field describing how they generally act */
-    Syb5eActorSheetNPC._getNpcData(this.actor, context);
 
     logger.debug('getData#context:', context);
     return context;
