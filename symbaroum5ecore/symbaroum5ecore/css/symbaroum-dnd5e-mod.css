@@ -254,9 +254,7 @@
   font-size: 20pt;
 }
 
-.symbaroum-dnd5e-mod .arpgtable,
-th,
-td {
+.symbaroum-dnd5e-mod .arpgtable {
   height: 36px;
   width: 80%;
   /* border-style: double;
@@ -269,9 +267,7 @@ td {
   background-color: transparent;
 }
 
-.symbaroum-dnd5e-mod .timetable,
-th,
-td {
+.symbaroum-dnd5e-mod .timetable {
   background-color: transparent;
   height: 36px;
   width: 89%;
@@ -353,13 +349,6 @@ td {
   border: 5px double hsl(0, 0%, 0%);
   border-radius: 25px;
   box-shadow: 3px 3px;
-}
-.symbaroum-dnd5e-mod .blockquoteplain {
-  max-width: 50%;
-  break-inside: avoid;
-  font-style: normal;
-  float: left;
-  border: none;
 }
 
 .symbaroum-dnd5e-mod .fancytextleft {
