@@ -92,6 +92,10 @@ export class SYB5E {
       tempc: "SYB5E.Corruption.TempDamage",
     }));
 
+    mergeObject(globalThis.game.dnd5e.config.spellSchools, COMMON.translateObject({
+      non: "None"
+    }));
+
     /* Store new armor properties */
     globalThis.game.syb5e.CONFIG.ARMOR_PROPS = COMMON.translateObject({
       con: "SYB5E.Item.ArmorProps.Concealable",
