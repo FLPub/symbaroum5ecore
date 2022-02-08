@@ -12,25 +12,25 @@
     <div class="attribute-value" style="height:auto;">
       {{#if isCharacter}}
       <label class="flexcol">
-        <input type="number" name="{{sybPaths.corruption.temp}}" value="{{data.attributes.corruption.temp}}" />
+        <input type="text" data-dtype="Number" name="{{sybPaths.corruption.temp}}" value="{{data.attributes.corruption.temp}}" />
         <span class="attribute-footer">{{ localize "SYB5E.Corruption.Temporary"}}</span>
       </label>
       <span> + </span>
       {{/if}}
       <label class="flexcol">
-        <input type="number"  name="{{sybPaths.corruption.permanent}}" value="{{data.attributes.corruption.permanent}}" />
+        <input type="text" data-dtype="Number"  name="{{sybPaths.corruption.permanent}}" value="{{data.attributes.corruption.permanent}}" />
         <span class="attribute-footer">{{ localize "SYB5E.Corruption.Permanent"}}</span>
       </label>
       {{#if isCharacter}}
       <span> = </span>
       <label class="flexcol">
-        <input type="number" name="{{sybPaths.corruption.value}}" value="{{data.attributes.corruption.value}}" disabled />
+        <input type="text" data-dtype="Number" name="{{sybPaths.corruption.value}}" value="{{data.attributes.corruption.value}}" disabled />
         <span class="attribute-footer">{{ localize "SYB5E.Corruption.Current"}}</span>
       </label>
       {{/if}}
       <span> / </span>
       <label class="flexcol">
-        <input type="number"  name="{{sybPaths.corruption.max}}" value="{{data.attributes.corruption.max}}" {{corruptionAbilities.disabled}} />
+        <input type="text" data-dtype="Number" name="{{sybPaths.corruption.max}}" value="{{data.attributes.corruption.max}}" {{corruptionAbilities.disabled}} />
 
         <span class="attribute-footer">{{ localize "SYB5E.Corruption.Threshold"}}</span>
       </label>
