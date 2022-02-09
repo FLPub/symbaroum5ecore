@@ -72,6 +72,7 @@
     "Corruption": {
       "Label": "Corruption",
       "Temporary": "Temp",
+      "TemporaryFull": "Temporary",
       "Permanent": "Permanent",
       "Current": "Current",
       "Threshold": "Threshold",

@@ -112,6 +112,31 @@ export class Syb5eItemSheet {
 
       equipmentDetails.after(propCheckboxes);
     }
+
+    /* we want to add a custom corruption field if there is a general resource consumption field */
+    const consumeGroup = html.find('[name="data.consume.type"]').parents('.uses-per').last();
+    if(consumeGroup.length > 0) {
+      const currentOverrides = item.corruptionOverride;
+      let data = {
+        corruptionType: {
+          none: '',
+          temp: COMMON.localize('SYB5E.Corruption.TemporaryFull'),
+          permanent: COMMON.localize('SYB5E.Corruption.Permanent')
+        },
+        corruptionModes: {
+          '': CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          ADD: CONST.ACTIVE_EFFECT_MODES.ADD,
+          MULTIPLY: CONST.ACTIVE_EFFECT_MODES.MULTIPLY,
+          OVERRIDE: CONST.ACTIVE_EFFECT_MODES.OVERRIDE
+        },
+        overridePath: game.syb5e.CONFIG.PATHS.corruptionOverride.root,
+        ...currentOverrides
+      }
+
+      const corruptionGroup = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/item-corruption.html`, data);
+      consumeGroup.after(corruptionGroup);
+    }
+
   }
 
 }

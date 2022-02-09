@@ -185,12 +185,36 @@ export class Spellcasting {
 
   static _corruptionExpression(itemData, level = itemData.data.level) {
 
-    /* non-spells can't corrupt */
-    if (itemData.type !== 'spell'){
-      return
+    /* get default expression */
+    let expression = itemData.type === 'spell' ? Spellcasting._generateCorruptionExpression(level, Spellcasting._isFavored(itemData)) : '0';
+    let type = 'temp'
+
+    /* has custom corruption? */
+    const custom = getProperty(itemData, game.syb5e.CONFIG.PATHS.corruptionOverride.root) ?? duplicate(game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride);
+
+    /* modify the expression (always round up) minimum 1 unless custom */
+    if(custom.value !== game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride.value){
+      //has override
+      switch (custom.mode) {
+        case CONST.ACTIVE_EFFECT_MODES.ADD:
+          expression = `max( ceil( (${expression}) + (${custom.value}) ), 1)`
+          break;
+        case CONST.ACTIVE_EFFECT_MODES.MULTIPLY:
+          expression = `max( ceil( (${expression}) * (${custom.value}) ), 1)`
+          break;
+        case CONST.ACTIVE_EFFECT_MODES.OVERRIDE:
+          expression = custom.value;
+          break;
+      }
     }
 
-    return Spellcasting._generateCorruptionExpression(level, Spellcasting._isFavored(itemData));
+    /* modify the target (only works for PCs) */
+    if (custom.type !== game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride.type) {
+      type = custom.type
+    }
+
+    /* after all modifications have been done, return the final expression */
+    return {expression, type};
   
   }
 
@@ -216,7 +240,7 @@ export class Spellcasting {
     const addSpellLevel = (level) => {
       spellLevels.push({
         level,
-        label: COMMON.localize( `DND5E.SpellLevel${level}`)+` (${Spellcasting._corruptionExpression(returnData.item, level)})`,
+        label: COMMON.localize( `DND5E.SpellLevel${level}`)+` (${Spellcasting._corruptionExpression(returnData.item, level).expression})`,
         canCast: true,
         hasSlots: true
       });
@@ -249,28 +273,23 @@ export class Spellcasting {
     const itemUpdates = {};
     const resourceUpdates = {};
 
-    /* Does this casting produce corruption? */
-    if (consumeCorruption) {
+    /* Does this item produce corruption? */
+    const corruptionInfo = item.corruption;
+
+    if (corruptionInfo.expression.length > 0) {
 
       /* roll for corruption */
-      const corruptionExpression = item.corruption;
-      if(!corruptionExpression) {
-        /* for whatever reason, this item did not produce a valid corruption expression.
-         * Assume it is because we cannot actually cast
-         */
-        logger.warning(true, COMMON.localize('SYB5E.Error.ItemInvalidCorruptionExpression'));
-        return false;
-      }
-      const gainedCorruption = new Roll(corruptionExpression).evaluate({async:false}).total;
+      const gainedCorruption = new Roll(corruptionInfo.expression, item.getRollData()).evaluate({async:false}).total;
 
       /* store corruption info in item (temporary) */
       item.corruptionUse = {
-        expression: corruptionExpression,
+        expression: corruptionInfo.expression,
+        type: corruptionInfo.type,
         total: gainedCorruption
       }
 
       /* field name shortcuts */
-      const fieldKey = item.actor.type == 'character' ? 'temp' : 'permanent';
+      const fieldKey = item.actor.type == 'character' ? corruptionInfo.type : 'permanent';
 
       /* get the current corruption values */
       let corruption = item.actor.corruption;

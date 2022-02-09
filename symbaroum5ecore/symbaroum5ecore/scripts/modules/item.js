@@ -27,6 +27,9 @@ export class ItemSyb5e {
       corruption: {
         get: ItemSyb5e.getCorruption
       },
+      corruptionOverride: {
+        get: ItemSyb5e.getCorruptionOverride
+      },
       isFavored: {
         get: ItemSyb5e.getIsFavored
       },
@@ -58,6 +61,13 @@ export class ItemSyb5e {
 
   static getCorruption() {
     return Spellcasting._corruptionExpression(this.data);
+    
+  }
+
+  static getCorruptionOverride() {
+    const override = getProperty(this.data, game.syb5e.CONFIG.PATHS.corruptionOverride.root) ?? duplicate(game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride);
+    override.mode = parseInt(override.mode);
+    return override;
   }
   
   static getIsFavored() {
@@ -74,7 +84,7 @@ export class ItemSyb5e {
     if(this.actor.isSybActor && this.corruptionUse){
       /* cantrips and favored spells have a flat corruption value */
       const totalString = this.isFavored || (parseInt(this.data.data.level) === 0) ? '' : ` (${this.corruptionUse.total})`;
-      props.push(`${this.corruptionUse.expression}${totalString}`);
+      props.push(`${this.corruptionUse.expression.expression}${totalString}`);
     }
     
   }
@@ -143,14 +153,14 @@ export class ItemSyb5e {
     if (sybActor) {
 
       /* if we are consuming a spell slot, treat it as adding corruption instead */
-      usageInfo.consumeCorruption = !!usageInfo.consumeSpellLevel || parseInt(this.data.data?.level) === 0;
+      //NOTE: handled inside _getUsageUpdates
+      //usageInfo.consumeCorruption = !!usageInfo.consumeSpellLevel || parseInt(this.data.data?.level) === 0;
 
       /* We are _never_ consuming spell slots in syb5e */
       usageInfo.consumeSpellLevel = null;
     }
 
     let updates = ItemSyb5e.parent._getUsageUpdates.call(this, usageInfo);
-
 
     /* now insert our needed information into the changes to be made to the actor */
     if (sybActor) {

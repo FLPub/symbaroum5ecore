@@ -1,0 +1,13 @@
+{{!-- Custom Item Corruption --}}
+<div class="form-group">
+  <label>{{ localize "SYB5E.Corruption.Label" }}</label>
+  <div class="form-fields flexcol">
+    <select name="{{overridePath}}.type" {{edit}}>
+      {{selectOptions corruptionType selected=type}}
+    </select>
+    <select type='number' data-dtype="Number" name="{{overridePath}}.mode" {{edit}}>
+      {{selectOptions corruptionModes selected=mode inverted=true}}
+    </select>
+    <input type='text' name="{{overridePath}}.value" value="{{value}}" placeholder="">
+  </div>
+</div>

@@ -131,12 +131,16 @@ export class SYB5E {
 
     /* The default values for syb5e item data */
     globalThis.game.syb5e.CONFIG.DEFAULT_ITEM = {
-        //[this.CONFIG.FLAG_KEY.initialized]: true,
-        favored: 0,
-        armorProps: Object.keys(game.syb5e.CONFIG.ARMOR_PROPS).reduce( (acc, key) => {
-          acc[key]=false;
-          return acc;
-        }, {}),
+      favored: 0,
+      armorProps: Object.keys(game.syb5e.CONFIG.ARMOR_PROPS).reduce( (acc, key) => {
+        acc[key]=false;
+        return acc;
+      }, {}),
+      corruptionOverride: {
+        type: '',
+        mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM, //custom = use stock items values (i.e. "none")
+        value: '',
+      }
     }
 
     /* paths for syb flag data */
@@ -148,8 +152,14 @@ export class SYB5E {
         ability: `${root}.corruption.ability`,
         temp: `${root}.corruption.temp`,
         permanent: `${root}.corruption.permanent`,
-        value: undefined, //getter only
+        value: undefined, //getter only for actors
         max: `${root}.corruption.max`,
+      },
+      corruptionOverride: {
+        root: `${root}.corruptionOverride`,
+        type: `${root}.corruptionOverride.type`,
+        value: `${root}.corruptionOverride.value`, //getter only for actors
+        mode: `${root}.corruptionOverride.mode`, //for custom corruption items
       },
       manner: `${root}.manner`,
       shadow: `${root}.shadow`,
