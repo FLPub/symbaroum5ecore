@@ -273,10 +273,10 @@ export class Spellcasting {
     const itemUpdates = {};
     const resourceUpdates = {};
 
-    /* Does this item produce corruption? */
-    const corruptionInfo = item.corruption;
+    if (consumeCorruption) {
 
-    if (corruptionInfo.expression.length > 0) {
+      /* Does this item produce corruption? */
+      const corruptionInfo = item.corruption;
 
       /* roll for corruption */
       const gainedCorruption = new Roll(corruptionInfo.expression, item.getRollData()).evaluate({async:false}).total;
@@ -300,6 +300,7 @@ export class Spellcasting {
       /* insert this update into the actorUpdates */
       const corruptionFieldPath = `flags.${COMMON.DATA.name}.corruption.${fieldKey}`;
       actorUpdates[corruptionFieldPath] = corruption[fieldKey];
+      
     }
 
     return {actorUpdates, itemUpdates, resourceUpdates};

@@ -12,6 +12,10 @@
     },
     "Sheet" : {
       "Origin": "Origin",
+      "Soulless" : {
+        "Hint": "Corruption damage is applied to current and maximum health.",
+        "Name": "Soulless"
+      },
       "Character": {
         "Label": "Symbaroum 5e Character"
       },

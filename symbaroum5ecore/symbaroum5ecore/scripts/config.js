@@ -137,9 +137,9 @@ export class SYB5E {
         return acc;
       }, {}),
       corruptionOverride: {
-        type: '',
+        type: 'none',
         mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM, //custom = use stock items values (i.e. "none")
-        value: '',
+        value: '0',
       }
     }
 
@@ -164,13 +164,25 @@ export class SYB5E {
       manner: `${root}.manner`,
       shadow: `${root}.shadow`,
       favored: `${root}.favored`,
-      armorProps: `${root}.armorProps`
+      armorProps: `${root}.armorProps`,
+      sybSoulless: {
+        dataPath: `flags.dnd5e.sybSoulless`,
+        scope: 'dnd5e',
+        key: 'sybSoulless'
+      }
     }
 
     globalThis.game.syb5e.CONFIG.SPELL_PROGRESSION = {
       none: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       full: [0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,9,9],
       half: [0,1,1,2,2,2,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4]
+    }
+
+    CONFIG.DND5E.characterFlags.sybSoulless = {
+      hint: 'SYB5E.Sheet.Soulless.Hint',
+      name: 'SYB5E.Sheet.Soulless.Name',
+      section: 'DND5E.RacialTraits',
+      type: Boolean
     }
 
   }

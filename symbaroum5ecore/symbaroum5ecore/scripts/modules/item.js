@@ -84,7 +84,7 @@ export class ItemSyb5e {
     if(this.actor.isSybActor && this.corruptionUse){
       /* cantrips and favored spells have a flat corruption value */
       const totalString = this.isFavored || (parseInt(this.data.data.level) === 0) ? '' : ` (${this.corruptionUse.total})`;
-      props.push(`${this.corruptionUse.expression.expression}${totalString}`);
+      props.push(`${this.corruptionUse.expression}${totalString}`);
     }
     
   }
@@ -122,7 +122,6 @@ export class ItemSyb5e {
       !!data && 
       (!this.parent || this.parent.isSybActor())
     ){
-      logger.debug('Item/rollData', this, data);
       data.item.properties = this.properties;
       data.item.favored = this.isFavored;
       data.item.type = this.type;
@@ -153,8 +152,8 @@ export class ItemSyb5e {
     if (sybActor) {
 
       /* if we are consuming a spell slot, treat it as adding corruption instead */
-      //NOTE: handled inside _getUsageUpdates
-      //usageInfo.consumeCorruption = !!usageInfo.consumeSpellLevel || parseInt(this.data.data?.level) === 0;
+      /* Note: consumeSpellSlot only valid for _leveled_ spells. All others MUST add corruption if a valid expression */
+      usageInfo.consumeCorruption = !!usageInfo.consumeSpellLevel || ((parseInt(this.data.data?.level ?? 0) < 1) && this.corruption.expression != game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride.expression);
 
       /* We are _never_ consuming spell slots in syb5e */
       usageInfo.consumeSpellLevel = null;

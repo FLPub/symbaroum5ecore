@@ -10,6 +10,7 @@ export class ActorSyb5e {
 
   static register() {
     this.patch();
+    this.hooks();
   }
 
   static parent = {};
@@ -68,6 +69,12 @@ export class ActorSyb5e {
       Object.defineProperty(game.dnd5e.entities.Actor5e.prototype, fn, mergeObject(original ?? {}, override));
 
     })
+  }
+
+  /* -------------------------------------------- */
+
+  static hooks() {
+    Hooks.on('preUpdateActor',ActorSyb5e._preUpdateActor);
   }
 
   /* -------------------------------------------- */
@@ -322,4 +329,34 @@ export class ActorSyb5e {
 
   }
 
+  /* handles the "soulless" trait */
+  static _preUpdateActor(actor, update) {
+
+    /* is corruption being modified? */
+    const {temp, permanent} = getProperty(update, game.syb5e.CONFIG.PATHS.corruption.root) ?? {temp: null, permanent: null};
+
+    /* if no corruption update, does not concern us */
+    if(temp == null && permanent == null) return;
+
+    /* compute the total change in corruption */
+    const current = actor.corruption;
+    const gainedCorruption = (temp ?? current.temp) - current.temp + (permanent ?? current.permanent) - current.permanent;
+
+    /* If the current actor has the 'soulless' trait, mirror this damage to current/max health */
+    const {scope, key} = game.syb5e.CONFIG.PATHS.sybSoulless;
+    if(actor.getFlag(scope, key)) {
+      logger.debug('Soulless Initial Values:', actor, update);
+      const hpPath = 'data.attributes.hp';
+
+      let {value: currentHp, tempmax: currentMaxDelta, max: currentMax} = getProperty(actor.data, hpPath);
+      currentMaxDelta = (currentMaxDelta ?? 0) - gainedCorruption;
+
+      /* clamp current HP between max HP and 0 */
+      currentHp = Math.max( Math.min( currentHp, currentMax + currentMaxDelta ), 0);
+
+      /* add in our hp changes to the update object */
+      setProperty(update, hpPath, {value: currentHp, tempmax: currentMaxDelta});
+      logger.debug('Soulless Update:', update);
+    }
+  }
 }
