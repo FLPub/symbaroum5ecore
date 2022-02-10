@@ -115,6 +115,10 @@
         "ExtendedRestOvernight": "Extended Rest (24h+, New Day)",
         "ExtendedRestNormal": "Extended Rest (24h+)"
       }
+    },
+    "Creature": {
+      "Abomination": "Abomination",
+      "Phenomenon": "Phenomenon"
     }
   }
 }

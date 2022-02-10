@@ -107,6 +107,12 @@ export class SYB5E {
       wei: "SYB5E.Item.ArmorProps.Weighty"
     });
 
+    /* add 'abomination' and 'phenomenon' to creature types */
+    mergeObject(globalThis.game.dnd5e.config.creatureTypes, COMMON.translateObject({
+      abomination: 'SYB5E.Creature.Abomination',
+      phenomenon: 'SYB5E.Creature.Phenomenon',
+    }));
+
     /* Replace currency names */
     globalThis.game.syb5e.CONFIG.CURRENCY = COMMON.translateObject({
       gp: 'SYB5E.Currency.Thaler', 
