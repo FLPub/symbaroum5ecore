@@ -2,6 +2,7 @@ import { COMMON } from '../common.js'
 import { logger } from '../logger.js';
 import { Spellcasting } from './spellcasting.js'
 import { SybRestDialog } from './apps/syb-rest-dialog.js'
+import { Resting } from './resting.js'
 
 export class ActorSyb5e {
 

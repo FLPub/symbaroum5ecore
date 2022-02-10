@@ -58,6 +58,8 @@ export class SYB5E {
       extended: 'ext'
     }
 
+    globalThis.game.dnd5e.config.limitedUsePeriods.er = COMMON.localize("SYB5E.Rest.Extended");
+
     /* Add in "Greater Artifact" rarity for items */
     globalThis.game.dnd5e.config.itemRarity.greaterArtifact = COMMON.localize("SYB5E.Item.Rarity.GreaterArtifact");
 
@@ -92,6 +94,7 @@ export class SYB5E {
       tempc: "SYB5E.Corruption.TempDamage",
     }));
 
+    /* add in "None" spell school (mainly for Troll Singer Songs) */
     mergeObject(globalThis.game.dnd5e.config.spellSchools, COMMON.translateObject({
       non: "None"
     }));
@@ -104,12 +107,14 @@ export class SYB5E {
       wei: "SYB5E.Item.ArmorProps.Weighty"
     });
 
+    /* Replace currency names */
     globalThis.game.syb5e.CONFIG.CURRENCY = COMMON.translateObject({
       gp: 'SYB5E.Currency.Thaler', 
       sp: 'SYB5E.Currency.Shilling', 
       cp: 'SYB5E.Currency.Orteg'
     });
 
+    /* redefine used currencies (only cp, sp, gp) */
     globalThis.game.syb5e.CONFIG.CURRENCY_CONVERSION = {
       cp: {into: 'sp', each: 10},
       sp: {into: 'gp', each: 10},
@@ -143,10 +148,11 @@ export class SYB5E {
       }
     }
 
-    /* paths for syb flag data */
     const root = `flags.${COMMON.DATA.name}`;
 
+    /* paths for syb flag data */
     globalThis.game.syb5e.CONFIG.PATHS = {
+      root,
       corruption: {
         root: `${root}.corruption`,
         ability: `${root}.corruption.ability`,

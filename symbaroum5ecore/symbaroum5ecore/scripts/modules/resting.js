@@ -118,6 +118,9 @@ export class Resting {
     /* get item uses recovery */
     const itemUseUpdates = actor._getRestItemUsesRecovery({recoverLongRestUses: type !== restTypes.short, recoverDailyUses: newDay});
 
+    /* get extend rest item use recovery */
+    const erItemUseUpdates = type === restTypes.extended ? Resting.getErItemUsesRecovery(actor.items) : [];
+
     const result = {
       dhp: dHp + hpGain,
       dhd: Math.abs(dHd + hitDiceRecovered),
@@ -130,6 +133,7 @@ export class Resting {
       itemUpdates: [
         ...hitDiceUpdates,
         ...itemUseUpdates,
+        ...erItemUseUpdates,
       ],
       longRest: type === restTypes.long, //emulating core field here
       restType: type, //the actual syb rest type
@@ -204,6 +208,18 @@ export class Resting {
     };
     ChatMessage.applyRollMode(chatData, game.settings.get("core", "rollMode"));
     return ChatMessage.create(chatData);
+  }
+
+/* -------------------------------------------- */
+
+  static getErItemUsesRecovery(items) {
+    /* collect any item with 'er' type recharge */
+    const type = 'er';
+
+    const erItems = items.filter( i => i.data.data.uses?.per === type );
+    const updates = erItems.map( item => { return { _id: item.id, 'data.uses.value': item.data.data.uses.max } } );
+
+    return updates;
   }
 
 /* -------------------------------------------- */
