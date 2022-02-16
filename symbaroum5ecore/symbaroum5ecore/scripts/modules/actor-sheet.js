@@ -310,6 +310,9 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
     let context = super.getData();
     SheetCommon._getCommonData(this.actor, context);
 
+    /* NPCS also have 'manner' */
+    setProperty(context.data.details, 'manner', this.actor.manner);
+
     logger.debug('getData#context:', context);
     return context;
   }
