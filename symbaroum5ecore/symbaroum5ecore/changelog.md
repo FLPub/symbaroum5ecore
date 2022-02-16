@@ -1,3 +1,6 @@
+## v0.3.1
+* Fixed NPC sheet getData bug that was erasing 'manner' when sheet was closed.
+
 ## v0.3.0
 * "Soulless" special trait added (used for Dwarves and Undead) which mirrors any corruption damage to max hp (and caps current HP accordingly).
 * Corruption fields now accept +/- delta values
