@@ -44,6 +44,21 @@
 /* End of Global Variables */
 /* ************************ */
 
+/* Character/NPC Sheet Styling  */
+/* ************************ */
+.syb5e.sheet.actor .editor .tox-toolbar-overlord,
+.syb5e.sheet.actor .editor .tox-toolbar__primary {
+  background-color: #fff;
+  border-bottom: solid 1px black;
+}
+
+.syb5e.sheet.actor .tox.tox-tinymce .tox-edit-area__iframe {
+  background-color: #fff;
+}
+
+/* End Character/NPC Sheet Styling  */
+/* ************************ */
+
 /* Character Sheet Styling  */
 /* ************************ */
 
@@ -201,6 +216,10 @@
 .syb5e.sheet.actor.character .spell-action,
 .syb5e.sheet.actor.character .spell-target {
   color: var(--syb5e-pc-color);
+}
+
+.syb5e.sheet.actor.character textarea {
+  color: var(--syb5e-npc-color);
 }
 
 /* End of Character Sheet Styling  */
@@ -365,6 +384,14 @@
   color: var(--syb5e-npc-color);
 }
 
+.syb5e.sheet.actor.npc .header-exp .experience,
+.syb5e.sheet.actor.np .header-exp .proficiency {
+  color: var(--syb5e-npc-color);
+}
+
+.syb5e.sheet.actor.npc textarea {
+  color: var(--syb5e-npc-color);
+}
 /* End of NPC Sheet Styling  */
 /* ************************ */
 
