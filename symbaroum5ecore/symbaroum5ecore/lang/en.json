@@ -118,7 +118,9 @@
     },
     "Creature": {
       "Abomination": "Abomination",
-      "Phenomenon": "Phenomenon"
+      "AbominationPl": "Abominations",
+      "Phenomenon": "Phenomenon",
+      "PhenomenonPl": "Phenomena"
     }
   }
 }
