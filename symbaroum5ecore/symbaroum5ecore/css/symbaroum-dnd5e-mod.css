@@ -30,13 +30,13 @@
 :root {
   --syb5e-pc-color: white;
   --syb5e-pc-background: none;
-  --syb5e-pc-background-image: url(../images/background/blue_square_light.webp);
+  --syb5e-pc-background-image: url(../images/background/blue_square_light.webp) repeat;
   --syb5e-pc-font: 'Fondamento';
   --syb5e-pc-border-image: url(../images/journal/sym-journal-border.webp);
 
   --syb5e-npc-color: white;
   --syb5e-npc-background: none;
-  --syb5e-npc-background-image: url(../images/background/dark_green_gold.webp);
+  --syb5e-npc-background-image: url(../images/background/dark_green_gold.webp) repeat;
   --syb5e-npc-font: 'Fondamento';
   --syb5e-npc-border-image: url(../images/journal/sym-journal-header.webp);
 }
@@ -71,7 +71,7 @@
 }
 .syb5e.sheet.actor.character .window-content {
   /* background: chartreuse; */
-  background-image: var(--syb5e-pc-background-image);
+  background: var(--syb5e-pc-background-image);
   color: var(--syb5e-pc-color);
   font-family: var(--syb5e-pc-font);
 }
@@ -190,6 +190,9 @@
   color: var(--syb5e-pc-color);
 }
 
+.syb5e.sheet.actor.character .resource .attribute-value label.recharge {
+  color: var(--syb5e-pc-color);
+}
 .syb5e.sheet.actor.character select {
   color: black;
   background-color: #b5b3a4;
@@ -237,7 +240,7 @@
 
 .syb5e.sheet.actor.npc .window-content {
   /* background: chartreuse; */
-  background-image: var(--syb5e-npc-background-image);
+  background: var(--syb5e-npc-background-image);
   color: var(--syb5e-npc-color);
   font-family: var(--syb5e-npc-font);
 }
