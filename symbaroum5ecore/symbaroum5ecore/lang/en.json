@@ -1,11 +1,11 @@
 {
-  "setting": {
-    "debug": {
-      "name": "Log Debug Output",
-      "hint": "Prints extended debug information to the console."
-    }
-  },
   "SYB5E" : {
+    "setting": {
+      "debug": {
+        "name": "Log Debug Output",
+        "hint": "Prints extended debug information to the console."
+      }
+    },
     "Never": "Never",
     "Init" : {
       "SubModule": "Initializing Sub-Module: {name}"

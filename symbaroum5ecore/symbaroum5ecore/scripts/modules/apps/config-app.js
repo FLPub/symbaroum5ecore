@@ -1,4 +1,6 @@
-export class syb5eConfig extends FormApplication {
+import {COMMON} from '../../common.js'
+
+export class SybConfigApp extends FormApplication {
   static get getDefaults() {
     return {
       addMenuButton: true,
@@ -33,7 +35,7 @@ export class syb5eConfig extends FormApplication {
       title: game.i18n.localize('symbaroum5ecore.OPTIONAL_CONFIG_MENULABEL'),
       id: 'symbaroum5ecoreSettings',
       icon: 'fas fa-cogs',
-      template: 'systems/symbaroum/template/symbaroumSettings.html',
+      template: `${COMMON.DATA.path}/templates/apps/config-app.html`,
       width: 700,
       closeOnSubmit: true,
     });
@@ -41,34 +43,34 @@ export class syb5eConfig extends FormApplication {
 
   getData(options) {
     const newData = {
-      charBGChoice: game.settings.get('symbaroum5ecore', 'charBGChoice'),
-      npcBGChoice: game.settings.get('symbaroum5ecore', 'npcBGChoice'),
-      titleBGChoice: game.settings.get('symbaroum5ecore', 'titleBGChoice'),
-      editableChoice: game.settings.get('symbaroum5ecore', 'editableChoice'),
-      noneditableChoice: game.settings.get('symbaroum5ecore', 'nonEditableChoice'),
+      charBGChoice: COMMON.setting('charBGChoice'),
+      npcBGChoice: COMMON.setting('npcBGChoice'),
+      titleBGChoice: COMMON.setting('titleBGChoice'),
+      editableChoice: COMMON.setting('editableChoice'),
+      noneditableChoice: COMMON.setting('nonEditableChoice'),
     };
-    if (game.settings.get('symbaroum5ecore', 'charBGChoice') === 'none') {
-      newData['charBGColour'] = game.settings.get('symbaroum5ecore', 'switchCharBGColour');
+    if (COMMON.setting('charBGChoice') === 'none') {
+      newData['charBGColour'] = COMMON.setting('switchCharBGColour');
     } else {
       newData['charBGColour'] = '#000000';
     }
-    if (game.settings.get('symbaroum5ecore', 'npcBGChoice') === 'none') {
-      newData['npcBGColour'] = game.settings.get('symbaroum5ecore', 'switchNpcBGColour');
+    if (COMMON.setting('npcBGChoice') === 'none') {
+      newData['npcBGColour'] = COMMON.setting('switchNpcBGColour');
     } else {
       newData['npcBGColour'] = '#000000';
     }
-    if (game.settings.get('symbaroum5ecore', 'titleBGChoice') === 'none') {
-      newData['titleBGColour'] = game.settings.get('symbaroum5ecore', 'switchTitleColour');
+    if (COMMON.setting('titleBGChoice') === 'none') {
+      newData['titleBGColour'] = COMMON.setting('switchTitleColour');
     } else {
       newData['titleBGColour'] = '#000000';
     }
-    if (game.settings.get('symbaroum5ecore', 'editableChoice') === 'none') {
-      newData['editableColour'] = game.settings.get('symbaroum5ecore', 'switchEditableColour');
+    if (COMMON.setting('editableChoice') === 'none') {
+      newData['editableColour'] = COMMON.setting('switchEditableColour');
     } else {
       newData['editableColour'] = '#000000';
     }
-    if (game.settings.get('symbaroum5ecore', 'nonEditableChoice') === 'none') {
-      newData['noneditableColour'] = game.settings.get('symbaroum5ecore', 'switchNoNEditableColour');
+    if (COMMON.setting('nonEditableChoice') === 'none') {
+      newData['noneditableColour'] = COMMON.setting('switchNonEditableColour');
     } else {
       newData['noneditableColour'] = '#000000';
     }
@@ -84,57 +86,57 @@ export class syb5eConfig extends FormApplication {
     html.find('button[name="resetNPC"]').click(this.onResetNPC.bind(this));
     html.find('button[name="resetAll"]').click(this.onResetAll.bind(this));
 
-    document.getElementById('charBGImage').value = game.settings.get('symbaroum5ecore', 'charBGChoice');
-    document.getElementById('npcBGImage').value = game.settings.get('symbaroum5ecore', 'npcBGChoice');
+    document.getElementById('charBGImage').value = COMMON.setting('charBGChoice');
+    document.getElementById('npcBGImage').value = COMMON.setting('npcBGChoice');
 
-    if (game.settings.get('symbaroum5ecore', 'charBGChoice') === 'none') {
+    if (COMMON.setting('charBGChoice') === 'none') {
       document.getElementById('pcColPanel').style.display = 'block';
     }
-    if (game.settings.get('symbaroum5ecore', 'npcBGChoice') === 'none') {
+    if (COMMON.setting('npcBGChoice') === 'none') {
       document.getElementById('npcColPanel').style.display = 'block';
     }
   }
 
-  onResetPC() {
-    game.settings.set('symbaroum5ecore', 'charBGChoice', 'url(../images/background/bg-green.webp) repeat');
-    game.settings.set('symbaroum5ecore', 'switchCharBGColour', 'url(../images/background/bg-green.webp) repeat');
+  async onResetPC() {
+    await COMMON.setting('charBGChoice', 'url(../images/background/bg-green.webp) repeat');
+    await COMMON.setting('switchCharBGColour', 'url(../images/background/bg-green.webp) repeat');
     location.reload();
   }
 
-  onResetNPC() {
-    game.settings.set('symbaroum5ecore', 'npcBGChoice', 'url(../images/background/bg-red.webp) repeat');
-    game.settings.set('symbaroum5ecore', 'switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
+  async onResetNPC() {
+    await COMMON.setting('npcBGChoice', 'url(../images/background/bg-red.webp) repeat');
+    await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
     location.reload();
   }
 
-  onResetAll() {
-    game.settings.set('symbaroum5ecore', 'charBGChoice', 'url(../images/background/bg-green.webp) repeat');
-    game.settings.set('symbaroum5ecore', 'switchCharBGColour', 'url(../images/background/bg-green.webp) repeat');
-    game.settings.set('symbaroum5ecore', 'npcBGChoice', 'url(../images/background/bg-red.webp) repeat');
-    game.settings.set('symbaroum5ecore', 'switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
+  async onResetAll() {
+    await COMMON.setting('charBGChoice', 'url(../images/background/bg-green.webp) repeat');
+    await COMMON.setting('switchCharBGColour', 'url(../images/background/bg-green.webp) repeat');
+    await COMMON.setting('npcBGChoice', 'url(../images/background/bg-red.webp) repeat');
+    await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
     location.reload();
   }
 
   async _updateObject(event, formData) {
-    await game.settings.set('symbaroum5ecore', 'charBGChoice', formData.charBGImage);
-    await game.settings.set('symbaroum5ecore', 'npcBGChoice', formData.npcBGImage);
+    await COMMON.setting('charBGChoice', formData.charBGImage);
+    await COMMON.setting('npcBGChoice', formData.npcBGImage);
 
     if (charBGImage.value === 'none') {
       if (formData.charBGColour.length > 0 && formData.charBGColour[0] != '#') {
         formData.charBGColour = '#000000';
       }
-      await game.settings.set('symbaroum5ecore', 'switchCharBGColour', formData.charBGColour);
+      await COMMON.setting('switchCharBGColour', formData.charBGColour);
     } else {
-      await game.settings.set('symbaroum5ecore', 'switchCharBGColour', formData.charBGImage);
+      await COMMON.setting('switchCharBGColour', formData.charBGImage);
     }
 
     if (npcBGImage.value === 'none') {
       if (formData.npcBGColour.length > 0 && formData.npcBGColour[0] != '#') {
         formData.npcBGColour = '#000000';
       }
-      await game.settings.set('symbaroum5ecore', 'switchNpcBGColour', formData.npcBGColour);
+      await COMMON.setting('switchNpcBGColour', formData.npcBGColour);
     } else {
-      await game.settings.set('symbaroum5ecore', 'switchNpcBGColour', formData.npcBGImage);
+      await COMMON.setting('switchNpcBGColour', formData.npcBGImage);
     }
     location.reload();
   }
