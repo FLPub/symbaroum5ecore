@@ -13,9 +13,11 @@ import { Syb5eItemSheet } from './modules/item-sheet.js'
 import { SYB5E } from './config.js'
 import { Spellcasting } from './modules/spellcasting.js'
 import { Resting } from './modules/resting.js'
-import { SybRestDialog } from './modules/apps/syb-rest-dialog.js'
 import { ActorSyb5e } from './modules/actor.js'
 import { ItemSyb5e } from './modules/item.js'
+
+import { SybRestDialog } from './modules/apps/syb-rest-dialog.js'
+import { SybConfigApp } from './modules/apps/config-app.js'
 
 /**
  * Sub Modules

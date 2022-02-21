@@ -1,0 +1,74 @@
+<form autocomplete="off">
+    <div class="tab-active">
+        <div class="form-group">
+            <label for="charBGImage">{{localize 'SYB5E.OPTIONAL_PC_CHAR_BG_IMGS'}}</label>
+            <select name="charBGImage" id="charBGImage">
+                <option value="url(../images/background/bg-green.webp repeat">Green Image</option>
+                <option value="url(../asset/image/background/blue_square_light.webp) repeat">Light Blue Squares Image</option>
+                <option value="url(../asset/image/background/brown_dark.webp) repeat">Dark Brown Image</option>
+                <option value="url(../asset/image/background/brown_square_dark.webp) repeat">Dark Brown Square Image</option>
+                <option value="url(../asset/image/background/green_flower_dark.webp) repeat">Dark Green Flower Image</option>
+                <option value="url(../asset/image/background/green_flower_light.webp) repeat">Light Green Flower Image</option>
+                <option value="url(../asset/image/background/green_flower.webp) repeat">Green Flower Image</option>
+                <option value="url(../asset/image/background/green_gold_dark.webp) repeat">Green and Gold Dark Image</option>
+                <option value="url(../asset/image/background/orange_light.webp) repeat">Light Orange Image</option>
+                <option value="url(../asset/image/background/purple_flower_light.webp) repeat">Light Purple Flower Image</option>
+                <option value="url(../asset/image/background/red_compass_light.webp) repeat">Light Red Compass Image</option>
+                <option value="url(../asset/image/background/red_flower_light.webp) repeat">Light Red Flower Image</option>
+                <option value="url(../asset/image/background/red_square_light.webp) repeat">Light Red Square Image</option>
+                <option value="url(../asset/image/background/green-scales.webp) repeat">Green Scales Image</option>
+                <option value="none">{{localize 'SYB5E.OPTIONAL_COLOR_PICKER'}}</option>
+            </select>
+        </div>
+
+        <div style="display:none" id="pcColPanel">
+            <input type="hidden" name="charBGColour" value="{{charBGColour}}" id="charBGColour" data-dtype="String" />
+            <label for="pcColPanel-ColourSelector">{{localize 'SYB5E.OPTIONAL_PC_COLOUR_SELECTOR'}}</label>
+            <input id="pcColPanel-ColourSelector" type="color" name="ColourSelector" value="{{charBGColour}}" data-edit="charBGColour" />
+        </div>
+
+        <hr>
+
+        <div class="form-group">
+            <label for="npcBGImage">{{localize 'SYB5E.OPTIONAL_NPC_CHAR_BG_IMGS'}}</label>
+            <select name="npcBGImage" id="npcBGImage">
+                <option value="url(../images/background/bg-red.webp repeat">Red Image</option>
+                <option value="url(../asset/image/background/blue_square_light.webp) repeat">Light Blue Squares Image</option>
+                <option value="url(../asset/image/background/brown_dark.webp) repeat">Dark Brown Image</option>
+                <option value="url(../asset/image/background/brown_square_dark.webp) repeat">Dark Brown Square Image</option>
+                <option value="url(../asset/image/background/green_flower_dark.webp) repeat">Dark Green Flower Image</option>
+                <option value="url(../asset/image/background/green_flower_light.webp) repeat">Light Green Flower Image</option>
+                <option value="url(../asset/image/background/green_flower.webp) repeat">Green Flower Image</option>
+                <option value="url(../asset/image/background/green_gold_dark.webp) repeat">Green and Gold Dark Image</option>
+                <option value="url(../asset/image/background/orange_light.webp) repeat">Light Orange Image</option>
+                <option value="url(../asset/image/background/purple_flower_light.webp) repeat">Light Purple Flower Image</option>
+                <option value="url(../asset/image/background/red_compass_light.webp) repeat">Light Red Compass Image</option>
+                <option value="url(../asset/image/background/red_flower_light.webp) repeat">Light Red Flower Image</option>
+                <option value="url(../asset/image/background/red_square_light.webp) repeat">Light Red Square Image</option>
+                <option value="url(../asset/image/background/green-scales.webp) repeat">Green Scales Image</option>
+                <option value="none">{{localize 'SYB5E.OPTIONAL_COLOR_PICKER'}}</option>
+            </select>
+
+        </div>
+
+        <div style="display:none" id="npcColPanel">
+            <input type="hidden" name="npcBGColour" value="{{npcBGColour}}" id="npcBGColour" data-dtype="String" />
+            <label for="npcColPanel-ColourSelector">{{localize "SYB5E.OPTIONAL_NPC_COLOUR_SELECTOR"}}</label>
+            <input id="npcColPanel-ColourSelector" type="color" name="ColourSelector" value="{{npcBGColour}}" data-edit="npcBGColour" />
+        </div>
+
+        <hr>
+
+        <p><i style="font-size: smaller">{{localize "SYB5E.OPTIONAL_RESET_NOTE"}}</i></p>
+
+        <div class="form-group buttons-save">
+            <button type="submit" name="submit"><b>{{localize "SYB5E.OPTIONAL_SUBMIT_BUTTON"}}</b></button>
+        </div>
+        <div class="form-group">
+            <button type="button" name="resetPC"><b>{{localize "SYB5E.OPTIONAL_RESET_PC_BUTTON"}}</b></button>
+            <button type="button" name="resetNPC"><b>{{localize "SYB5E.OPTIONAL_RESET_NPC_BUTTON"}}</b></button>
+        </div>
+        <div class="form-group ">
+            <button type="button" name="resetAll"><b>{{localize "SYB5E.OPTIONAL_RESET_ALL_BUTTON"}}</b></button>
+        </div>
+</form>

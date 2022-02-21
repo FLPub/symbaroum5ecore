@@ -65,7 +65,12 @@ export class COMMON {
   }
 
   /** HELPER FUNCTIONS **/
-  static setting(key){
+  static setting(key, value = null){
+
+    if(value) {
+      return game.settings.set(COMMON.DATA.name, key, value);
+    }
+
     return game.settings.get(COMMON.DATA.name, key);
   }
 
@@ -77,8 +82,8 @@ export class COMMON {
     Object.entries(settingsData).forEach(([key, data])=> {
       game.settings.register(
         COMMON.DATA.name, key, {
-          name : COMMON.localize(`setting.${key}.name`),
-          hint : COMMON.localize(`setting.${key}.hint`),
+          name : COMMON.localize(`SYB5E.setting.${key}.name`),
+          hint : COMMON.localize(`SYB5E.setting.${key}.hint`),
           ...data
         }
       );

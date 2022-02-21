@@ -1,4 +1,5 @@
 import { COMMON } from './common.js'
+import { SybConfigApp } from './modules/apps/config-app.js'
 
 /* CONFIG class for syb5e data.
  * Stored in 'game.syb5e.CONFIG'
@@ -10,6 +11,8 @@ export class SYB5E {
   static register() {
     this.globals();
     this.templates();
+    this.settings();
+    this.hooks();
   }
 
   static get CONFIG(){
@@ -32,6 +35,112 @@ export class SYB5E {
       `${COMMON.DATA.path}/templates/apps/rest.html`,
     ]);
   }
+
+  /* registering our settings */
+  static settings() {
+    const settingsData = {
+      charBGChoice: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: 'url(../images/background/bg-green.webp) repeat'
+      },
+      npcBGChoice: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: 'url(../images/background/bg-green.webp) repeat'
+      },
+      titleBGChoice: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: 'url(../images/background/bg-green.webp) repeat'
+      },
+      editableChoice: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: 'url(../images/background/bg-green.webp) repeat'
+      },
+      nonEditableChoice: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: 'url(../images/background/bg-green.webp) repeat'
+      },
+      switchCharBGColour: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: 'url(../images/background/bg-green.webp) repeat',
+      },
+      switchNpcBGColour: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: 'url(../images/background/bg-red.webp) repeat',
+      },
+      switchTitleColour: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: 'url(../images/background/bg-green.webp) repeat',
+      },
+      switchEditableColour: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: 'url(../images/background/bg-green.webp) repeat',
+      },
+      switchNonEditableColour: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: 'url(../images/background/bg-green.webp) repeat',
+      },
+      addMenuButton: {
+        scope: 'world',
+        config: true,
+        default: SybConfigApp.getDefaults.addMenuButton,
+        type: Boolean,
+        onChange: (enabled) => {
+          SybConfigApp.toggleConfigButton(enabled);
+        },
+      }
+    }
+
+    game.settings.registerMenu('symbaroum5ecore', 'symbaroumSettings', {
+      name: 'symbaroum5ecore.OPTIONAL_CONFIG_MENULABEL',
+      label: 'symbaroum5ecore.OPTIONAL_CONFIG_MENULABEL',
+      hint: 'symbaroum5ecore.OPTIONAL_CONFIG_MENUHINT',
+      icon: 'fas fa-palette',
+      type: SybConfigApp,
+      restricted: false,
+    });
+
+    COMMON.applySettings(settingsData);
+  }
+
+  static hooks() {
+    Hooks.once('ready', async () => {
+      /* setup config options */
+      let r = document.querySelector(':root');
+      await r.style.setProperty('--syb5e-pc-background-image', game.settings.get('symbaroum5ecore', 'switchCharBGColour'));
+      await r.style.setProperty('--syb5e-npc-background-image', game.settings.get('symbaroum5ecore', 'switchNpcBGColour'));
+    })
+  }
+
 
   /* setting our global config data */
   static globals() {
