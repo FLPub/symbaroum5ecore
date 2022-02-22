@@ -5,7 +5,7 @@
         "name": "Log Debug Output",
         "hint": "Prints extended debug information to the console."
       }
-    },
+    }, 
     "Never": "Never",
     "Init" : {
       "SubModule": "Initializing Sub-Module: {name}"

@@ -15,6 +15,7 @@ import { Spellcasting } from './modules/spellcasting.js'
 import { Resting } from './modules/resting.js'
 import { ActorSyb5e } from './modules/actor.js'
 import { ItemSyb5e } from './modules/item.js'
+import { DamageRollSyb5e } from './modules/damage-roll.js'
 
 import { SybRestDialog } from './modules/apps/syb-rest-dialog.js'
 import { SybConfigApp } from './modules/apps/config-app.js'
@@ -38,11 +39,13 @@ const SUB_MODULES = {
   Syb5eActorSheetNPC,
   Syb5eItemSheet,
   Spellcasting,
-  Resting
+  Resting,
+  DamageRollSyb5e
 }
 
 const SUB_APPS = {
-  SybRestDialog
+  SybRestDialog,
+  SybConfigApp
 }
 
 /*
