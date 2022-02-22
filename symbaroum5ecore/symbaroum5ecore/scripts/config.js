@@ -87,14 +87,36 @@ export class SYB5E {
         scope: 'client',
         default: 'Fondamento',
       },
-      actorBorder: {
+      charBorder: {
         restricted: false,
         type: String,
         config: false,
         scope: 'client',
         default: '13px solid transparent',
       },
+      npcBorder: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: '13px solid transparent',
+      },
+      charChanged: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: '',
+      },
+      npcChanged: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: '',
+      },
       // addMenuButton: {
+      //   name: 'SYB5E.setting.config-menu-label.name',
       //   scope: 'world',
       //   config: true,
       //   default: SybConfigApp.getDefaults.addMenuButton,
@@ -127,7 +149,8 @@ export class SYB5E {
       await r.style.setProperty('--syb5e-npc-color', COMMON.setting('npcTextColour'));
       await r.style.setProperty('--syb5e-pc-font', COMMON.setting('fontFamily'));
       await r.style.setProperty('--syb5e-npc-font', COMMON.setting('fontFamily'));
-      await r.style.setProperty('--syb5e-sheet-border', COMMON.setting('actorBorder'));
+      await r.style.setProperty('--syb5e-pc-sheet-border', COMMON.setting('charBorder'));
+      await r.style.setProperty('--syb5e-npc-sheet-border', COMMON.setting('npcBorder'));
     });
   }
 

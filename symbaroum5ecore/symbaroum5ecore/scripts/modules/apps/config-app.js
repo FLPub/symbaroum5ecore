@@ -10,25 +10,25 @@ export class SybConfigApp extends FormApplication {
   // * Creates or removes the quick access config button
   // * @param  {Boolean} shown true to add, false to remove
 
-  static toggleConfigButton(shown) {
-    const button = $('#SymbaroumButton');
-    if (button) button.remove();
+  // static toggleConfigButton(shown = true) {
+  //   const button = $('#SybConfigApp');
+  //   if (button) button.remove();
 
-    if (shown) {
-      const title = COMMON.localize('SYB5E.setting.config-menu-label.name');
+  //   if (shown) {
+  //     const title = COMMON.localize('SYB5E.setting.config-menu-label.name');
 
-      $(`<button id="SymbaroumButton" data-action="symbaroumConfig" title="${title}">
-         <i class="fas fa-palette"></i> ${title}
-       </button>`)
-        .insertAfter('button[data-action="configure"]')
-        .on('click', (event) => {
-          const menu = game.settings.menus.get('symbaroum.symbaroumSettings');
-          if (!menu) return ui.notifications.error('No submenu found for the provided key');
-          const app = new menu.type();
-          return app.render(true);
-        });
-    }
-  }
+  //     $(`<button id="SybConfigApp" data-action="SybConfigApp" title="${title}">
+  //        <i class="fas fa-palette"></i> ${title}
+  //      </button>`)
+  //       .insertAfter('button[data-action="configure"]')
+  //       .on('click', (event) => {
+  //         const menu = game.settings.menus.get('symbaroum5ecore.symbaroumSettings');
+  //         if (!menu) return ui.notifications.error('No submenu found for the provided key');
+  //         const app = new menu.type();
+  //         return app.render(true);
+  //       });
+  //   }
+  // }
 
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
@@ -48,7 +48,8 @@ export class SybConfigApp extends FormApplication {
       npcBGChoice: COMMON.setting('npcBGChoice'),
       npcTextColour: COMMON.setting('npcTextColour'),
       fontFamily: COMMON.setting('fontFamily'),
-      actorBorder: COMMON.setting('actorBorder'),
+      charBorder: COMMON.setting('charBorder'),
+      npcBorder: COMMON.setting('npcBorder'),
     };
     if (COMMON.setting('charBGChoice') === 'none') {
       newData['charBGColour'] = COMMON.setting('switchCharBGColour');
@@ -80,9 +81,29 @@ export class SybConfigApp extends FormApplication {
     document.getElementById('npcBGImage').value = COMMON.setting('npcBGChoice');
     document.getElementById('npcTextColour').value = COMMON.setting('npcTextColour');
 
+    document.addEventListener(
+      'input',
+      function (event) {
+        // Only run on our select menu
+        if (event.target.id !== 'charBGImage') return;
+        COMMON.setting('charChanged', event.target.options[event.target.selectedIndex].label);
+      },
+      false
+    );
+    document.addEventListener(
+      'input',
+      function (event) {
+        // Only run on our select menu
+        if (event.target.id !== 'npcBGImage') return;
+        COMMON.setting('npcChanged', event.target.options[event.target.selectedIndex].label);
+      },
+      false
+    );
+
     if (COMMON.setting('charBGChoice') === 'none') {
       document.getElementById('pcColPanel').style.display = 'block';
     }
+
     if (COMMON.setting('npcBGChoice') === 'none') {
       document.getElementById('npcColPanel').style.display = 'block';
     }
@@ -92,6 +113,7 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('charBGChoice', 'url(../images/background/bg-green.webp) repeat');
     await COMMON.setting('switchCharBGColour', 'url(../images/background/bg-green.webp) repeat');
     await COMMON.setting('charTextColour', '#ffffff');
+    await COMMON.setting('charBorder', '13px solid transparent');
     location.reload();
   }
 
@@ -99,6 +121,7 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('npcBGChoice', 'url(../images/background/bg-red.webp) repeat');
     await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
     await COMMON.setting('npcTextColour', '#ffffff');
+    await COMMON.setting('npcBorder', '13px solid transparent');
     location.reload();
   }
 
@@ -110,7 +133,8 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
     await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
     await COMMON.setting('npcTextColour', '#ffffff');
-
+    await COMMON.setting('charBorder', '13px solid transparent');
+    await COMMON.setting('npcBorder', '13px solid transparent');
     location.reload();
   }
 
@@ -118,21 +142,52 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('charBGChoice', '#dad8cc');
     await COMMON.setting('switchCharBGColour', '#dad8cc');
     await COMMON.setting('charTextColour', '#000000');
+    await COMMON.setting('charBorder', 'none');
     await COMMON.setting('npcBGChoice', '#dad8cc');
     await COMMON.setting('switchNpcBGColour', '#dad8cc');
-    await COMMON.setting('switchNpcBGColour', '#dad8cc');
     await COMMON.setting('npcTextColour', '#000000');
+    await COMMON.setting('npcBorder', 'none');
     await COMMON.setting('fontFamily', 'none');
-    await COMMON.setting('actorBorder', 'none');
 
     location.reload();
   }
 
   async _updateObject(event, formData) {
+    if (COMMON.setting('charChanged')) {
+      if (COMMON.setting('charChanged') === 'DnD5E Default') {
+        await COMMON.setting('charBGChoice', '#dad8cc');
+        await COMMON.setting('switchCharBGColour', '#dad8cc');
+        await COMMON.setting('charTextColour', '#000000');
+        await COMMON.setting('charBorder', 'none');
+        await COMMON.setting('fontFamily', 'none');
+        location.reload();
+      } else {
+        if (COMMON.setting('charChanged') != 'DnD5E Default' && formData.charTextColour === '#000000') {
+          await COMMON.setting('charTextColour', '#ffffff');
+        } else {
+          await COMMON.setting('charTextColour', formData.charTextColour);
+        }
+      }
+    }
+
+    if (COMMON.setting('npcChanged')) {
+      if (COMMON.setting('npcChanged') === 'DnD5E Default') {
+        await COMMON.setting('npcBGChoice', '#dad8cc');
+        await COMMON.setting('switchNpcBGColour', '#dad8cc');
+        await COMMON.setting('npcTextColour', '#000000');
+        await COMMON.setting('npcBorder', 'none');
+        await COMMON.setting('fontFamily', 'none');
+        location.reload();
+      } else {
+        if (COMMON.setting('npcChanged') != 'DnD5E Default' && formData.npcTextColour === '#000000') {
+          await COMMON.setting('npcTextColour', '#ffffff');
+        } else {
+          await COMMON.setting('npcTextColour', formData.npcTextColour);
+        }
+      }
+    }
     await COMMON.setting('charBGChoice', formData.charBGImage);
     await COMMON.setting('npcBGChoice', formData.npcBGImage);
-    await COMMON.setting('charTextColour', formData.charTextColour);
-    await COMMON.setting('npcTextColour', formData.npcTextColour);
 
     if (charBGImage.value === 'none') {
       if (formData.charBGColour.length > 0 && formData.charBGColour[0] != '#') {
@@ -151,7 +206,6 @@ export class SybConfigApp extends FormApplication {
     } else {
       await COMMON.setting('switchNpcBGColour', formData.npcBGImage);
     }
-
     location.reload();
   }
 
