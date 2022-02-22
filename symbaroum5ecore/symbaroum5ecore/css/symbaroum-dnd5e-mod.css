@@ -38,6 +38,7 @@
   --syb5e-npc-background-image: url(../images/background/bg-red.webp) repeat;
   --syb5e-npc-font: 'Fondamento';
   --syb5e-npc-border-image: url(../images/journal/sym-journal-header.webp);
+  --syb5e-sheet-border: 13px solid transparent;
 }
 
 /* End of Global Variables */
@@ -63,7 +64,7 @@
 
 .app.window-app.syb5e.actor.character.sheet {
   /* background: chartreuse; */
-  border: 13px solid transparent;
+  border: var(--syb5e-sheet-border);
   border-image: var(--syb5e-pc-border-image);
   border-image-slice: 50%;
   border-image-width: 100%;
@@ -231,7 +232,7 @@
 /* ************************ */
 .app.window-app.syb5e.actor.npc.sheet {
   /* background: chartreuse; */
-  border: 13px solid transparent;
+  border: var(--syb5e-sheet-border);
   border-image: var(--syb5e-npc-border-image);
   border-image-slice: 50%;
   border-image-width: 100%;

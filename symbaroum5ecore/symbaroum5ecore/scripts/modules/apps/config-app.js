@@ -48,6 +48,7 @@ export class SybConfigApp extends FormApplication {
       npcBGChoice: COMMON.setting('npcBGChoice'),
       npcTextColour: COMMON.setting('npcTextColour'),
       fontFamily: COMMON.setting('fontFamily'),
+      actorBorder: COMMON.setting('actorBorder'),
     };
     if (COMMON.setting('charBGChoice') === 'none') {
       newData['charBGColour'] = COMMON.setting('switchCharBGColour');
@@ -122,6 +123,7 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('switchNpcBGColour', '#dad8cc');
     await COMMON.setting('npcTextColour', '#000000');
     await COMMON.setting('fontFamily', 'none');
+    await COMMON.setting('actorBorder', 'none');
 
     location.reload();
   }
