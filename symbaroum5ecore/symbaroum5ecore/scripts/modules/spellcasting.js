@@ -193,7 +193,7 @@ export class Spellcasting {
     const custom = getProperty(itemData, game.syb5e.CONFIG.PATHS.corruptionOverride.root) ?? duplicate(game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride);
 
     /* modify the expression (always round up) minimum 1 unless custom */
-    if(custom.value !== game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride.value){
+    if(custom.mode !== game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride.mode){
       //has override
       switch (custom.mode) {
         case CONST.ACTIVE_EFFECT_MODES.ADD:
