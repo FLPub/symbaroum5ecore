@@ -27,18 +27,18 @@
 }
 
 /* Global Variables */
-/* :root {
-  --syb5e-pc-color: white;
+:root {
+  --syb5e-pc-color: #ffffff;
   --syb5e-pc-background: none;
   --syb5e-pc-background-image: url(../images/background/bg-green.webp) repeat;
   --syb5e-pc-font: 'Fondamento';
   --syb5e-pc-border-image: url(../images/journal/sym-journal-border.webp);
-  --syb5e-npc-color: white;
+  --syb5e-npc-color: #ffffff;
   --syb5e-npc-background: none;
   --syb5e-npc-background-image: url(../images/background/bg-red.webp) repeat;
   --syb5e-npc-font: 'Fondamento';
   --syb5e-npc-border-image: url(../images/journal/sym-journal-header.webp);
-} */
+}
 
 /* End of Global Variables */
 /* ************************ */
