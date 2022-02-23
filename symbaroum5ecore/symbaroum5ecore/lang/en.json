@@ -4,6 +4,49 @@
       "debug": {
         "name": "Log Debug Output",
         "hint": "Prints extended debug information to the console."
+      },
+      "config-menu-label":{
+        "name": "Configure Symbaroum 5E Settings",
+        "hint": "Configure PC and NPC sheet background color (These are Client based settings)."
+      },
+      "config-pc-char-bg-img":{
+        "name": "Character Background Images"
+      },
+      "config-npc-char-bg-img":{
+        "name": "NPC Background Images"
+      },
+      "config-default-dnd5e":{
+        "name": "Default DnD5E Settings for Character and NPC"
+      },
+      "config-color-picker":{
+        "name": "Plain Color Picker"
+      },
+      "config-reset-all-button":{
+        "name": "Reset all settings to defaults"
+      },
+      "config-reset-note":{
+        "name": "NOTE: Submit and Reset will cause FVTT to reload."
+      },
+      "config-submit-button":{
+        "name": "Submit"
+      },
+      "config-reset-pc-config":{
+        "name": "Reset PC Config"
+      },
+      "config-reset-npc-config":{
+        "name": "Reset NPC Config"
+      },
+      "config-pc-color-selector":{
+        "name": "Select PC Background Color"
+      },
+      "config-npc-color-selector":{
+        "name": "Select NPC Background Color"
+      },
+      "config-pc-text-selector":{
+        "name": "Select PC Text Color"
+      },
+      "config-npc-text-selector":{
+        "name": "Select NPC Text Color"
       }
     },
     "Never": "Never",
