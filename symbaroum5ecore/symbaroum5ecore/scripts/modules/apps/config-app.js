@@ -50,6 +50,10 @@ export class SybConfigApp extends FormApplication {
       fontFamily: COMMON.setting('fontFamily'),
       charBorder: COMMON.setting('charBorder'),
       npcBorder: COMMON.setting('npcBorder'),
+      charItemLink: COMMON.setting('charItemLink'),
+      npcItemLink: COMMON.setting('npcItemLink'),
+      pcTag: COMMON.setting('charTag'),
+      npcTag: COMMON.setting('npcTag'),
     };
     if (COMMON.setting('charBGChoice') === 'none') {
       newData['charBGColour'] = COMMON.setting('switchCharBGColour');
@@ -61,6 +65,8 @@ export class SybConfigApp extends FormApplication {
     } else {
       newData['npcBGColour'] = '#000000';
     }
+    COMMON.setting('charChanged', 'false');
+    COMMON.setting('npcChanged', 'false');
 
     return foundry.utils.mergeObject(newData);
   }
@@ -114,6 +120,8 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('switchCharBGColour', 'url(../images/background/bg-green.webp) repeat');
     await COMMON.setting('charTextColour', '#ffffff');
     await COMMON.setting('charBorder', '13px solid transparent');
+    await COMMON.setting('charItemLink', '#000000');
+    await COMMON.setting('charTag', '#ffffff');
     location.reload();
   }
 
@@ -122,6 +130,8 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
     await COMMON.setting('npcTextColour', '#ffffff');
     await COMMON.setting('npcBorder', '13px solid transparent');
+    await COMMON.setting('npcItemLink', '#000000');
+    await COMMON.setting('npcTag', '#ffffff');
     location.reload();
   }
 
@@ -135,6 +145,10 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('npcTextColour', '#ffffff');
     await COMMON.setting('charBorder', '13px solid transparent');
     await COMMON.setting('npcBorder', '13px solid transparent');
+    await COMMON.setting('charItemLink', '#000000');
+    await COMMON.setting('npcItemLink', '#000000');
+    await COMMON.setting('charTag', '#ffffff');
+    await COMMON.setting('npcTag', '#ffffff');
     location.reload();
   }
 
@@ -148,21 +162,29 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('npcTextColour', '#000000');
     await COMMON.setting('npcBorder', 'none');
     await COMMON.setting('fontFamily', 'none');
-
+    await COMMON.setting('charItemLink', '#000000');
+    await COMMON.setting('npcItemLink', '#000000');
+    await COMMON.setting('charTag', '#000000');
+    await COMMON.setting('npcTag', '#000000');
     location.reload();
   }
 
   async _updateObject(event, formData) {
-    if (COMMON.setting('charChanged')) {
+    if (COMMON.setting('charChanged') != 'false') {
       if (COMMON.setting('charChanged') === 'DnD5E Default') {
         await COMMON.setting('charBGChoice', '#dad8cc');
         await COMMON.setting('switchCharBGColour', '#dad8cc');
         await COMMON.setting('charTextColour', '#000000');
         await COMMON.setting('charBorder', 'none');
         await COMMON.setting('fontFamily', 'none');
+        await COMMON.setting('charItemLink', '#000000');
+        await COMMON.setting('charTag', '#000000');
         location.reload();
       } else {
-        if (COMMON.setting('charChanged') != 'DnD5E Default' && formData.charTextColour === '#000000') {
+        await COMMON.setting('charItemLink', '#000000');
+        await COMMON.setting('charTag', '#ffffff');
+
+        if (formData.charTextColour === '#000000') {
           await COMMON.setting('charTextColour', '#ffffff');
         } else {
           await COMMON.setting('charTextColour', formData.charTextColour);
@@ -170,16 +192,20 @@ export class SybConfigApp extends FormApplication {
       }
     }
 
-    if (COMMON.setting('npcChanged')) {
+    if (COMMON.setting('npcChanged') != 'false') {
       if (COMMON.setting('npcChanged') === 'DnD5E Default') {
         await COMMON.setting('npcBGChoice', '#dad8cc');
         await COMMON.setting('switchNpcBGColour', '#dad8cc');
         await COMMON.setting('npcTextColour', '#000000');
         await COMMON.setting('npcBorder', 'none');
         await COMMON.setting('fontFamily', 'none');
+        await COMMON.setting('npcItemLink', '#000000');
+        await COMMON.setting('npcTag', '#000000');
         location.reload();
       } else {
-        if (COMMON.setting('npcChanged') != 'DnD5E Default' && formData.npcTextColour === '#000000') {
+        await COMMON.setting('npcItemLink', '#000000');
+        await COMMON.setting('npcTag', '#ffffff');
+        if (formData.npcTextColour === '#000000') {
           await COMMON.setting('npcTextColour', '#ffffff');
         } else {
           await COMMON.setting('npcTextColour', formData.npcTextColour);
