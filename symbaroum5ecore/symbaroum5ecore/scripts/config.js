@@ -115,6 +115,34 @@ export class SYB5E {
         scope: 'client',
         default: '',
       },
+      charItemLink: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: '#000000',
+      },
+      npcItemLink: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: '#000000',
+      },
+      charTag: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: '#ffffff',
+      },
+      npcTag: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: '#ffffff',
+      },
       // addMenuButton: {
       //   name: 'SYB5E.setting.config-menu-label.name',
       //   scope: 'world',
@@ -145,12 +173,16 @@ export class SYB5E {
       let r = document.querySelector(':root');
       await r.style.setProperty('--syb5e-pc-background-image', COMMON.setting('switchCharBGColour'));
       await r.style.setProperty('--syb5e-pc-color', COMMON.setting('charTextColour'));
+      await r.style.setProperty('--syb5e-pc-font', COMMON.setting('fontFamily'));
+      await r.style.setProperty('--syb5e-pc-sheet-border', COMMON.setting('charBorder'));
+      await r.style.setProperty('--syb5e-pc-item-link', COMMON.setting('charItemLink'));
+      await r.style.setProperty('--syb5e-pc-tag', COMMON.setting('charTag'));
       await r.style.setProperty('--syb5e-npc-background-image', COMMON.setting('switchNpcBGColour'));
       await r.style.setProperty('--syb5e-npc-color', COMMON.setting('npcTextColour'));
-      await r.style.setProperty('--syb5e-pc-font', COMMON.setting('fontFamily'));
       await r.style.setProperty('--syb5e-npc-font', COMMON.setting('fontFamily'));
-      await r.style.setProperty('--syb5e-pc-sheet-border', COMMON.setting('charBorder'));
       await r.style.setProperty('--syb5e-npc-sheet-border', COMMON.setting('npcBorder'));
+      await r.style.setProperty('--syb5e-npc-item-link', COMMON.setting('npcItemLink'));
+      await r.style.setProperty('--syb5e-npc-tag', COMMON.setting('npcTag'));
     });
   }
 
