@@ -1,4 +1,4 @@
-import {COMMON} from '../../common.js'
+import { COMMON } from '../../common.js';
 
 export class SybConfigApp extends FormApplication {
   static get getDefaults() {
@@ -10,29 +10,29 @@ export class SybConfigApp extends FormApplication {
   // * Creates or removes the quick access config button
   // * @param  {Boolean} shown true to add, false to remove
 
-  static toggleConfigButton(shown) {
-    const button = $('#SymbaroumButton');
-    if (button) button.remove();
+  // static toggleConfigButton(shown = true) {
+  //   const button = $('#SybConfigApp');
+  //   if (button) button.remove();
 
-    if (shown) {
-      const title = game.i18n.localize('symbaroum5ecore.OPTIONAL_CONFIG_MENULABEL');
+  //   if (shown) {
+  //     const title = COMMON.localize('SYB5E.setting.config-menu-label.name');
 
-      $(`<button id="SymbaroumButton" data-action="symbaroumConfig" title="${title}">
-         <i class="fas fa-palette"></i> ${title}
-       </button>`)
-        .insertAfter('button[data-action="configure"]')
-        .on('click', (event) => {
-          const menu = game.settings.menus.get('symbaroum.symbaroumSettings');
-          if (!menu) return ui.notifications.error('No submenu found for the provided key');
-          const app = new menu.type();
-          return app.render(true);
-        });
-    }
-  }
+  //     $(`<button id="SybConfigApp" data-action="SybConfigApp" title="${title}">
+  //        <i class="fas fa-palette"></i> ${title}
+  //      </button>`)
+  //       .insertAfter('button[data-action="configure"]')
+  //       .on('click', (event) => {
+  //         const menu = game.settings.menus.get('symbaroum5ecore.symbaroumSettings');
+  //         if (!menu) return ui.notifications.error('No submenu found for the provided key');
+  //         const app = new menu.type();
+  //         return app.render(true);
+  //       });
+  //   }
+  // }
 
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      title: game.i18n.localize('symbaroum5ecore.OPTIONAL_CONFIG_MENULABEL'),
+      title: COMMON.localize('SYB5E.setting.config-menu-label.name'),
       id: 'symbaroum5ecoreSettings',
       icon: 'fas fa-cogs',
       template: `${COMMON.DATA.path}/templates/apps/config-app.html`,
@@ -44,10 +44,16 @@ export class SybConfigApp extends FormApplication {
   getData(options) {
     const newData = {
       charBGChoice: COMMON.setting('charBGChoice'),
+      charTextColour: COMMON.setting('charTextColour'),
       npcBGChoice: COMMON.setting('npcBGChoice'),
-      titleBGChoice: COMMON.setting('titleBGChoice'),
-      editableChoice: COMMON.setting('editableChoice'),
-      noneditableChoice: COMMON.setting('nonEditableChoice'),
+      npcTextColour: COMMON.setting('npcTextColour'),
+      fontFamily: COMMON.setting('fontFamily'),
+      charBorder: COMMON.setting('charBorder'),
+      npcBorder: COMMON.setting('npcBorder'),
+      charItemLink: COMMON.setting('charItemLink'),
+      npcItemLink: COMMON.setting('npcItemLink'),
+      pcTag: COMMON.setting('charTag'),
+      npcTag: COMMON.setting('npcTag'),
     };
     if (COMMON.setting('charBGChoice') === 'none') {
       newData['charBGColour'] = COMMON.setting('switchCharBGColour');
@@ -59,21 +65,8 @@ export class SybConfigApp extends FormApplication {
     } else {
       newData['npcBGColour'] = '#000000';
     }
-    if (COMMON.setting('titleBGChoice') === 'none') {
-      newData['titleBGColour'] = COMMON.setting('switchTitleColour');
-    } else {
-      newData['titleBGColour'] = '#000000';
-    }
-    if (COMMON.setting('editableChoice') === 'none') {
-      newData['editableColour'] = COMMON.setting('switchEditableColour');
-    } else {
-      newData['editableColour'] = '#000000';
-    }
-    if (COMMON.setting('nonEditableChoice') === 'none') {
-      newData['noneditableColour'] = COMMON.setting('switchNonEditableColour');
-    } else {
-      newData['noneditableColour'] = '#000000';
-    }
+    COMMON.setting('charChanged', 'false');
+    COMMON.setting('npcChanged', 'false');
 
     return foundry.utils.mergeObject(newData);
   }
@@ -82,16 +75,41 @@ export class SybConfigApp extends FormApplication {
     super.activateListeners(html);
     html.find('#charBGImage').change((ev) => this._showColOption(ev, '#pcColPanel', charBGImage.value));
     html.find('#npcBGImage').change((ev) => this._showColOption(ev, '#npcColPanel', npcBGImage.value));
+
     html.find('button[name="resetPC"]').click(this.onResetPC.bind(this));
     html.find('button[name="resetNPC"]').click(this.onResetNPC.bind(this));
     html.find('button[name="resetAll"]').click(this.onResetAll.bind(this));
 
+    html.find('button[name="dnd5eSettings"]').click(this.dnd5eSettings.bind(this));
+
     document.getElementById('charBGImage').value = COMMON.setting('charBGChoice');
+    document.getElementById('charTextColour').value = COMMON.setting('charTextColour');
     document.getElementById('npcBGImage').value = COMMON.setting('npcBGChoice');
+    document.getElementById('npcTextColour').value = COMMON.setting('npcTextColour');
+
+    document.addEventListener(
+      'input',
+      function (event) {
+        // Only run on our select menu
+        if (event.target.id !== 'charBGImage') return;
+        COMMON.setting('charChanged', event.target.options[event.target.selectedIndex].label);
+      },
+      false
+    );
+    document.addEventListener(
+      'input',
+      function (event) {
+        // Only run on our select menu
+        if (event.target.id !== 'npcBGImage') return;
+        COMMON.setting('npcChanged', event.target.options[event.target.selectedIndex].label);
+      },
+      false
+    );
 
     if (COMMON.setting('charBGChoice') === 'none') {
       document.getElementById('pcColPanel').style.display = 'block';
     }
+
     if (COMMON.setting('npcBGChoice') === 'none') {
       document.getElementById('npcColPanel').style.display = 'block';
     }
@@ -100,24 +118,100 @@ export class SybConfigApp extends FormApplication {
   async onResetPC() {
     await COMMON.setting('charBGChoice', 'url(../images/background/bg-green.webp) repeat');
     await COMMON.setting('switchCharBGColour', 'url(../images/background/bg-green.webp) repeat');
+    await COMMON.setting('charTextColour', '#ffffff');
+    await COMMON.setting('charBorder', '13px solid transparent');
+    await COMMON.setting('charItemLink', '#000000');
+    await COMMON.setting('charTag', '#ffffff');
     location.reload();
   }
 
   async onResetNPC() {
     await COMMON.setting('npcBGChoice', 'url(../images/background/bg-red.webp) repeat');
     await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
+    await COMMON.setting('npcTextColour', '#ffffff');
+    await COMMON.setting('npcBorder', '13px solid transparent');
+    await COMMON.setting('npcItemLink', '#000000');
+    await COMMON.setting('npcTag', '#ffffff');
     location.reload();
   }
 
   async onResetAll() {
     await COMMON.setting('charBGChoice', 'url(../images/background/bg-green.webp) repeat');
     await COMMON.setting('switchCharBGColour', 'url(../images/background/bg-green.webp) repeat');
+    await COMMON.setting('charTextColour', '#ffffff');
     await COMMON.setting('npcBGChoice', 'url(../images/background/bg-red.webp) repeat');
     await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
+    await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
+    await COMMON.setting('npcTextColour', '#ffffff');
+    await COMMON.setting('charBorder', '13px solid transparent');
+    await COMMON.setting('npcBorder', '13px solid transparent');
+    await COMMON.setting('charItemLink', '#000000');
+    await COMMON.setting('npcItemLink', '#000000');
+    await COMMON.setting('charTag', '#ffffff');
+    await COMMON.setting('npcTag', '#ffffff');
+    location.reload();
+  }
+
+  async dnd5eSettings() {
+    await COMMON.setting('charBGChoice', '#dad8cc');
+    await COMMON.setting('switchCharBGColour', '#dad8cc');
+    await COMMON.setting('charTextColour', '#000000');
+    await COMMON.setting('charBorder', 'none');
+    await COMMON.setting('npcBGChoice', '#dad8cc');
+    await COMMON.setting('switchNpcBGColour', '#dad8cc');
+    await COMMON.setting('npcTextColour', '#000000');
+    await COMMON.setting('npcBorder', 'none');
+    await COMMON.setting('fontFamily', 'none');
+    await COMMON.setting('charItemLink', '#000000');
+    await COMMON.setting('npcItemLink', '#000000');
+    await COMMON.setting('charTag', '#000000');
+    await COMMON.setting('npcTag', '#000000');
     location.reload();
   }
 
   async _updateObject(event, formData) {
+    if (COMMON.setting('charChanged') != 'false') {
+      if (COMMON.setting('charChanged') === 'DnD5E Default') {
+        await COMMON.setting('charBGChoice', '#dad8cc');
+        await COMMON.setting('switchCharBGColour', '#dad8cc');
+        await COMMON.setting('charTextColour', '#000000');
+        await COMMON.setting('charBorder', 'none');
+        await COMMON.setting('fontFamily', 'none');
+        await COMMON.setting('charItemLink', '#000000');
+        await COMMON.setting('charTag', '#000000');
+        location.reload();
+      } else {
+        await COMMON.setting('charItemLink', '#000000');
+        await COMMON.setting('charTag', '#ffffff');
+
+        if (formData.charTextColour === '#000000') {
+          await COMMON.setting('charTextColour', '#ffffff');
+        } else {
+          await COMMON.setting('charTextColour', formData.charTextColour);
+        }
+      }
+    }
+
+    if (COMMON.setting('npcChanged') != 'false') {
+      if (COMMON.setting('npcChanged') === 'DnD5E Default') {
+        await COMMON.setting('npcBGChoice', '#dad8cc');
+        await COMMON.setting('switchNpcBGColour', '#dad8cc');
+        await COMMON.setting('npcTextColour', '#000000');
+        await COMMON.setting('npcBorder', 'none');
+        await COMMON.setting('fontFamily', 'none');
+        await COMMON.setting('npcItemLink', '#000000');
+        await COMMON.setting('npcTag', '#000000');
+        location.reload();
+      } else {
+        await COMMON.setting('npcItemLink', '#000000');
+        await COMMON.setting('npcTag', '#ffffff');
+        if (formData.npcTextColour === '#000000') {
+          await COMMON.setting('npcTextColour', '#ffffff');
+        } else {
+          await COMMON.setting('npcTextColour', formData.npcTextColour);
+        }
+      }
+    }
     await COMMON.setting('charBGChoice', formData.charBGImage);
     await COMMON.setting('npcBGChoice', formData.npcBGImage);
 
