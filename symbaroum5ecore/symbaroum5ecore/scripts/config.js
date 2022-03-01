@@ -260,7 +260,8 @@ export class SYB5E {
         type: 'none',
         mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM, //custom = use stock items values (i.e. "none")
         value: '0',
-      }
+      },
+      corruption: false //temp storage for previously rolled corruption
     }
 
     const root = `flags.${COMMON.DATA.name}`;
@@ -268,6 +269,9 @@ export class SYB5E {
     /* paths for syb flag data */
     globalThis.game.syb5e.CONFIG.PATHS = {
       root,
+      delete: {
+        corruption: `${root}.-=corruption`,
+      },
       corruption: {
         root: `${root}.corruption`,
         ability: `${root}.corruption.ability`,
@@ -275,6 +279,11 @@ export class SYB5E {
         permanent: `${root}.corruption.permanent`,
         value: undefined, //getter only for actors
         max: `${root}.corruption.max`,
+        last: {
+          total: `${root}.corruption.total`, //last rolled corruption value (items)
+          expression: `${root}.corruption.expression`, //last roll corruption expression (items)
+          summary: `${root}.corruption.summary`, //text output of results -- '${expression} (${total})
+        }
       },
       corruptionOverride: {
         root: `${root}.corruptionOverride`,

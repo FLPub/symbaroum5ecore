@@ -33,8 +33,8 @@ export class ItemSyb5e {
       isFavored: {
         get: ItemSyb5e.getIsFavored
       },
-      _spellChatData: {
-        value: ItemSyb5e._spellChatData
+      getChatData: {
+        value: ItemSyb5e.getChatData
       },
       hasDamage: {
         get: ItemSyb5e.hasDamage
@@ -75,17 +75,19 @@ export class ItemSyb5e {
   }
 
   /* @override */
-  static _spellChatData(data, labels, props) {
+  static getChatData(...args) {
 
     /* should insert 2 labels -- level and components */
-    ItemSyb5e.parent._spellChatData.call(this, data, labels, props)
+    let data = ItemSyb5e.parent.getChatData.call(this, ...args);
 
     /* add ours right after if we are consuming corruption */
-    if(this.actor.isSybActor && this.corruptionUse){
-      /* cantrips and favored spells have a flat corruption value */
-      const totalString = this.isFavored || (parseInt(this.data.data.level) === 0) ? '' : ` (${this.corruptionUse.total})`;
-      props.push(`${this.corruptionUse.expression}${totalString}`);
+    const corruptionUse = getProperty(this.data, game.syb5e.CONFIG.PATHS.corruption.root);
+    if(this.actor.isSybActor && corruptionUse && corruptionUse.total != 0){
+      logger.debug('Retrieving last rolled corruption:', corruptionUse);
+      data.properties.push(corruptionUse.summary);
     }
+
+    return data;
     
   }
 
@@ -125,13 +127,13 @@ export class ItemSyb5e {
       data.item.properties = this.properties;
       data.item.favored = this.isFavored;
       data.item.type = this.type;
-      if(this.type == 'spell') {
-        /* add in corruption expression */
-        COMMON.addGetter(data.item, 'corruption', function(){
-          return Spellcasting._generateCorruptionExpression(this.level, this.favored)
-        });
-      }
 
+      /* populate most up to date corruption use information */
+      const lastCorruptionField = game.syb5e.CONFIG.PATHS.corruption;
+      const lastCorruptionData = getProperty(this.data, lastCorruptionField.root) ?? {expression: this.corruption.expression, total: 0, summary: '- (-)'};
+
+      data.item.corruption = lastCorruptionData;
+      
     }
 
     return data;

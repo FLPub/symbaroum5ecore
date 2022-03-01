@@ -197,10 +197,10 @@ export class Spellcasting {
       //has override
       switch (custom.mode) {
         case CONST.ACTIVE_EFFECT_MODES.ADD:
-          expression = `max( ceil( (${expression}) + (${custom.value}) ), 1)`
+          expression = `${expression} + (${custom.value})`
           break;
         case CONST.ACTIVE_EFFECT_MODES.MULTIPLY:
-          expression = `max( ceil( (${expression}) * (${custom.value}) ), 1)`
+          expression = `(${expression}) * (${custom.value})`
           break;
         case CONST.ACTIVE_EFFECT_MODES.OVERRIDE:
           expression = custom.value;
@@ -278,15 +278,24 @@ export class Spellcasting {
       /* Does this item produce corruption? */
       const corruptionInfo = item.corruption;
 
-      /* roll for corruption */
-      const gainedCorruption = new Roll(corruptionInfo.expression, item.getRollData()).evaluate({async:false}).total;
+      /* roll for corruption (always round up)*/
+      const gainedCorruption = new Roll(`ceil(${corruptionInfo.expression})`, item.getRollData()).evaluate({async:false}).total;
 
-      /* store corruption info in item (temporary) */
-      item.corruptionUse = {
+      /* cantrips and favored spells have a flat corruption value */
+      const summaryString = `${corruptionInfo.expression} (${gainedCorruption})`;
+
+      /* store this most recently rolled corruption value in its flags */
+      const lastCorruptionField = game.syb5e.CONFIG.PATHS.corruption.root;
+      itemUpdates[lastCorruptionField] = {
+        total: gainedCorruption,
         expression: corruptionInfo.expression,
-        type: corruptionInfo.type,
-        total: gainedCorruption
+        summary: summaryString
       }
+
+      /* hack: force a local update so we can use this data immediately */
+      item.data.update({[lastCorruptionField]: itemUpdates[lastCorruptionField]});
+
+      logger.debug('Cached rolled corruption:', itemUpdates);
 
       /* field name shortcuts */
       const fieldKey = item.actor.type == 'character' ? corruptionInfo.type : 'permanent';
@@ -301,6 +310,10 @@ export class Spellcasting {
       const corruptionFieldPath = `flags.${COMMON.DATA.name}.corruption.${fieldKey}`;
       actorUpdates[corruptionFieldPath] = corruption[fieldKey];
       
+    } else {
+      /* clear out the previously stored corruption results, if any */
+      itemUpdates[game.syb5e.CONFIG.PATHS.delete.corruption] = null;
+      item.data.update({[game.syb5e.CONFIG.PATHS.delete.corruption]: null});
     }
 
     return {actorUpdates, itemUpdates, resourceUpdates};
