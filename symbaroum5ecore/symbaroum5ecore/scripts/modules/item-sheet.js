@@ -133,6 +133,12 @@ export class Syb5eItemSheet {
         ...currentOverrides
       }
 
+      /* non-spell items have no base corruption to modify, can only override with a custom value */
+      if(item.type !== 'spell') {
+        delete data.corruptionModes.ADD;
+        delete data.corruptionModes.MULTIPLY;
+      }
+
       const corruptionGroup = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/item-corruption.html`, data);
       consumeGroup.after(corruptionGroup);
     }
