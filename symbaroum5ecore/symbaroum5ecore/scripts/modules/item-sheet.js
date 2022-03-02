@@ -45,18 +45,22 @@ export class Syb5eItemSheet {
         favoredPath: SYB5E.CONFIG.PATHS.favored,
         favoredValue: getProperty(item.data, SYB5E.CONFIG.PATHS.favored) ?? 0,
         favoredStates: {
-          [COMMON.localize("Yes")]: 1,
-          [COMMON.localize("No")]: 0,
-          [COMMON.localize("SYB5E.Never")]: -1
+          [COMMON.localize("SYB5E.Spell.Favored")]: 1,
+          [COMMON.localize("SYB5E.Spell.NotFavored")]: 0,
+          [COMMON.localize("SYB5E.Spell.NeverFavored")]: -1
         }
       }
 
-      const favoredCheckbox = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/spell-favored.html`, data);
+      const favoredSelect = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/spell-favored.html`, data);
       const favoredBadge = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/spell-favored-badge.html`, data);
 
-      /* insert our favored checkbox */
+      /* adjust spell prep div style to <label style="max-width: fit-content;"> */
       const preparedCheckbox = html.find('label.checkbox.prepared');
-      preparedCheckbox.before(favoredCheckbox);
+      const prepModeLineLabel = preparedCheckbox.parent().prev();
+      prepModeLineLabel.css('max-width', 'fit-content');
+
+      /* insert our favored select menu */
+      preparedCheckbox.after(favoredSelect);
 
       /* insert our favored badge */
       const itemPropBadges = html.find('.properties-list li');

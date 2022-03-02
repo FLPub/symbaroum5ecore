@@ -108,6 +108,8 @@
     },
     "Spell": {
       "Favored": "Favored",
+      "NotFavored": "Not Favored",
+      "NeverFavored": "Never Favored",
       "MaxLevel": "Maximum Spell Level"
     },
     "Shadow": {
