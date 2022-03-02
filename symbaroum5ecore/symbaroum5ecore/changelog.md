@@ -9,7 +9,7 @@
   * Non-spell items will still need to have an `OVERRIDE` corruption formula set. Spell items will use the default spell corruption scaling rules, which consider favored state and spell level, unless overriden or modified.
   * Non-spell items now only have an `OVERRIDE` corruption mode as they have no default corruption expression to modify via `ADD`/`MULTIPLY`
 
-  ### Known Issues
+### Known Issues
   * "Thoroughly Corrupted" state is not implemented and currently represented with the NPC's corruption values being set to its computed maximum.
 
 ## 0.4.0
