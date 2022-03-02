@@ -7,7 +7,7 @@
       },
       "config-menu-label":{
         "name": "Configure Symbaroum 5E Settings",
-        "hint": "Configure PC and NPC sheet background color (These are Client based settings)."
+        "hint": "Configure PC and NPC sheet background image/color and font colours (These are Client based settings)."
       },
       "config-pc-char-bg-img":{
         "name": "Character Background Images"

@@ -1,5 +1,6 @@
 import { COMMON } from './common.js';
 import { SybConfigApp } from './modules/apps/config-app.js';
+import { ModuleImportDialog, moduleKey } from './modules/apps/import.js';
 
 /* CONFIG class for syb5e data.
  * Stored in 'game.syb5e.CONFIG'
@@ -38,6 +39,13 @@ export class SYB5E {
   /* registering our settings */
   static settings() {
     const settingsData = {
+      imported: {
+        name: 'Imported Compendiums',
+        scope: 'world',
+        config: false,
+        type: Boolean,
+        default: false,
+      },
       charBGChoice: {
         restricted: false,
         type: String,
@@ -143,22 +151,12 @@ export class SYB5E {
         scope: 'client',
         default: '#ffffff',
       },
-      // addMenuButton: {
-      //   name: 'SYB5E.setting.config-menu-label.name',
-      //   scope: 'world',
-      //   config: true,
-      //   default: SybConfigApp.getDefaults.addMenuButton,
-      //   type: Boolean,
-      //   onChange: (enabled) => {
-      //     SybConfigApp.toggleConfigButton(enabled);
-      //   },
-      // },
     };
 
     game.settings.registerMenu('symbaroum5ecore', 'symbaroumSettings', {
       name: 'SYB5E.setting.config-menu-label.name',
       label: 'SYB5E.setting.config-menu-label.name',
-      hint: 'SYB5E.setting.config-menu-hint.hint',
+      hint: 'SYB5E.setting.config-menu-label.hint',
       icon: 'fas fa-palette',
       type: SybConfigApp,
       restricted: false,
@@ -183,6 +181,10 @@ export class SYB5E {
       await r.style.setProperty('--syb5e-npc-sheet-border', COMMON.setting('npcBorder'));
       await r.style.setProperty('--syb5e-npc-item-link', COMMON.setting('npcItemLink'));
       await r.style.setProperty('--syb5e-npc-tag', COMMON.setting('npcTag'));
+
+      if (!game.settings.get(moduleKey, 'imported') && game.user.isGM) {
+        return new ModuleImportDialog().render(true);
+      }
     });
   }
 
