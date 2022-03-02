@@ -1,3 +1,8 @@
+## 0.5.1
+* CSS/Sheet styling updates
+  * Modified available sheet background images
+  * Tweaked layout of Favored Spell dropdown
+
 ## 0.5.0
 * Overhaul to item corruption generation system.
   * New item rollData field: `@item.corruption.total/expression/summary`
