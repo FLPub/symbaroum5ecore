@@ -50,21 +50,15 @@ export class COMMON {
    
   }
 
-  static _init() {
-
-    return loadTemplates([
-      /* Actor partials */
-      `${COMMON.DATA.path}/templates/actors/parts/actor-corruption.html`,
-      `${COMMON.DATA.path}/templates/actors/parts/actor-shadow.html`,
-      `${COMMON.DATA.path}/templates/actors/parts/npc-manner.html`,
-      `${COMMON.DATA.path}/templates/actors/parts/character-max-spell.html`,
-      `${COMMON.DATA.path}/templates/items/parts/spell-favored.html`,
-      `${COMMON.DATA.path}/templates/apps/rest.html`,
-    ]);
-
+  /** HELPER FUNCTIONS **/
+  static firstGM(){
+    return game.users.find(u => u.isGM && u.active);
   }
 
-  /** HELPER FUNCTIONS **/
+  static isFirstGM(){
+    return game.user.id === COMMON.firstGM()?.id;
+  }
+
   static setting(key, value = null){
 
     if(value) {

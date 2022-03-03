@@ -1,6 +1,5 @@
 import { COMMON } from './common.js';
 import { SybConfigApp } from './modules/apps/config-app.js';
-import { ModuleImportDialog, moduleKey } from './modules/apps/import.js';
 
 /* CONFIG class for syb5e data.
  * Stored in 'game.syb5e.CONFIG'
@@ -39,13 +38,6 @@ export class SYB5E {
   /* registering our settings */
   static settings() {
     const settingsData = {
-      imported: {
-        name: 'Imported Compendiums',
-        scope: 'world',
-        config: false,
-        type: Boolean,
-        default: false,
-      },
       charBGChoice: {
         restricted: false,
         type: String,
@@ -167,24 +159,7 @@ export class SYB5E {
 
   static hooks() {
     Hooks.once('ready', async () => {
-      /* setup config options */
-      let r = document.querySelector(':root');
-      await r.style.setProperty('--syb5e-pc-background-image', COMMON.setting('switchCharBGColour'));
-      await r.style.setProperty('--syb5e-pc-color', COMMON.setting('charTextColour'));
-      await r.style.setProperty('--syb5e-pc-font', COMMON.setting('fontFamily'));
-      await r.style.setProperty('--syb5e-pc-sheet-border', COMMON.setting('charBorder'));
-      await r.style.setProperty('--syb5e-pc-item-link', COMMON.setting('charItemLink'));
-      await r.style.setProperty('--syb5e-pc-tag', COMMON.setting('charTag'));
-      await r.style.setProperty('--syb5e-npc-background-image', COMMON.setting('switchNpcBGColour'));
-      await r.style.setProperty('--syb5e-npc-color', COMMON.setting('npcTextColour'));
-      await r.style.setProperty('--syb5e-npc-font', COMMON.setting('fontFamily'));
-      await r.style.setProperty('--syb5e-npc-sheet-border', COMMON.setting('npcBorder'));
-      await r.style.setProperty('--syb5e-npc-item-link', COMMON.setting('npcItemLink'));
-      await r.style.setProperty('--syb5e-npc-tag', COMMON.setting('npcTag'));
-
-      if (!game.settings.get(moduleKey, 'imported') && game.user.isGM) {
-        return new ModuleImportDialog().render(true);
-      }
+      
     });
   }
 
