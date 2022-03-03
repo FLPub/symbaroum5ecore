@@ -1,0 +1,45 @@
+{
+    "name": "symbaroum5ecore",
+    "title": "Symbaroum 5E Ruins of Symbaroum - Core System",
+    "description": "Implements the core rules mechanics of the Ruins of Symbaroum conversion.",
+    "author": "Matthew Haentschke, Paul Watson",
+    "version": "0.5.!2",
+    "minimumCoreVersion": "9",
+    "compatibleCoreVersion": "9",
+    "system": [
+        "dnd5e"
+    ],
+    "styles": [
+        "/css/symbaroum-dnd5e-mod.css"
+    ],
+    "esmodules": [
+        "/scripts/core.js"
+    ],
+    "languages": [
+        {
+            "lang": "en",
+            "name": "English",
+            "path": "lang/en.json"
+        }
+    ],
+    "packs": [
+        {
+            "name": "ros-core-user-guide-journal",
+            "label": "Symbaroum RoS - How to",
+            "path": "packs/ros-core-user-guide-journal.db",
+            "entity": "JournalEntry",
+            "module": "symbaroum5ecore",
+            "private": false
+        },
+        {
+            "name": "ros-core-scenes",
+            "label": "Symbaroum RoS - GM Aids",
+            "path": "packs/ros-core-scenes.db",
+            "entity": "Scene",
+            "module": "symbaroum5ecore"
+        }
+    ],
+    "url": "https://github.com/FLPub/symbaroum5ecore",
+    "manifest": "https://raw.githubusercontent.com/FLPub/symbaroum5ecore/next/module.json",
+    "download": "https://github.com/FLPub/symbaroum5ecore/releases/download/0.5.!2/module.zip"
+}
