@@ -1,0 +1,23 @@
+{
+    "name": "fvtt-dual-track-module",
+    "title": "FVTT Dual-Track Module Template",
+    "description": "A template repository.",
+    "system": [],
+    "version": "1.0.0",
+    "author": "",
+    "authors": [
+    ],
+    "esmodules": [
+        "scripts/module.mjs"
+    ],
+    "languages": [
+    ],
+    "styles": [
+    ],
+    "socket": false,
+    "url": "",
+    "manifest": "",
+    "download": "",
+    "minimumCoreVersion": "9",
+    "compatibleCoreVersion": "9"
+}
