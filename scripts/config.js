@@ -43,42 +43,42 @@ export class SYB5E {
         type: String,
         config: false,
         scope: 'client',
-        default: 'url(../images/background/bg-green.webp) repeat',
+        default: 'url(../images/background/bg-paper.webp) repeat',
       },
       charTextColour: {
         restricted: false,
         type: String,
         config: false,
         scope: 'client',
-        default: '#ffffff',
+        default: '#000000',
       },
       npcBGChoice: {
         restricted: false,
         type: String,
         config: false,
         scope: 'client',
-        default: 'url(../images/background/bg-green.webp) repeat',
+        default: 'url(../images/background/bg-paper.webp) repeat',
       },
       switchCharBGColour: {
         restricted: false,
         type: String,
         config: false,
         scope: 'client',
-        default: 'url(../images/background/bg-green.webp) repeat',
+        default: 'url(../images/background/bg-paper.webp) repeat',
       },
       switchNpcBGColour: {
         restricted: false,
         type: String,
         config: false,
         scope: 'client',
-        default: 'url(../images/background/bg-red.webp) repeat',
+        default: 'url(../images/background/bg-paper.webp) repeat',
       },
       npcTextColour: {
         restricted: false,
         type: String,
         config: false,
         scope: 'client',
-        default: '#ffffff',
+        default: '#000000',
       },
       fontFamily: {
         restricted: false,
@@ -158,9 +158,7 @@ export class SYB5E {
   }
 
   static hooks() {
-    Hooks.once('ready', async () => {
-      
-    });
+    Hooks.once('ready', async () => {});
   }
 
   /* setting our global config data */
@@ -294,8 +292,8 @@ export class SYB5E {
         mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM, //custom = use stock items values (i.e. "none")
         value: '0',
       },
-      corruption: false //temp storage for previously rolled corruption
-    }
+      corruption: false, //temp storage for previously rolled corruption
+    };
 
     const root = `flags.${COMMON.DATA.name}`;
 
@@ -316,7 +314,7 @@ export class SYB5E {
           total: `${root}.corruption.total`, //last rolled corruption value (items)
           expression: `${root}.corruption.expression`, //last roll corruption expression (items)
           summary: `${root}.corruption.summary`, //text output of results -- '${expression} (${total})
-        }
+        },
       },
       corruptionOverride: {
         root: `${root}.corruptionOverride`,
