@@ -115,6 +115,7 @@
 .syb5e.sheet.actor.character input[type='text'],
 .syb5e.sheet.actor.character input[type='number'] {
   color: var(--syb5e-pc-color);
+  font-family: var(--syb5e-pc-font);
 }
 
 .syb5e.sheet.actor.character .sheet-header h1.charname input {
@@ -128,8 +129,17 @@
   font-family: var(--syb5e-pc-font);
 }
 
+.syb5e.sheet.actor.character .sheet-header .attributes .attribute .attribute-value {
+  font-family: var(--syb5e-pc-font);
+}
+
+.syb5e.sheet.actor.character .ability-scores .ability .ability-modifiers span.ability-mod {
+  font-family: var(--syb5e-pc-font);
+}
+
 .syb5e.sheet.actor.character .sheet-header .experience span.max {
   color: var(--syb5e-pc-color);
+  font-family: var(--syb5e-pc-font);
 }
 .syb5e.sheet.actor.character .form-group label {
   color: var(--syb5e-pc-color);
@@ -143,6 +153,11 @@
 }
 
 .syb5e.sheet.actor.character .ability-scores .ability input.ability-score {
+  color: var(--syb5e-pc-color);
+  font-family: var(--syb5e-pc-font);
+}
+
+.syb5e.sheet.actor.character .ability-scores .ability .ability-modifiers span.ability-save {
   color: var(--syb5e-pc-color);
   font-family: var(--syb5e-pc-font);
 }
@@ -205,6 +220,7 @@
 
 .syb5e.sheet.actor.character .items-list .items-header h3 {
   color: var(--syb5e-pc-color);
+  font-family: var(--syb5e-pc-font);
 }
 
 .syb5e.sheet.actor.character .items-list {
@@ -226,6 +242,16 @@
 .syb5e.sheet.actor.character .spell-school,
 .syb5e.sheet.actor.character .spell-action,
 .syb5e.sheet.actor.character .spell-target {
+  color: var(--syb5e-pc-color);
+}
+
+.syb5e.sheet.actor.character .spell-slots,
+.syb5e.sheet.actor.character .spell-comps {
+  color: var(--syb5e-pc-color);
+}
+
+.syb5e.sheet.actor.character .spell-component.C,
+.syb5e.sheet.actor.character .spell-component.R {
   color: var(--syb5e-pc-color);
 }
 
@@ -295,9 +321,14 @@ a.inline-roll {
   font-family: var(--syb5e-npc-font);
 }
 
+.syb5e.sheet.actor.npc .header-exp .cr {
+  font-family: var(--syb5e-npc-font);
+}
+
 .syb5e.sheet.actor.npc input[type='text'],
 .syb5e.sheet.actor.npc input[type='number'] {
   color: var(--syb5e-npc-color);
+  font-family: var(--syb5e-npc-font);
 }
 
 .syb5e.sheet.actor.npc .sheet-header h1.charname input {
@@ -331,6 +362,18 @@ a.inline-roll {
 }
 
 .syb5e.sheet.actor.npc ul.attributes li.attribute .attribute-value.multiple input {
+  color: var(--syb5e-npc-color);
+  font-family: var(--syb5e-npc-font);
+}
+
+.syb5e.sheet.actor.npc .sheet-header .attributes .attribute .attribute-value {
+  font-family: var(--syb5e-npc-font);
+}
+.syb5e.sheet.actor.npc .ability-scores .ability .ability-modifiers span.ability-mod {
+  font-family: var(--syb5e-npc-font);
+}
+
+.syb5e.sheet.actor.npc .ability-scores .ability .ability-modifiers span.ability-save {
   color: var(--syb5e-npc-color);
   font-family: var(--syb5e-npc-font);
 }
@@ -385,6 +428,7 @@ a.inline-roll {
 
 .syb5e.sheet.actor.npc .items-list .items-header h3 {
   color: var(--syb5e-npc-color);
+  font-family: var(--syb5e-npc-font);
 }
 
 .syb5e.sheet.actor.npc .items-list {
@@ -410,13 +454,26 @@ a.inline-roll {
   color: var(--syb5e-npc-color);
 }
 
+.syb5e.sheet.actor.npc .spell-slots,
+.syb5e.sheet.actor.npc .spell-comps {
+  color: var(--syb5e-npc-color);
+}
+
+.syb5e.sheet.actor.npc .spell-component.C,
+.syb5e.sheet.actor.npc .spell-component.R {
+  color: var(--syb5e-npc-color);
+}
+
 .syb5e.sheet.actor.npc .header-exp .experience,
 .syb5e.sheet.actor.np .header-exp .proficiency {
   color: var(--syb5e-npc-color);
+  font-family: var(--syb5e-npc-font);
 }
 
 .syb5e.sheet.actor.npc .header-exp .proficiency {
   color: var(--syb5e-npc-color);
+  font-family: var(--syb5e-npc-font);
+  width: max-content;
 }
 
 .syb5e.sheet.actor.npc a.entity-link,
