@@ -165,12 +165,18 @@ export class Spellcasting {
     }
   }
 
-  static _generateCorruptionExpression(level, favored) {
+  static _generateCorruptionExpression(level, favored, prepMode) {
     /* cantrips have a level of "0" (string) for some reason */
     level = parseInt(level);
 
     if(isNaN(level)){
       return false
+    }
+
+    switch (prepMode) {
+      case 'atwill':
+      case 'innate':
+        return '0'
     }
 
     if (favored) {
