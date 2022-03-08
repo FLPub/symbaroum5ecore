@@ -266,14 +266,18 @@ export class ActorSyb5e {
     let corruptionAbility = getProperty(actor.data, paths.corruption.ability) ?? defaultAbility;
     /* if we are in a custom max mode, just return the current stored max */
     const currentMax = getProperty(actor.data, paths.corruption.max) ?? game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.max
-    if(corruptionAbility === 'custom'){
-      return currentMax;
+
+    /* handle special cases */
+    switch (corruptionAbility) {
+      case 'custom': return currentMax;
+      case 'thorough': return 0;
+      case 'spellcasting': {
+        /* if corruption is set to use spellcasting, ensure we have a spellcasting stat as well */
+        corruptionAbility = !!actor.data.data.attributes.spellcasting ? corruptionAbility : defaultAbility;
+      }
     }
 
-    /* if corruption is set to use spellcasting, ensure we have a spellcasting stat as well */
-    corruptionAbility = corruptionAbility === 'spellcasting' && !actor.data.data.attributes.spellcasting ? defaultAbility : corruptionAbility;
-
-    const usesSpellcasting = corruptionAbility === 'spellcasting' ? true : false;
+    const usesSpellcasting = corruptionAbility === 'spellcasting';
 
     /* otherwise determine corruption calc -- full casters get a special one */
     const {fullCaster} = actor.type === 'character' ? Spellcasting._maxSpellLevelByClass(Object.values(actor.classes).map( item => item.data.data )) : Spellcasting._maxSpellLevelNPC(actor.data.data);
@@ -287,7 +291,7 @@ export class ActorSyb5e {
     const corrMod = actor.data.data.abilities[corrAbility].mod;
 
     if (corrMod == null) {
-      /* we havent prepped enough data used the stored value */
+      /* we havent prepped enough data; use the stored value */
       return currentMax
     }
 

@@ -165,7 +165,7 @@ export class SYB5E {
   }
 
   static hooks() {
-    Hooks.once('ready', async () => {});
+    
   }
 
   /* setting our global config data */

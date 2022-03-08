@@ -51,28 +51,36 @@ export class SheetCommon {
   /* -------------------------------------------- */
 
   static _getCorruptionAbilityData(actor, contextAbilities) {
-    let defaultEntries = [];
-
-    /* if this actor has any spellcasting, allow it to be selected as corruption stat */
-    if (actor.data.data.attributes.spellcasting?.length > 0) {
-      defaultEntries.push({ ability: 'spellcasting', label: COMMON.localize('DND5E.Spellcasting') });
-    }
-
-    defaultEntries.push({ ability: 'custom', label: COMMON.localize('SYB5E.Corruption.Custom') });
 
     const corruptionAbilities = Object.entries(contextAbilities).reduce((acc, [key, val]) => {
       acc.push({ ability: key, label: val.label });
       return acc;
-    }, defaultEntries);
+    }, []);
+
+    /* if this actor has any spellcasting, allow it to be selected as corruption stat */
+    if (actor.data.data.attributes.spellcasting?.length > 0) {
+      corruptionAbilities.push({ ability: 'spellcasting', label: COMMON.localize('DND5E.Spellcasting') });
+    }
+
+    /* add in the 'custom' option */
+    corruptionAbilities.push({ ability: 'custom', label: COMMON.localize('SYB5E.Corruption.Custom') });
+
+    /* add in the 'thoroughly corrupt' option */
+    corruptionAbilities.push({ ability: 'thorough', label: COMMON.localize('SYB5E.Corruption.ThoroughShort') });
+
 
     let corruptionAbilityData = {
       path: game.syb5e.CONFIG.PATHS.corruption.ability,
       abilities: corruptionAbilities,
       current: actor.corruption.ability,
+      disabled: false,
+      thorough: actor.corruption.ability === 'thorough',
     };
 
     /* can only edit max corruption if using a custom value */
     corruptionAbilityData.disabled = corruptionAbilityData.current !== 'custom' ? 'disabled' : '';
+
+    /* can only show corruption totals if NOT thoroughly corrupted */
 
     return corruptionAbilityData;
   }

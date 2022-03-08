@@ -125,6 +125,8 @@
       "Permanent": "Permanent",
       "Current": "Current",
       "Threshold": "Threshold",
+      "ThoroughFull": "Thoroughly Corrupted",
+      "ThoroughShort": "Thoroughly",
       "ShortDesc": "Current Corruption: {value}/{max}",
       "Custom": "Custom",
       "GainQuestion": "Suffer Corruption",
