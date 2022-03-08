@@ -4,7 +4,7 @@ import { COMMON } from './../common.js'
 export class Importer extends ModuleImportDialog {
   static NAME = 'Importer';
   static importedStateKey = 'imported'
-  static migratedVersionKey = 'migratedVersion'
+  static migratedVersionKey = 'migrationVersion'
 
   constructor() {
     /* give our module specific information to the importer app */
@@ -58,7 +58,7 @@ export class Importer extends ModuleImportDialog {
 
   /* @override */
   static get migrationVersions() {
-    return ["0.5.1"];
+    return [];
   }
 
   /* @override */
