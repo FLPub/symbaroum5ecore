@@ -80,7 +80,14 @@ export class SYB5E {
         scope: 'client',
         default: '#000000',
       },
-      fontFamily: {
+      charFontFamily: {
+        restricted: false,
+        type: String,
+        config: false,
+        scope: 'client',
+        default: 'Fondamento',
+      },
+      npcFontFamily: {
         restricted: false,
         type: String,
         config: false,
