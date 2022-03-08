@@ -184,7 +184,7 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
       classes: ['syb5e', 'dnd5e', 'sheet', 'actor', 'character'],
-      width: 757,
+      width: 780,
       height: 749,
     });
   }

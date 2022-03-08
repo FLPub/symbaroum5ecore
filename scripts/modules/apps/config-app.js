@@ -116,39 +116,38 @@ export class SybConfigApp extends FormApplication {
   }
 
   async onResetPC() {
-    await COMMON.setting('charBGChoice', 'url(../images/background/bg-green.webp) repeat');
-    await COMMON.setting('switchCharBGColour', 'url(../images/background/bg-green.webp) repeat');
-    await COMMON.setting('charTextColour', '#ffffff');
+    await COMMON.setting('charBGChoice', 'url(../images/background/bg-paper.webp) repeat');
+    await COMMON.setting('switchCharBGColour', 'url(../images/background/bg-paper.webp) repeat');
+    await COMMON.setting('charTextColour', '#000000');
     await COMMON.setting('charBorder', '13px solid transparent');
     await COMMON.setting('charItemLink', '#000000');
-    await COMMON.setting('charTag', '#ffffff');
+    await COMMON.setting('charTag', '#000000');
     location.reload();
   }
 
   async onResetNPC() {
-    await COMMON.setting('npcBGChoice', 'url(../images/background/bg-red.webp) repeat');
-    await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
-    await COMMON.setting('npcTextColour', '#ffffff');
+    await COMMON.setting('npcBGChoice', 'url(../images/background/bg-paper.webp) repeat');
+    await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-paper.webp) repeat');
+    await COMMON.setting('npcTextColour', '#000000');
     await COMMON.setting('npcBorder', '13px solid transparent');
     await COMMON.setting('npcItemLink', '#000000');
-    await COMMON.setting('npcTag', '#ffffff');
+    await COMMON.setting('npcTag', '#000000');
     location.reload();
   }
 
   async onResetAll() {
-    await COMMON.setting('charBGChoice', 'url(../images/background/bg-green.webp) repeat');
-    await COMMON.setting('switchCharBGColour', 'url(../images/background/bg-green.webp) repeat');
-    await COMMON.setting('charTextColour', '#ffffff');
-    await COMMON.setting('npcBGChoice', 'url(../images/background/bg-red.webp) repeat');
-    await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
-    await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-red.webp) repeat');
-    await COMMON.setting('npcTextColour', '#ffffff');
+    await COMMON.setting('charBGChoice', 'url(../images/background/bg-paper.webp) repeat');
+    await COMMON.setting('switchCharBGColour', 'url(../images/background/bg-paper.webp) repeat');
+    await COMMON.setting('charTextColour', '#000000');
+    await COMMON.setting('npcBGChoice', 'url(../images/background/bg-paper.webp) repeat');
+    await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-paper.webp) repeat');
+    await COMMON.setting('npcTextColour', '#000000');
     await COMMON.setting('charBorder', '13px solid transparent');
     await COMMON.setting('npcBorder', '13px solid transparent');
     await COMMON.setting('charItemLink', '#000000');
     await COMMON.setting('npcItemLink', '#000000');
-    await COMMON.setting('charTag', '#ffffff');
-    await COMMON.setting('npcTag', '#ffffff');
+    await COMMON.setting('charTag', '#000000');
+    await COMMON.setting('npcTag', '#000000');
     location.reload();
   }
 
@@ -183,12 +182,19 @@ export class SybConfigApp extends FormApplication {
       } else {
         await COMMON.setting('charItemLink', '#000000');
         await COMMON.setting('charTag', '#ffffff');
+        await COMMON.setting('charBGChoice', formData.charBGImage);
 
         if (formData.charTextColour === '#000000') {
           await COMMON.setting('charTextColour', '#ffffff');
         } else {
           await COMMON.setting('charTextColour', formData.charTextColour);
+          await COMMON.setting('charTag', formData.charTextColour);
         }
+      }
+    } else {
+      if ((await COMMON.setting('charTextColour')) != formData.charTextColour) {
+        await COMMON.setting('charTextColour', formData.charTextColour);
+        await COMMON.setting('charTag', formData.charTextColour);
       }
     }
 
@@ -205,15 +211,21 @@ export class SybConfigApp extends FormApplication {
       } else {
         await COMMON.setting('npcItemLink', '#000000');
         await COMMON.setting('npcTag', '#ffffff');
+        await COMMON.setting('npcBGChoice', formData.npcBGImage);
+
         if (formData.npcTextColour === '#000000') {
           await COMMON.setting('npcTextColour', '#ffffff');
         } else {
           await COMMON.setting('npcTextColour', formData.npcTextColour);
+          await COMMON.setting('npcTag', formData.npcTextColour);
         }
       }
+    } else {
+      if ((await COMMON.setting('npcTextColour')) != formData.npcTextColour) {
+        await COMMON.setting('npcTextColour', formData.npcTextColour);
+        await COMMON.setting('npcTag', formData.npcTextColour);
+      }
     }
-    await COMMON.setting('charBGChoice', formData.charBGImage);
-    await COMMON.setting('npcBGChoice', formData.npcBGImage);
 
     if (charBGImage.value === 'none') {
       if (formData.charBGColour.length > 0 && formData.charBGColour[0] != '#') {
