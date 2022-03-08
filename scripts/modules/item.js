@@ -141,8 +141,14 @@ export class ItemSyb5e {
 
   static hasDamage() {
     /* core logic */
-    return !!(this.data.data.damage && this.data.data.damage.parts.length) ||
-      (this.data.data.consume.type === 'ammo' && this.actor?.items.get(this.data.data.consume.target)?.hasDamage)
+    const coreHasDamage = !!(this.data.data.damage && this.data.data.damage.parts.length)
+    const consumesAmmo = this.data.data.consume.type === 'ammo';
+    const consumedItem = this.actor?.items.get(this.data.data.consume.target);
+    let consumedDamage = false;
+
+    if(consumesAmmo && !!consumedItem && consumedItem?.id !== this.id ) consumedDamage = consumedItem.hasDamage;
+
+    return coreHasDamage || consumedDamage;
 
   }
 
