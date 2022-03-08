@@ -9,6 +9,7 @@
         </select>
       </div>
     </div>
+    {{#unless corruptionAbilities.thorough }}
     <div class="attribute-value" style="height:auto;">
       {{#if isCharacter}}
       <label class="flexcol">
@@ -35,5 +36,6 @@
         <span class="attribute-footer">{{ localize "SYB5E.Corruption.Threshold"}}</span>
       </label>
     </div>
+    {{/unless}}
   </li>
 </ul>
