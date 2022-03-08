@@ -61,6 +61,11 @@
   background-color: #fff;
 }
 
+.syb5e.sheet.actor .dnd5e-border {
+  border: 2px groove #eeede0;
+  border-radius: 4px;
+}
+
 /* End Character/NPC Sheet Styling  */
 /* ************************ */
 

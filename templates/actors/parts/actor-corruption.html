@@ -1,41 +1,51 @@
+{{#*inline "corruptionRow" }}
+<div class="attribute-value" style="height: unset;">
+  {{#if isCharacter}}
+  <label class="flexcol">
+    <input type="text" data-dtype="Number" name="{{sybPaths.corruption.temp}}" value="{{data.attributes.corruption.temp}}" />
+    <span class="attribute-footer">{{ localize "SYB5E.Corruption.Temporary"}}</span>
+  </label>
+  <span> + </span>
+  {{/if}}
+  <label class="flexcol">
+    <input type="text" data-dtype="Number"  name="{{sybPaths.corruption.permanent}}" value="{{data.attributes.corruption.permanent}}" />
+    <span class="attribute-footer">{{ localize "SYB5E.Corruption.Permanent"}}</span>
+  </label>
+  {{#if isCharacter}}
+  <span> = </span>
+  <label class="flexcol">
+    <input type="text" data-dtype="Number" name="{{sybPaths.corruption.value}}" value="{{data.attributes.corruption.value}}" disabled />
+    <span class="attribute-footer">{{ localize "SYB5E.Corruption.Current"}}</span>
+  </label>
+  {{/if}}
+  <span> / </span>
+  <label class="flexcol">
+    <input type="text" data-dtype="Number" name="{{sybPaths.corruption.max}}" value="{{data.attributes.corruption.max}}" {{corruptionAbilities.disabled}} />
+
+    <span class="attribute-footer">{{ localize "SYB5E.Corruption.Threshold"}}</span>
+  </label>
+</div>
+{{/inline}}
+
+{{#*inline "corruptionSelection"}}
+<div class="flexrow {{#if corruptionAbilities.thorough}}dnd5e-border{{/if}}" style="border-bottom: solid var(--syb5e-pc-color) 1px;align-items:center;">
+  <h4 class="attribute-name" style="text-align:right;margin:0">{{ localize "SYB5E.Corruption.Label"}}</h4>
+  <div style="text-align:left;">
+    <select name="{{corruptionAbilities.path}}" data-type="String">
+      {{selectOptions corruptionAbilities.abilities selected=corruptionAbilities.current nameAttr="ability" labelAttr="label"}}
+    </select>
+  </div>
+</div>
+{{/inline}}
+
 {{!-- TODO cement CSS --}}
 <ul class="attributes flexrow">
+  {{#unless corruptionAbilities.thorough }}
   <li class="attribute resource" style="height:auto;">
-    <div class="flexrow">
-      <h4 class="attribute-name box-title" style="text-align:right;">{{ localize "SYB5E.Corruption.Label"}}</h4>
-      <div style="text-align:left;">
-        <select name="{{corruptionAbilities.path}}" data-type="String">
-          {{selectOptions corruptionAbilities.abilities selected=corruptionAbilities.current nameAttr="ability" labelAttr="label"}}
-        </select>
-      </div>
-    </div>
-    {{#unless corruptionAbilities.thorough }}
-    <div class="attribute-value" style="height:auto;">
-      {{#if isCharacter}}
-      <label class="flexcol">
-        <input type="text" data-dtype="Number" name="{{sybPaths.corruption.temp}}" value="{{data.attributes.corruption.temp}}" />
-        <span class="attribute-footer">{{ localize "SYB5E.Corruption.Temporary"}}</span>
-      </label>
-      <span> + </span>
-      {{/if}}
-      <label class="flexcol">
-        <input type="text" data-dtype="Number"  name="{{sybPaths.corruption.permanent}}" value="{{data.attributes.corruption.permanent}}" />
-        <span class="attribute-footer">{{ localize "SYB5E.Corruption.Permanent"}}</span>
-      </label>
-      {{#if isCharacter}}
-      <span> = </span>
-      <label class="flexcol">
-        <input type="text" data-dtype="Number" name="{{sybPaths.corruption.value}}" value="{{data.attributes.corruption.value}}" disabled />
-        <span class="attribute-footer">{{ localize "SYB5E.Corruption.Current"}}</span>
-      </label>
-      {{/if}}
-      <span> / </span>
-      <label class="flexcol">
-        <input type="text" data-dtype="Number" name="{{sybPaths.corruption.max}}" value="{{data.attributes.corruption.max}}" {{corruptionAbilities.disabled}} />
-
-        <span class="attribute-footer">{{ localize "SYB5E.Corruption.Threshold"}}</span>
-      </label>
-    </div>
-    {{/unless}}
+    {{> corruptionSelection}}    
+    {{> corruptionRow}} 
   </li>
+  {{else}}
+  {{> corruptionSelection}}
+  {{/unless}}
 </ul>
