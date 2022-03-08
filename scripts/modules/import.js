@@ -1,10 +1,10 @@
-import { ModuleImportDialog } from './apps/import-dialog.js'
-import { COMMON } from './../common.js'
+import { ModuleImportDialog } from './apps/import-dialog.js';
+import { COMMON } from './../common.js';
 
 export class Importer extends ModuleImportDialog {
   static NAME = 'Importer';
-  static importedStateKey = 'imported'
-  static migratedVersionKey = 'migratedVersion'
+  static importedStateKey = 'imported';
+  static migratedVersionKey = 'migratedVersion';
 
   constructor() {
     /* give our module specific information to the importer app */
@@ -32,8 +32,7 @@ export class Importer extends ModuleImportDialog {
   }
 
   static shouldShow() {
-    return (!COMMON.setting(this.importedStateKey) || this.needsMigration(COMMON.DATA.name, this.migratedVersionKey) ) &&
-      COMMON.isFirstGM();
+    return (!COMMON.setting(this.importedStateKey) || this.needsMigration(COMMON.DATA.name, this.migratedVersionKey)) && COMMON.isFirstGM();
   }
 
   /* @override */
@@ -49,16 +48,16 @@ export class Importer extends ModuleImportDialog {
         scope: 'world',
         config: false,
         type: String,
-        default: "0.0.0"
-      }
-    }
+        default: '0.0.0',
+      },
+    };
 
     return settingsData;
   }
 
   /* @override */
   static get migrationVersions() {
-    return ["0.5.1"];
+    return ['0.5.1'];
   }
 
   /* @override */
@@ -67,18 +66,17 @@ export class Importer extends ModuleImportDialog {
     let r = document.querySelector(':root');
     await r.style.setProperty('--syb5e-pc-background-image', COMMON.setting('switchCharBGColour'));
     await r.style.setProperty('--syb5e-pc-color', COMMON.setting('charTextColour'));
-    await r.style.setProperty('--syb5e-pc-font', COMMON.setting('fontFamily'));
+    await r.style.setProperty('--syb5e-pc-font', COMMON.setting('charFontFamily'));
     await r.style.setProperty('--syb5e-pc-sheet-border', COMMON.setting('charBorder'));
     await r.style.setProperty('--syb5e-pc-item-link', COMMON.setting('charItemLink'));
     await r.style.setProperty('--syb5e-pc-tag', COMMON.setting('charTag'));
     await r.style.setProperty('--syb5e-npc-background-image', COMMON.setting('switchNpcBGColour'));
     await r.style.setProperty('--syb5e-npc-color', COMMON.setting('npcTextColour'));
-    await r.style.setProperty('--syb5e-npc-font', COMMON.setting('fontFamily'));
+    await r.style.setProperty('--syb5e-npc-font', COMMON.setting('npcFontFamily'));
     await r.style.setProperty('--syb5e-npc-sheet-border', COMMON.setting('npcBorder'));
     await r.style.setProperty('--syb5e-npc-item-link', COMMON.setting('npcItemLink'));
     await r.style.setProperty('--syb5e-npc-tag', COMMON.setting('npcTag'));
 
     return this.shouldShow();
   }
-
 }

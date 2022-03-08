@@ -47,7 +47,8 @@ export class SybConfigApp extends FormApplication {
       charTextColour: COMMON.setting('charTextColour'),
       npcBGChoice: COMMON.setting('npcBGChoice'),
       npcTextColour: COMMON.setting('npcTextColour'),
-      fontFamily: COMMON.setting('fontFamily'),
+      charFontFamily: COMMON.setting('charFontFamily'),
+      npcFontFamily: COMMON.setting('npcFontFamily'),
       charBorder: COMMON.setting('charBorder'),
       npcBorder: COMMON.setting('npcBorder'),
       charItemLink: COMMON.setting('charItemLink'),
@@ -122,6 +123,7 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('charBorder', '13px solid transparent');
     await COMMON.setting('charItemLink', '#000000');
     await COMMON.setting('charTag', '#000000');
+    await COMMON.setting('charFontFamily', 'Fondamento');
     location.reload();
   }
 
@@ -132,6 +134,7 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('npcBorder', '13px solid transparent');
     await COMMON.setting('npcItemLink', '#000000');
     await COMMON.setting('npcTag', '#000000');
+    await COMMON.setting('npcFontFamily', 'Fondamento');
     location.reload();
   }
 
@@ -148,6 +151,9 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('npcItemLink', '#000000');
     await COMMON.setting('charTag', '#000000');
     await COMMON.setting('npcTag', '#000000');
+    await COMMON.setting('charFontFamily', 'Fondamento');
+    await COMMON.setting('npcFontFamily', 'Fondamento');
+
     location.reload();
   }
 
@@ -160,7 +166,8 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('switchNpcBGColour', '#dad8cc');
     await COMMON.setting('npcTextColour', '#000000');
     await COMMON.setting('npcBorder', 'none');
-    await COMMON.setting('fontFamily', 'none');
+    await COMMON.setting('charFontFamily', 'none');
+    await COMMON.setting('npcFontFamily', 'none');
     await COMMON.setting('charItemLink', '#000000');
     await COMMON.setting('npcItemLink', '#000000');
     await COMMON.setting('charTag', '#000000');
@@ -175,7 +182,7 @@ export class SybConfigApp extends FormApplication {
         await COMMON.setting('switchCharBGColour', '#dad8cc');
         await COMMON.setting('charTextColour', '#000000');
         await COMMON.setting('charBorder', 'none');
-        await COMMON.setting('fontFamily', 'none');
+        await COMMON.setting('charFontFamily', 'none');
         await COMMON.setting('charItemLink', '#000000');
         await COMMON.setting('charTag', '#000000');
         location.reload();
@@ -204,7 +211,7 @@ export class SybConfigApp extends FormApplication {
         await COMMON.setting('switchNpcBGColour', '#dad8cc');
         await COMMON.setting('npcTextColour', '#000000');
         await COMMON.setting('npcBorder', 'none');
-        await COMMON.setting('fontFamily', 'none');
+        await COMMON.setting('npcFontFamily', 'none');
         await COMMON.setting('npcItemLink', '#000000');
         await COMMON.setting('npcTag', '#000000');
         location.reload();
