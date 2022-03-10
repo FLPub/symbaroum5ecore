@@ -23,7 +23,6 @@ export class SYB5E {
       /* Actor partials */
       `${COMMON.DATA.path}/templates/actors/parts/actor-corruption.html`,
       `${COMMON.DATA.path}/templates/actors/parts/actor-shadow.html`,
-      `${COMMON.DATA.path}/templates/actors/parts/npc-manner.html`,
       `${COMMON.DATA.path}/templates/actors/parts/actor-currency.html`,
 
       /* Item partials */
