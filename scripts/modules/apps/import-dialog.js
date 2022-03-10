@@ -90,11 +90,45 @@ export class ModuleImportDialog extends Dialog {
   }
 
   static hooks() {
-    Hooks.on('ready', this._init.bind(this))
+    Hooks.on('sybRunImport', this._init.bind(this))
   }
 
   static settings() {
-    COMMON.applySettings(this.settingsData);
+    COMMON.applySettings(this.settingsData, this.moduleName);
+    const callerClass = this;
+    class formAppWrapper extends FormApplication {
+      render() {
+        new callerClass().render(true);
+      }
+    }
+
+    Object.entries(this.menuData).forEach( ([key, value]) => {
+      game.settings.registerMenu(
+        this.moduleName, key, {
+          ...value,
+          name : COMMON.localize(value.name),
+          hint : COMMON.localize(value.hint),
+          label: COMMON.localize(value.label),
+          type: formAppWrapper,
+          restricted: true
+        }
+    )});
+  }
+
+  static get utils() {
+    return {
+      setting: this._setting.bind(this),
+      isFirstGM: COMMON.isFirstGM,
+    }
+  }
+
+  static _setting(key, value = null){
+    if(value) {
+      return game.settings.set(this.moduleName, key, value);
+    }
+
+    return game.settings.get(this.moduleName, key);
+
   }
 
   /* OVERRIDE FOR INITIALIZATION TASKS */
@@ -106,6 +140,11 @@ export class ModuleImportDialog extends Dialog {
   /* OVERRIDE FOR IMPORTER SPECIFIC SETTINGS */
   static get settingsData() {
     return {}
+  }
+
+  /* OVERRIDE FOR IMPORTER SPECIFIC MENUS */
+  static get menuData() {
+    return {};
   }
 
   /* OVERRIDE FOR VERSIONS REQUIRING REFRESHED IMPORT */
