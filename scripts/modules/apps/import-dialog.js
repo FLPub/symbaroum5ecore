@@ -94,7 +94,7 @@ export class ModuleImportDialog extends Dialog {
   }
 
   static settings() {
-    COMMON.applySettings(this.settingsData, this.moduleName);
+    COMMON.applySettings(this.getSettingsData(), this.moduleName);
     const callerClass = this;
     class formAppWrapper extends FormApplication {
       render() {
@@ -119,7 +119,13 @@ export class ModuleImportDialog extends Dialog {
     return {
       setting: this._setting.bind(this),
       isFirstGM: COMMON.isFirstGM,
+      importedAndMigrated: this._importedAndMigrated.bind(this),
     }
+  }
+
+
+  static _importedAndMigrated() {
+    return this.utils.setting(this.importedStateKey) && !this.needsMigration(this.moduleName, this.migratedVersionKey);
   }
 
   static _setting(key, value = null){
@@ -134,12 +140,28 @@ export class ModuleImportDialog extends Dialog {
   /* OVERRIDE FOR INITIALIZATION TASKS */
   /* return {Boolean} should this import dialog be shown? */
   static async init() {
-    return false;
+    return !this.utils.importedAndMigrated() && this.utils.isFirstGM();
+    
   }
 
   /* OVERRIDE FOR IMPORTER SPECIFIC SETTINGS */
-  static get settingsData() {
-    return {}
+  static getSettingsData() {
+    const settingsData = {
+      [this.importedStateKey]: {
+        scope: 'world',
+        config: false,
+        type: Boolean,
+        default: false,
+      },
+      [this.migratedVersionKey]: {
+        scope: 'world',
+        config: false,
+        type: String,
+        default: '0.0.0',
+      },
+    };
+
+    return settingsData;
   }
 
   /* OVERRIDE FOR IMPORTER SPECIFIC MENUS */

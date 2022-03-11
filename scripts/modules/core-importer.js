@@ -49,24 +49,24 @@ export class CoreImporter {
       }
 
       /* @override */
-      static get settingsData() {
-        const settingsData = {
-          [this.importedStateKey]: {
-            scope: 'world',
-            config: false,
-            type: Boolean,
-            default: false,
-          },
-          [this.migratedVersionKey]: {
-            scope: 'world',
-            config: false,
-            type: String,
-            default: '0.0.0',
-          },
-        };
+      //static getSettingsData() {
+      //  const settingsData = {
+      //    [this.importedStateKey]: {
+      //      scope: 'world',
+      //      config: false,
+      //      type: Boolean,
+      //      default: false,
+      //    },
+      //    [this.migratedVersionKey]: {
+      //      scope: 'world',
+      //      config: false,
+      //      type: String,
+      //      default: '0.0.0',
+      //    },
+      //  };
 
-        return settingsData;
-      }
+      //  return settingsData;
+      //}
 
       /* @override */
       static get menuData() {
