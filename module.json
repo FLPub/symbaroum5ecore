@@ -3,7 +3,7 @@
     "title": "Symbaroum 5E Ruins of Symbaroum - Core System",
     "description": "Implements the core rules mechanics of the Ruins of Symbaroum conversion.",
     "author": "Matthew Haentschke, Paul Watson",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "minimumCoreVersion": "9",
     "compatibleCoreVersion": "9",
     "system": [
@@ -41,5 +41,5 @@
     ],
     "url": "https://github.com/FLPub/symbaroum5ecore",
     "manifest": "https://raw.githubusercontent.com/FLPub/symbaroum5ecore/next/module.json",
-    "download": "https://github.com/FLPub/symbaroum5ecore/releases/download/0.6.0/module.zip"
+    "download": "https://github.com/FLPub/symbaroum5ecore/releases/download/0.6.1/module.zip"
 }
