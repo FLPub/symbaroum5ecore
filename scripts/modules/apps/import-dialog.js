@@ -8,6 +8,37 @@ import { COMMON } from './../../common.js';
 //TODO replace all relevant display text with localization
 export class ModuleImportDialog extends Dialog {
 
+  /* Default class data for overrides */
+  static get moduleName() { return '**NONE**'; }
+  static get moduleTitle() { return '**NONE**'; }
+  static get sceneToActivate() { return '**NONE**'; }
+  
+  static get postImportJournalName() { return '**NONE**' };
+  static get importedStateKey() { return 'imported' };
+  static get migratedVersionKey() { return 'migrationVersion' };
+  static get migrationVersions() { return [] };
+
+  /** OVERRIDE FOR IMPORTER SPECIFIC MIGRATION VERSIONS *
+   * updateData parameters.
+   * @param {Text} assetType - Type of asset journal, scenes, actors, items
+   * @param {Text} oldAsset - Name of the asset you want removed
+   * @param {Text} newAsset - Name of the asset you want replaced
+   * @param {Text} packName - Name of the pack (from the module.js)
+   * @param {Text} folder - Name of the folder to put the asset in
+   */
+  /** example *
+  {'1.0.0': packs: ['Core Rules - Book 1'],
+          data: [{ assetType: 'folders', oldAsset: '1. The Promised Land - Artifacts', newAsset: 'N/A', packName: 'N/A', folder: 'Symbaroum - APG - Actors' },
+  { assetType: 'folders', oldAsset: `GM Aids`, newAsset: 'N/A', packName: 'N/A', folder: `GM Aids` }]}
+  */
+  static get migrationData() {return {} };
+  static get menuData() { return {} };
+  static get requiredSybCoreVersion() {return game.modules.get('symbaroum5ecore').data.version};
+  static get requiredDnDCoreVersion() {return '1.5.6'};
+  static get manifestPath() {return `modules/${this.moduleName}/manifests/manifest.json`};
+  static get folderNameDict() { return {} };
+  static get dialogContent() { return '' };
+
   constructor({
     moduleName,
     moduleTitle,
@@ -15,41 +46,23 @@ export class ModuleImportDialog extends Dialog {
     postImportJournalName,
     importedStateKey,
     migratedVersionKey,
-    requiredSybCoreVersion = game.modules.get('symbaroum5ecore').data.version,
+    migrationVersions,
+    migrationData,
+    menuData,
+    requiredSybCoreVersion,
     requiredDnDCoreVersion,
-    manifestPath = `modules/${moduleName}/manifests/manifest.json`,
-    folderNameDict = {},
+    manifestPath,
+    folderNameDict,
     dialogContent,
-  }) {
+  } = ModuleImportDialog) {
+
+    
+
     super({
       content: dialogContent,
-      buttons: {
-        initialize: {
-          label: 'Import',
-          callback: async () => {
-            await this.checkVersion().catch(() => {
-              throw console.warn('Version check failed.');
-            });
-            // await this.checkStarterSet();
-            await this.prepareModule().catch((e) => {
-              let error = console.error('Failed to initialize module', e);
-              throw error;
-            });
-            await this.renderWelcome();
-            await this.setImportedState(true);
-            await this.updateLastMigratedVersion();
-            ui.notifications.notify('Import complete. No Issues.');
-          },
-        },
-        cancel: {
-          label: 'Cancel',
-          callback: async () => {
-            await this.setImportedState(true);
-            ui.notifications.notify("Canceled importing content. You can always import the compendiums through the Module's settings menu.");
-          },
-        },
-      },
+      buttons: {},
     });
+
     this.imported = {
       Actor: {},
       Item: {},
@@ -63,6 +76,9 @@ export class ModuleImportDialog extends Dialog {
     this.moduleTitle = moduleTitle;
     this.importedStateKey = importedStateKey;
     this.migratedVersionKey = migratedVersionKey;
+    this.migrationVersions = migrationVersions;
+    this.migrationData = migrationData;
+    this.menuData = menuData;
     this.sceneToActivate = sceneToActivate;
     this.postImportJournalName = postImportJournalName;
     this.requiredSybCoreVersion = requiredSybCoreVersion;
@@ -81,6 +97,53 @@ export class ModuleImportDialog extends Dialog {
       <br><br>`;
 
     this.data.title = `Import ${this.moduleTitle}`
+
+    const needsImport = !ModuleImportDialog.isImported(this);
+    const needsMigration = !ModuleImportDialog.isMigrated(this);
+
+    const importCallback = async () => {
+      await this.checkVersion().catch(() => {
+        throw console.warn('Version check failed.');
+      });
+
+      await this.prepareModule().catch((e) => {
+        let error = console.error('Failed to initialize module', e);
+        throw error;
+      });
+
+      await this.renderWelcome();
+      await this.setImportedState(true);
+      await this.updateLastMigratedVersion();
+      ui.notifications.notify('Import complete. No Issues.');
+    };
+
+    const migrateCallback = async () => {
+      await this.checkVersion().catch(() => {
+        throw console.warn('Version check failed.');
+      });
+      
+      let migrationVersion = false;
+      while( migrationVersion = ModuleImportDialog.needsMigration(this.moduleName, this.migratedVersionKey, this.migrationVersions) ) {
+        await this.moduleUpdate(migrationVersion).catch((e) => {
+          let error = console.error(`Failed to upgrade module to ${migrationVersion}`, e);
+          throw error;
+        });
+
+        ui.notifications.notify(`Upgrade to ${migrationVersion} complete. No Issues.`);
+      }
+
+
+      //await this.renderWelcome();
+    }
+
+    const buttons = {
+      initialize: {
+        label: needsImport ? 'Import' : needsMigration ? 'Upgrade' : '**ERROR**',
+        callback: needsImport ? importCallback : migrateCallback,
+      }
+    }
+
+    this.data.buttons = buttons;
 
   }
 
@@ -117,31 +180,22 @@ export class ModuleImportDialog extends Dialog {
 
   static get utils() {
     return {
-      setting: this._setting.bind(this),
       isFirstGM: COMMON.isFirstGM,
-      importedAndMigrated: this._importedAndMigrated.bind(this),
     }
   }
 
-
-  static _importedAndMigrated() {
-    return this.utils.setting(this.importedStateKey) && !this.needsMigration(this.moduleName, this.migratedVersionKey);
+  static isImported({moduleName = this.moduleName, importedStateKey = this.importedStateKey} = {}) {
+    return game.settings.get(moduleName, importedStateKey)
   }
 
-  static _setting(key, value = null){
-    if(value) {
-      return game.settings.set(this.moduleName, key, value);
-    }
-
-    return game.settings.get(this.moduleName, key);
-
+  static isMigrated({moduleName = this.moduleName, migratedVersionKey = this.migratedVersionKey, migrationVersions = this.migrationVersions}) {
+    return !ModuleImportDialog.needsMigration(moduleName, migratedVersionKey, migrationVersions);
   }
 
   /* OVERRIDE FOR INITIALIZATION TASKS */
   /* return {Boolean} should this import dialog be shown? */
   static async init() {
-    return !this.utils.importedAndMigrated() && this.utils.isFirstGM();
-    
+    return (!this.isImported(this) || !this.isMigrated(this)) && this.utils.isFirstGM();
   }
 
   /* OVERRIDE FOR IMPORTER SPECIFIC SETTINGS */
@@ -164,27 +218,32 @@ export class ModuleImportDialog extends Dialog {
     return settingsData;
   }
 
-  /* OVERRIDE FOR IMPORTER SPECIFIC MENUS */
-  static get menuData() {
-    return {};
-  }
+  /** OVERRIDE FOR IMPORTER SPECIFIC MIGRATION VERSIONS *
+   * updateData parameters.
+   * @param {Text} assetType - Type of asset journal, scenes, actors, items
+   * @param {Text} oldAsset - Name of the asset you want removed
+   * @param {Text} newAsset - Name of the asset you want replaced
+   * @param {Text} packName - Name of the pack (from the module.js)
+   * @param {Text} folder - Name of the folder to put the asset in
+   */
+  /** example *
+  {'1.0.0': packs: ['Core Rules - Book 1'],
+          data: [{ assetType: 'folders', oldAsset: '1. The Promised Land - Artifacts', newAsset: 'N/A', packName: 'N/A', folder: 'Symbaroum - APG - Actors' },
+  { assetType: 'folders', oldAsset: `GM Aids`, newAsset: 'N/A', packName: 'N/A', folder: `GM Aids` }]}
+*/
+  static migrationData = {};
 
-  /* OVERRIDE FOR VERSIONS REQUIRING REFRESHED IMPORT */
-  static get migrationVersions() {
-    return [];
-  }
-
-  static needsMigration(moduleName, migratedVersionSetting) {
+  static needsMigration(moduleName = this.moduleName, migratedVersionSetting = this.migratedVersionKey, migrationVersions = this.migrationVersions) {
     const lastMigratedVersion = game.settings.get(moduleName, migratedVersionSetting);
-    const neededMigrationVersions = this.migrationVersions;
+    const neededMigrationVersions = migrationVersions;
 
     const needsMigration = neededMigrationVersions.find( version => isNewerVersion(version, lastMigratedVersion) )
     logger.debug(`${moduleName} ${!!needsMigration ? 'requires migration to '+needsMigration : 'does not require migration'} (last migrated version: ${lastMigratedVersion})`)
-    return !!needsMigration;
+    return needsMigration;
   }
 
   static async _init() {
-    const render = await this.init();
+    const render = await this.init.call(this);
     if (render) {
       return new this().render(true);
     }
@@ -194,8 +253,8 @@ export class ModuleImportDialog extends Dialog {
     await game.settings.set(this.moduleName, this.importedStateKey, bool);
   }
 
-  async updateLastMigratedVersion() {
-    await game.settings.set(this.moduleName, this.migratedVersionKey, this.moduleVersion);
+  async updateLastMigratedVersion(version = this.moduleVersion) {
+    await game.settings.set(this.moduleName, this.migratedVersionKey, version);
   }
 
   async prepareModule() {
@@ -337,6 +396,114 @@ export class ModuleImportDialog extends Dialog {
       }
     }
   }
+  
+  async moduleUpdate(toMigrationVersion) {
+    const thisMigration = this.migrationData[toMigrationVersion] ?? {packs: [], data: []};
+    for( const { assetType, oldAsset, newAsset, packName, folder } of thisMigration.data ) {
+      switch (assetType) {
+        case 'journal':
+        case 'items':
+        case 'actors':
+        case 'tables':
+          try {
+            const isThere = game[assetType].getName(oldAsset);
+            if (isThere) await isThere.delete({ deleteSubfolders: true, deleteContents: true });
+          } catch (error) {
+            console.warn(`${oldAsset} already deleted`);
+          }
+          const pack = await game.packs.find((p) => p.metadata.name === packName);
+          await pack.getIndex();
+          const entry = pack.index.find((j) => j.name === newAsset);
+          const folderId = await game.folders.getName(folder)?.id;
+          const documents = await pack.getDocuments(entry);
+
+          const createData = documents.map(doc => {
+            let data = doc.toObject();
+            data.folder = folderId;
+            return data;
+          })
+
+          await pack.documentClass.createDocuments(createData, { folder: folderId, keepId: true });
+
+          break;
+
+        case 'scenes':
+          let isActive = !!game.scenes.getName(newAsset)?.active;
+          let hasTokens = !!game.scenes.getName(newAsset)?.data.tokens.length;
+          let hasNotes = !!game.scenes.getName(newAsset)?.data.notes.length;
+          let hasLights = !!game.scenes.getName(newAsset)?.data.lights.length;
+          if (isActive || hasTokens || hasNotes || hasLights) {
+            let chatMessage = `<div class="chatBG">`;
+            chatMessage += `<h2 style="color:  #fff">The scene: <br> ${newAsset} <br> has not been imported as:</h2> `;
+            if (isActive) chatMessage += 'It is Active and in use.<br>';
+            if (hasTokens) chatMessage += `It has ${hasTokens} placed Tokens.<br>`;
+            if (hasNotes) chatMessage += `It has ${hasNotes} placed Notes.<br>`;
+            if (hasLights) chatMessage += `It has ${hasLights} placed Lights sources. <br>`;
+            chatMessage += '<br><h3>Import the new version manually from the Compendium when convenient.</h3> ';
+            await ChatMessage.create({
+              user: game.user.id,
+              content: chatMessage,
+              whisper: game.users.contents.filter((u) => u.isGM).map((u) => u.id),
+              rollMode: game.settings.get('core', 'rollMode'),
+            });
+            break;
+          } else {
+            try {
+              const scene = game.scenes.getName(oldAsset);
+              if (scene) await scene.delete({ deleteSubfolders: true, deleteContents: true });
+              console.warn(`${newAsset} has been deleted`);
+            } catch (error) {
+              console.warn(`${newAsset} already deleted`);
+            }
+            const pack = await game.packs.find((p) => p.metadata.name === packName);
+            const index = await pack.getIndex();
+            const entry = index.find((j) => j.name === newAsset);
+            const documents = await pack.getDocuments(entry);
+            const folderId = await game.folders.getName(folder).data._id;
+            
+            const createData = documents.map(doc => {
+              let data = doc.toObject();
+              data.folder = folderId;
+              return data;
+            })
+
+            const cls = getDocumentClass('Scene');
+            await cls.createDocuments(createData, { folder: folderId, keepId: true });
+          }
+          break;
+        case 'folders':
+          try {
+            const isThere = game[assetType].getName(oldAsset);
+            if (isThere) {
+              console.log('It Exists');
+              await isThere.delete({ deleteSubfolders: true, deleteContents: true });
+            }
+          } catch (error) {
+            console.warn(`${oldAsset} already deleted`);
+          }
+          await importModule(manifest, modulePacks, moduleUpdateNameDict);
+          break;
+        default:
+          break;
+      }
+    }
+    await this.migrationComplete(toMigrationVersion);
+  }
+
+  async migrationComplete(toVersion) {
+    await this.updateLastMigratedVersion(toVersion);
+    return new Promise( (resolve) => {
+      Dialog.prompt({
+        title: `Symbaroum Core Rules Update`,
+        content: `<p>The update to migration version ${toVersion} has completed.</p>`,
+        label: 'Okay!',
+        callback: () => {
+          resolve(console.log('All Done'));
+        },
+      })
+    });
+
+  }
 
   async checkVersion() {
     const currentDnD = game.system.data.version;
@@ -369,7 +536,7 @@ export class ModuleImportDialog extends Dialog {
   async renderWelcome() {
     setTimeout(() => {
       try {
-        game.scenes.getName(this.sceneToActivate).activate();
+        game.scenes.getName(this.sceneToActivate)?.activate();
         Dialog.prompt({
           title: `${this.moduleTitle} Importer`,
           content: `<p>Welcome to the <strong>${this.moduleTitle}</strong> <br><br> All assets have been imported.`,

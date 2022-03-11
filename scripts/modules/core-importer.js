@@ -14,76 +14,51 @@ export class CoreImporter {
 
     class Importer extends cls {
       static NAME = 'CoreImporter';
-      static moduleName = COMMON.DATA.name;
-      static importedStateKey = 'imported'
-      static migratedVersionKey = 'migrationVersion'
 
+      /* Data override */
+      static get moduleName() { return COMMON.DATA.name }
+
+      static get moduleTitle() { return COMMON.DATA.title}
+      static get sceneToActivate() { return 'System Cover'; }
+
+      static get postImportJournalName() { return 'RoS - Core - How To Use This Module' };
+
+      static get menuData() { 
+        return {
+          'forceImport': {
+            name: `I18N.forceImport.name`,
+            label: `I18N.forceImport.label`,
+            hint: `I18N.forceImport.hint`,
+          }
+        }
+      };
+
+      static get folderNameDict() { 
+        return {
+          'Symbaroum RoS - How to': 'Symbaroum RoS - How to',
+          'Symbaroum RoS - GM Aids': 'Symbaroum RoS - GM Aids',
+        } 
+      };
+
+      static get dialogContent() { return `
+        <img src="modules/symbaroum5ecore/images/journal/symbaroum_onelayer.webp" style="height:127px; width:384px; border:0;" />
+        <p><b>Initialize Symbaroum RPG - Symbaroum 5E Ruins of Symbaroum - Core System?</b><br><br>
+        This will import the RoS - Core - How To Use This Module user guide</p>
+        <p>
+        No part of this publication may be reproduced, distributed, stored in a retrieval system, or transmitted in any form by any means, electronic, mechanical, photocopying, recording or otherwise without the prior permission of the publishers.<br><br>
+              <br>
+        Published by: <b>Free League Publishing</b><br>
+        Foundry Conversion by <b>Matthew Haentschke and Paul Watson</b>`
+      };
 
       constructor() {
+
         /* give our module specific information to the importer app */
-        super({
-          moduleName: Importer.moduleName,
-          moduleTitle: COMMON.DATA.title,
-          sceneToActivate: 'System Cover',
-          postImportJournalName: 'RoS - Core - How To Use This Module',
-          importedStateKey: Importer.importedStateKey,
-          migratedVersionKey: Importer.migratedVersionKey,
-          requiredDnDCoreVersion: '1.5.6',
-          folderNameDict: {
-            'Symbaroum RoS - How to': 'Symbaroum RoS - How to',
-            'Symbaroum RoS - GM Aids': 'Symbaroum RoS - GM Aids',
-          },
-          dialogContent: `<img src="modules/symbaroum5ecore/images/journal/symbaroum_onelayer.webp" style="height:127px; width:384px; border:0;" />
-      <p><b>Initialize Symbaroum RPG - Symbaroum 5E Ruins of Symbaroum - Core System?</b><br><br>
-      This will import the RoS - Core - How To Use This Module user guide</p>
-      <p>
-      No part of this publication may be reproduced, distributed, stored in a retrieval system, or transmitted in any form by any means, electronic, mechanical, photocopying, recording or otherwise without the prior permission of the publishers.<br><br>
-            <br>
-      Published by: <b>Free League Publishing</b><br>
-      Foundry Conversion by <b>Matthew Haentschke and Paul Watson</b>`,
-        });
+        super(Importer);
       }
 
       static shouldShow() {
         return (!COMMON.setting(this.importedStateKey) || this.needsMigration(COMMON.DATA.name, this.migratedVersionKey)) && COMMON.isFirstGM();
-      }
-
-      /* @override */
-      //static getSettingsData() {
-      //  const settingsData = {
-      //    [this.importedStateKey]: {
-      //      scope: 'world',
-      //      config: false,
-      //      type: Boolean,
-      //      default: false,
-      //    },
-      //    [this.migratedVersionKey]: {
-      //      scope: 'world',
-      //      config: false,
-      //      type: String,
-      //      default: '0.0.0',
-      //    },
-      //  };
-
-      //  return settingsData;
-      //}
-
-      /* @override */
-      static get menuData() {
-        return {
-          'forceImport': {
-            name: "Force Import",
-            label: "Force Import",
-            hint: "A hint",
-          }
-        }
-      }
-
-      /* @override */
-      static get migrationVersions() {
-
-        return [];
-
       }
 
       /* @override */
