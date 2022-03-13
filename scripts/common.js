@@ -72,10 +72,10 @@ export class COMMON {
     return game.i18n.format(stringId, data);
   }
 
-  static applySettings(settingsData){
+  static applySettings(settingsData, moduleKey = COMMON.DATA.name){
     Object.entries(settingsData).forEach(([key, data])=> {
       game.settings.register(
-        COMMON.DATA.name, key, {
+        moduleKey, key, {
           name : COMMON.localize(`SYB5E.setting.${key}.name`),
           hint : COMMON.localize(`SYB5E.setting.${key}.hint`),
           ...data
@@ -95,6 +95,11 @@ export class COMMON {
     Object.keys(obj).forEach( key => obj[key] = COMMON.localize(obj[key]));
 
     return obj;
+  }
+
+  static addAbstract(cls, key) {
+    if(!globalThis.game.syb5e.abstract) globalThis.game.syb5e.abstract = {};
+    globalThis.game.syb5e.abstract[key] = cls;
   }
 
 }

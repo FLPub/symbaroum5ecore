@@ -1,7 +1,6 @@
 import { COMMON } from '../common.js'
 import { logger } from '../logger.js';
 import { SYB5E } from '../config.js'
-import { SheetCommon } from './actor-sheet.js'
 
 /* Casting a Spell:
  * To cast a spell you take an appropriate action and gain tem-
@@ -49,7 +48,7 @@ export class Spellcasting {
     }
   }
 
-  static _renderAbilityUseDialog(app, html, data){
+  static _renderAbilityUseDialog(app, html/*, data*/){
 
     const actor = app.item?.actor
 
@@ -214,7 +213,7 @@ export class Spellcasting {
       }
     }
 
-    /* modify the target (only works for PCs) */
+    /* modify the target */
     if (custom.type !== game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride.type) {
       type = custom.type
     }
@@ -304,7 +303,7 @@ export class Spellcasting {
       logger.debug('Cached rolled corruption:', itemUpdates);
 
       /* field name shortcuts */
-      const fieldKey = item.actor.type == 'character' ? corruptionInfo.type : 'permanent';
+      const fieldKey = corruptionInfo.type;
 
       /* get the current corruption values */
       let corruption = item.actor.corruption;

@@ -16,7 +16,8 @@ import { Resting } from './modules/resting.js'
 import { ActorSyb5e } from './modules/actor.js'
 import { ItemSyb5e } from './modules/item.js'
 import { DamageRollSyb5e } from './modules/damage-roll.js'
-import { Importer } from './modules/import.js'
+import { ImporterBase } from './modules/importer-base.js'
+import { CoreImporter } from './modules/core-importer.js'
 
 import { SybRestDialog } from './modules/apps/syb-rest-dialog.js'
 import { SybConfigApp } from './modules/apps/config-app.js'
@@ -42,7 +43,8 @@ const SUB_MODULES = {
   Spellcasting,
   Resting,
   DamageRollSyb5e,
-  Importer
+  ImporterBase,
+  CoreImporter
 }
 
 const SUB_APPS = {
