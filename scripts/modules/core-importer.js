@@ -23,16 +23,6 @@ export class CoreImporter {
 
       static get postImportJournalName() { return 'RoS - Core - How To Use This Module' };
 
-      static get menuData() { 
-        return {
-          'forceImport': {
-            name: `I18N.forceImport.name`,
-            label: `I18N.forceImport.label`,
-            hint: `I18N.forceImport.hint`,
-          }
-        }
-      };
-
       static get folderNameDict() { 
         return {
           'Symbaroum RoS - How to': 'Symbaroum RoS - How to',

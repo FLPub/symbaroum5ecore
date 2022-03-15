@@ -252,11 +252,10 @@ export class SYB5E {
 
     /* add 'abomination' and 'phenomenon' to creature types */
     mergeObject(
-      globalThis.game.dnd5e.config.creatureTypes,
-      COMMON.translateObject({
+      globalThis.game.dnd5e.config.creatureTypes, {
         abomination: 'SYB5E.Creature.Abomination',
         phenomenon: 'SYB5E.Creature.Phenomenon',
-      })
+      }
     );
 
     /* Replace currency names */

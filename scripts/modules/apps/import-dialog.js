@@ -32,7 +32,17 @@ export class ModuleImportDialog extends Dialog {
   { assetType: 'folders', oldAsset: `GM Aids`, newAsset: 'N/A', packName: 'N/A', folder: `GM Aids` }]}
   */
   static get migrationData() {return {} };
-  static get menuData() { return {} };
+
+  static get menuData() { 
+        return {
+          'forceImport': {
+            name: `SYB5E.menu.forceImport.name`,
+            label: `SYB5E.menu.forceImport.label`,
+            hint: `SYB5E.menu.forceImport.hint`,
+          }
+        }
+      };
+
   static get requiredSybCoreVersion() {return game.modules.get('symbaroum5ecore').data.version};
   static get requiredDnDCoreVersion() {return '1.5.6'};
   static get manifestPath() {return `modules/${this.moduleName}/manifests/manifest.json`};

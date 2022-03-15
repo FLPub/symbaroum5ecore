@@ -184,8 +184,8 @@ export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharact
 
   /* -------------------------------------------- */
 
-  //TODO expand to other modes (like limited)
   get template() {
+    if ( !game.user.isGM && this.actor.limited ) return `${COMMON.DATA.path}/templates/actors/syb5e-limited-sheet.html`;
     return `${COMMON.DATA.path}/templates/actors/syb5e-character-sheet.html`;
   }
 
@@ -291,6 +291,7 @@ export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
 
   //TODO expand to other modes (like limited)
   get template() {
+    if ( !game.user.isGM && this.actor.limited ) return `${COMMON.DATA.path}/templates/actors/syb5e-limited-sheet.html`;
     return `${COMMON.DATA.path}/templates/actors/syb5e-npc-sheet.html`;
   }
 
