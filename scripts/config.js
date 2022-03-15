@@ -280,6 +280,7 @@ export class SYB5E {
         permanent: 0,
         value: 0,
         max: 0,
+        bonus: 0
       },
       manner: '',
       shadow: '',
@@ -315,6 +316,7 @@ export class SYB5E {
         permanent: `${root}.corruption.permanent`,
         value: undefined, //getter only for actors
         max: `${root}.corruption.max`,
+        bonus: `${root}.corruption.bonus`,
         last: {
           total: `${root}.corruption.total`, //last rolled corruption value (items)
           expression: `${root}.corruption.expression`, //last roll corruption expression (items)

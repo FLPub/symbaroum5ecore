@@ -126,7 +126,6 @@ export class ActorSyb5e {
       /* prepare derived corruption data */
       setProperty(this.data, game.syb5e.CONFIG.PATHS.corruption.root,this.corruption);
       
-      
       /* check for half caster and "fix" for syb5e half-caster progression */
       Spellcasting._modifyDerivedProgression(this.data);
     }
@@ -266,6 +265,7 @@ export class ActorSyb5e {
     let corruptionAbility = getProperty(actor.data, paths.corruption.ability) ?? defaultAbility;
     /* if we are in a custom max mode, just return the current stored max */
     const currentMax = getProperty(actor.data, paths.corruption.max) ?? game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.max
+    const currentBonus = actor._simplifyBonus((getProperty(actor.data, paths.corruption.bonus) ?? 0) + getProperty(actor, 'overrides.data.attributes.corruption.bonus') ?? 0);
 
     /* handle special cases */
     switch (corruptionAbility) {
@@ -295,7 +295,10 @@ export class ActorSyb5e {
       return currentMax
     }
 
-    return fullCaster ? (prof + corrMod) * 2 : Math.max( corrMod + prof * 2, 2 );
+    /* we can only apply a bonus to an automatically computed maximum (i.e. derived from attributes) */
+    const rawMax = fullCaster ? (prof + corrMod) * 2 : Math.max( corrMod + prof * 2, 2 );
+    
+    return rawMax + currentBonus;
   }
 
   /* -------------------------------------------- */
