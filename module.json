@@ -25,7 +25,7 @@
     "packs": [
       {
         "name": "ros-core-user-guide-journal",
-        "label": "Symbaroum RoS - How to",
+        "label": "RoS CORE - How to",
         "path": "packs/ros-core-user-guide-journal.db",
         "entity": "JournalEntry",
         "module": "symbaroum5ecore",
@@ -33,7 +33,7 @@
       },
       {
         "name": "ros-core-scenes",
-        "label": "Symbaroum RoS - GM Aids",
+        "label": "RoS CORE - GM Aids",
         "path": "packs/ros-core-scenes.db",
         "entity": "Scene",
         "module": "symbaroum5ecore"

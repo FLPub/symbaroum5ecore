@@ -1,46 +1,53 @@
 import { COMMON } from './../common.js';
 
 export class CoreImporter {
-  
   static register() {
     this.hooks();
   }
 
   static hooks() {
-    Hooks.on('sybRegisterImport', this.registerImport)
+    Hooks.on('sybRegisterImport', this.registerImport);
   }
 
   static registerImport(cls) {
-
     class Importer extends cls {
       static NAME = 'CoreImporter';
 
       /* Data override */
-      static get moduleName() { return COMMON.DATA.name }
+      static get moduleName() {
+        return COMMON.DATA.name;
+      }
 
-      static get moduleTitle() { return COMMON.DATA.title}
-      static get sceneToActivate() { return 'System Cover'; }
+      static get moduleTitle() {
+        return COMMON.DATA.title;
+      }
+      static get sceneToActivate() {
+        return 'System Cover';
+      }
 
-      static get postImportJournalName() { return 'RoS - Core - How To Use This Module' };
+      static get postImportJournalName() {
+        return 'RoS - Core - How To Use This Module';
+      }
 
-      static get menuData() { 
+      static get menuData() {
         return {
-          'forceImport': {
+          forceImport: {
             name: `I18N.forceImport.name`,
             label: `I18N.forceImport.label`,
             hint: `I18N.forceImport.hint`,
-          }
-        }
-      };
+          },
+        };
+      }
 
-      static get folderNameDict() { 
+      static get folderNameDict() {
         return {
-          'Symbaroum RoS - How to': 'Symbaroum RoS - How to',
-          'Symbaroum RoS - GM Aids': 'Symbaroum RoS - GM Aids',
-        } 
-      };
+          'RoS CORE - How to': 'RoS CORE - How to',
+          'RoS CORE - GM Aids': 'RoS CORE - GM Aids',
+        };
+      }
 
-      static get dialogContent() { return `
+      static get dialogContent() {
+        return `
         <img src="modules/symbaroum5ecore/images/journal/symbaroum_onelayer.webp" style="height:127px; width:384px; border:0;" />
         <p><b>Initialize Symbaroum RPG - Symbaroum 5E Ruins of Symbaroum - Core System?</b><br><br>
         This will import the RoS - Core - How To Use This Module user guide</p>
@@ -48,11 +55,10 @@ export class CoreImporter {
         No part of this publication may be reproduced, distributed, stored in a retrieval system, or transmitted in any form by any means, electronic, mechanical, photocopying, recording or otherwise without the prior permission of the publishers.<br><br>
               <br>
         Published by: <b>Free League Publishing</b><br>
-        Foundry Conversion by <b>Matthew Haentschke and Paul Watson</b>`
-      };
+        Foundry Conversion by <b>Matthew Haentschke and Paul Watson</b>`;
+      }
 
       constructor() {
-
         /* give our module specific information to the importer app */
         super(Importer);
       }
@@ -84,6 +90,4 @@ export class CoreImporter {
 
     Importer.register();
   }
-
 }
-
