@@ -28,6 +28,11 @@ Additionally, when an item generates corruption, both the die expression used to
   * `@item.corruption.total` - Number representing the total amount of corruption evaluated from the corruption expression.
   * `@item.corruption.summary` - Human readable string detailing both the expression and result of the most recent corruption expression.
 
+# Active Effects and Corruption
+An actor's corruption threshold can be targeted for modification via the Active Effect system. Additionally, it can be set by hand in the Symbaroum flags. This is included to manage features and effects that alter your corruption threshold either temporarily, or permanently.
+  * `data.attributes.corruption.bonus`: Active Effect key. Remember to include `"+"` for any intented numerical addition.
+  * `Actor.data.flags.symbaroum5ecore.corruption.bonus`: Data path for permanent modification of an actor's corruption threshold.
+
 # Rest types
 The core dnd5e resting types have been modified and extended to support this ruleset's three-tierd rests -- Short, Long, and Extended -- with similar rest dialogs. The primary change is the ability for characters, on some rest types, to spend hit die in order to reduce Temporary Corruption. When this option is avilable for a rest, a few new elements are added to the resting dialog:
   * `[Roll] Corruption` - expends a hit die and reduces your current Temporary Corruption by an amount described in the dialog's informational text.
