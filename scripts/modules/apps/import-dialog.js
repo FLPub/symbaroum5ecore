@@ -148,8 +148,8 @@ export class ModuleImportDialog extends Dialog {
 
     const buttons = {
       initialize: {
-        label: needsImport ? 'Import' : needsMigration ? 'Upgrade' : '**ERROR**',
-        callback: needsImport ? importCallback : migrateCallback,
+        label: needsMigration ? 'Upgrade' : 'Import',
+        callback: needsMigration ? migrateCallback : importCallback,
       }
     }
 
