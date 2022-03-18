@@ -1,7 +1,7 @@
 {
     "name": "symbaroum5ecore",
-    "title": "Symbaroum 5E Ruins of Symbaroum - Core System",
-    "description": "Implements the core rules mechanics of the Ruins of Symbaroum conversion.",
+    "title": "Ruins of Symbaroum 5E - Core",
+    "description": "Implements the core rules mechanics of the Ruins of Symbaroum conversion for 5th Edition.",
     "author": "Matthew Haentschke, Paul Watson",
     "version": "1.0.0",
     "minimumCoreVersion": "9",
