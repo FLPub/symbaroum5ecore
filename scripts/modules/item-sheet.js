@@ -1,8 +1,6 @@
 import { COMMON } from '../common.js'
 import { logger } from '../logger.js';
 import { SYB5E } from '../config.js'
-import { Spellcasting } from './spellcasting.js'
-import { SheetCommon } from './actor-sheet.js'
 
 
 /* Initial attempt is via injection only */

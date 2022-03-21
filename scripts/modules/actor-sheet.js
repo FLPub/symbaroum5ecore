@@ -1,7 +1,5 @@
 import { COMMON } from '../common.js';
 import { logger } from '../logger.js';
-import { Spellcasting } from './spellcasting.js';
-import { ActorSyb5e } from './actor.js';
 
 export class SheetCommon {
   static NAME = 'SheetCommon';
@@ -12,12 +10,24 @@ export class SheetCommon {
 
   static register() {
     this.globals();
+    this.build();
+  }
+
+  /* -------------------------------------------- */
+
+  static build() {
+    const charSheet = game.dnd5e.applications.ActorSheet5eCharacter;
+    const npcSheet = game.dnd5e.applications.ActorSheet5eNPC;
+
+    this.buildCharSheet(charSheet);
+    this.buildNpcSheet(npcSheet);
   }
 
   /* -------------------------------------------- */
 
   static globals() {
     game.syb5e.sheetClasses = [];
+
   }
 
   /** \SETUP **/
@@ -239,267 +249,279 @@ export class SheetCommon {
     await this._onSubmit(event);
     return this.actor.convertSybCurrency();
   }
-}
 
-export class Syb5eActorSheetCharacter extends COMMON.CLASSES.ActorSheet5eCharacter {
-  static NAME = 'Syb5eActorSheetCharacter';
+  static buildCharSheet(parentClass) {
 
-  /* -------------------------------------------- */
+    class Syb5eActorSheetCharacter extends parentClass {
+      static NAME = 'Syb5eActorSheetCharacter';
 
-  static register() {
-    this.defaults();
+      /* -------------------------------------------- */
 
-    /* register our sheet */
-    Actors.registerSheet(COMMON[this.NAME].scope, COMMON[this.NAME].sheetClass, {
-      types: ['character'],
-      makeDefault: true,
-      label: COMMON.localize('SYB5E.Sheet.Character.Label'),
-    });
-  }
+      static register() {
+        this.defaults();
 
-  /* -------------------------------------------- */
+        /* register our sheet */
+        Actors.registerSheet(COMMON[this.NAME].scope, COMMON[this.NAME].sheetClass, {
+          types: ['character'],
+          makeDefault: true,
+          label: COMMON.localize('SYB5E.Sheet.Character.Label'),
+        });
+      }
 
-  static defaults() {
-    SheetCommon.defaults(this);
-  }
+      /* -------------------------------------------- */
 
-  /* -------------------------------------------- */
+      static defaults() {
+        SheetCommon.defaults(this);
+      }
 
-  /** OVERRIDES **/
+      /* -------------------------------------------- */
 
-  /* -------------------------------------------- */
+      /** OVERRIDES **/
 
-  _filterItems(items, filters) {
+      /* -------------------------------------------- */
 
-    if (filters.size == 1 && filters.has('prepared') ) {
-      const favored = SheetCommon._filterForFavored(items);
+      _filterItems(items, filters) {
 
-      /* if we are the only filter, return just us */
-      return favored;
+        if (filters.size == 1 && filters.has('prepared') ) {
+          const favored = SheetCommon._filterForFavored(items);
+
+          /* if we are the only filter, return just us */
+          return favored;
+        }
+
+        /* otherwise, ignored our hijacked filter and do normal stuff */
+        filters.delete('prepared');
+        const filtered = super._filterItems(items, filters);
+
+        return filtered;
+      }
+
+      /* -------------------------------------------- */
+
+      get template() {
+        if ( !game.user.isGM && this.actor.limited ) return `${COMMON.DATA.path}/templates/actors/syb5e-limited-sheet.html`;
+        return `${COMMON.DATA.path}/templates/actors/syb5e-character-sheet.html`;
+      }
+
+      /* -------------------------------------------- */
+
+      static get defaultOptions() {
+        return mergeObject(super.defaultOptions, {
+          classes: ['syb5e', 'dnd5e', 'sheet', 'actor', 'character'],
+          width: 780,
+          height: 749,
+          numFavored: 0, // hack: allows retrieval of data needed for replacement
+        });
+      }
+
+      /* -------------------------------------------- */
+
+      getData() {
+        let context = super.getData();
+
+        SheetCommon._getCommonData(this.actor, context);
+
+        logger.debug('getData#context:', context);
+        return context;
+      }
+
+      /* -------------------------------------------- */
+
+      /* supressing display of spell slot counts */
+      async _render(...args) {
+        await super._render(...args);
+
+        /* call the common _render by binding (pretend its our own method) */
+        const boundRender = await SheetCommon._render.bind(this);
+        boundRender(...args);
+
+        /* Inject the extended rest button and listener ( TODO should the whole sheet be injected like this?) */
+        const footer = this.element.find('.hit-dice .attribute-footer');
+        footer.append(`<a class="rest extended-rest" title="${COMMON.localize('SYB5E.Rest.ExtRest')}">${COMMON.localize('SYB5E.Rest.ExtendedAbbr')}</a>`);
+
+        /* activate listener for Extended Rest Button */
+        this.element.find('.extended-rest').click(this._onExtendedRest.bind(this));
+
+      }
+      /* -------------------------------------------- */
+
+      _prepareItemToggleState(item) {
+        super._prepareItemToggleState(item);
+
+        /* now modify toggle data related to spells */
+        SheetCommon._prepareItemToggleState.call(this, item);
+      }
+
+      /* -------------------------------------------- */
+
+      _prepareItems(data) {
+        super._prepareItems(data);
+
+        /* now modify spell information to replace 'prepared' with 'favored' */ 
+        SheetCommon._prepareItems.call(this, data);
+      }
+
+      /* -------------------------------------------- */
+
+
+
+      _onToggleItem(event) {
+        /* purposefully not calling super */
+        return SheetCommon._onToggleItem.call(this, event);
+      }
+      /* -------------------------------------------- */
+
+      async _onShortRest(event) {
+        event.preventDefault();
+        await this._onSubmit(event);
+        return this.actor.shortRest();
+      }
+
+      /* -------------------------------------------- */
+
+      async _onLongRest(event) {
+        event.preventDefault();
+        await this._onSubmit(event);
+        return this.actor.longRest();
+      }
+
+      /* -------------------------------------------- */
+
+      async _onExtendedRest(event) {
+        event.preventDefault();
+        await this._onSubmit(event);
+        return this.actor.extendedRest();
+      }
+
+      /* -------------------------------------------- */
+
+      async _onExtendedRest(event) {
+        event.preventDefault();
+        await this._onSubmit(event);
+        return this.actor.extendedRest();
+      }
+
+      /* -------------------------------------------- */
     }
 
-    /* otherwise, ignored our hijacked filter and do normal stuff */
-    filters.delete('prepared');
-    const filtered = super._filterItems(items, filters);
-
-    return filtered;
+    Syb5eActorSheetCharacter.register();
   }
 
-  /* -------------------------------------------- */
+  static buildNpcSheet(parentClass) {
 
-  get template() {
-    if ( !game.user.isGM && this.actor.limited ) return `${COMMON.DATA.path}/templates/actors/syb5e-limited-sheet.html`;
-    return `${COMMON.DATA.path}/templates/actors/syb5e-character-sheet.html`;
-  }
+    class Syb5eActorSheetNPC extends parentClass {
+      static NAME = 'Syb5eActorSheetNPC';
 
-  /* -------------------------------------------- */
+      /* -------------------------------------------- */
 
-  static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
-      classes: ['syb5e', 'dnd5e', 'sheet', 'actor', 'character'],
-      width: 780,
-      height: 749,
-      numFavored: 0, // hack: allows retrieval of data needed for replacement
-    });
-  }
+      static register() {
+        this.defaults();
 
-  /* -------------------------------------------- */
+        /* register our sheet */
+        Actors.registerSheet('dnd5e', Syb5eActorSheetNPC, {
+          types: ['npc'],
+          makeDefault: true,
+          label: COMMON.localize('SYB5E.Sheet.NPC.Label'),
+        });
+      }
 
-  getData() {
-    let context = super.getData();
+      /* -------------------------------------------- */
 
-    SheetCommon._getCommonData(this.actor, context);
+      static defaults() {
+        SheetCommon.defaults(this);
+      }
 
-    logger.debug('getData#context:', context);
-    return context;
-  }
+      /* -------------------------------------------- */
 
-  /* -------------------------------------------- */
+      /** OVERRIDES **/
 
-  /* supressing display of spell slot counts */
-  async _render(...args) {
-    await super._render(...args);
+      /* -------------------------------------------- */
 
-    /* call the common _render by binding (pretend its our own method) */
-    const boundRender = await SheetCommon._render.bind(this);
-    boundRender(...args);
+      _filterItems(items, filters) {
+        if (filters.size == 1 && filters.has('prepared') ) {
+          const favored = SheetCommon._filterForFavored(items);
 
-    /* Inject the extended rest button and listener ( TODO should the whole sheet be injected like this?) */
-    const footer = this.element.find('.hit-dice .attribute-footer');
-    footer.append(`<a class="rest extended-rest" title="${COMMON.localize('SYB5E.Rest.ExtRest')}">${COMMON.localize('SYB5E.Rest.ExtendedAbbr')}</a>`);
+          /* if we are the only filter, return just us */
+          return favored;
+        }
 
-    /* activate listener for Extended Rest Button */
-    this.element.find('.extended-rest').click(this._onExtendedRest.bind(this));
+        /* otherwise, ignored our hijacked filter and do normal stuff */
+        filters.delete('prepared');
+        const filtered = super._filterItems(items, filters);
 
-  }
-  /* -------------------------------------------- */
+        return filtered;
+      }
 
-  _prepareItemToggleState(item) {
-    super._prepareItemToggleState(item);
+      /* -------------------------------------------- */
 
-    /* now modify toggle data related to spells */
-    SheetCommon._prepareItemToggleState.call(this, item);
-  }
+      _prepareItemToggleState(item) {
+        super._prepareItemToggleState(item);
 
-  /* -------------------------------------------- */
+        /* now modify data related to spells */
+        SheetCommon._prepareItemToggleState.call(this, item);
+      }
 
-  _prepareItems(data) {
-    super._prepareItems(data);
+      /* -------------------------------------------- */
 
-    /* now modify spell information to replace 'prepared' with 'favored' */ 
-    SheetCommon._prepareItems.call(this, data);
-  }
+      _prepareItems(data) {
+        super._prepareItems(data);
 
-  /* -------------------------------------------- */
+        /* now modify spell information to replace 'prepared' with 'favored' */ 
+        SheetCommon._prepareItems.call(this, data);
+      }
 
-  
+      /* -------------------------------------------- */
 
-  _onToggleItem(event) {
-    /* purposefully not calling super */
-    return SheetCommon._onToggleItem.call(this, event);
-  }
-  /* -------------------------------------------- */
+      _onToggleItem(event) {
+        /* purposefully not calling super */
+        return SheetCommon._onToggleItem.call(this, event);
+      }
 
-  async _onShortRest(event) {
-    event.preventDefault();
-    await this._onSubmit(event);
-    return this.actor.shortRest();
-  }
+      /* -------------------------------------------- */
 
-  /* -------------------------------------------- */
+      get template() {
+        if ( !game.user.isGM && this.actor.limited ) return `${COMMON.DATA.path}/templates/actors/syb5e-limited-sheet.html`;
+        return `${COMMON.DATA.path}/templates/actors/syb5e-npc-sheet.html`;
+      }
 
-  async _onLongRest(event) {
-    event.preventDefault();
-    await this._onSubmit(event);
-    return this.actor.longRest();
-  }
+      /* -------------------------------------------- */
 
-  /* -------------------------------------------- */
+      static get defaultOptions() {
+        return mergeObject(super.defaultOptions, {
+          classes: ['syb5e', 'dnd5e', 'sheet', 'actor', 'npc'],
+          width: 625,
+          height: 705,
+          numFavored: 0, // hack: allows retrieval of data needed for replacement
+        });
+      }
 
-  async _onExtendedRest(event) {
-    event.preventDefault();
-    await this._onSubmit(event);
-    return this.actor.extendedRest();
-  }
+      /* -------------------------------------------- */
 
-  /* -------------------------------------------- */
+      getData() {
+        let context = super.getData();
+        SheetCommon._getCommonData(this.actor, context);
 
-  async _onExtendedRest(event) {
-    event.preventDefault();
-    await this._onSubmit(event);
-    return this.actor.extendedRest();
-  }
+        /* NPCS also have 'manner' */
+        setProperty(context.data.details, 'manner', this.actor.manner);
 
-  /* -------------------------------------------- */
-}
+        logger.debug('getData#context:', context);
+        return context;
+      }
 
-export class Syb5eActorSheetNPC extends COMMON.CLASSES.ActorSheet5eNPC {
-  static NAME = 'Syb5eActorSheetNPC';
+      /* -------------------------------------------- */
 
-  /* -------------------------------------------- */
+      /* supressing display of spell slot counts */
+      async _render(...args) {
+        await super._render(...args);
 
-  static register() {
-    this.defaults();
-
-    /* register our sheet */
-    Actors.registerSheet('dnd5e', Syb5eActorSheetNPC, {
-      types: ['npc'],
-      makeDefault: true,
-      label: COMMON.localize('SYB5E.Sheet.NPC.Label'),
-    });
-  }
-
-  /* -------------------------------------------- */
-
-  static defaults() {
-    SheetCommon.defaults(this);
-  }
-
-  /* -------------------------------------------- */
-
-  /** OVERRIDES **/
-
-  /* -------------------------------------------- */
-
-  _filterItems(items, filters) {
-    if (filters.size == 1 && filters.has('prepared') ) {
-      const favored = SheetCommon._filterForFavored(items);
-
-      /* if we are the only filter, return just us */
-      return favored;
+        /* call the common _render by binding (pretend its our own method) */
+        return SheetCommon._render.call(this, ...args);
+      }
     }
 
-    /* otherwise, ignored our hijacked filter and do normal stuff */
-    filters.delete('prepared');
-    const filtered = super._filterItems(items, filters);
-
-    return filtered;
-  }
-
-  /* -------------------------------------------- */
-
-  _prepareItemToggleState(item) {
-    super._prepareItemToggleState(item);
-
-    /* now modify data related to spells */
-    SheetCommon._prepareItemToggleState.call(this, item);
-  }
-
-  /* -------------------------------------------- */
-
-  _prepareItems(data) {
-    super._prepareItems(data);
-
-    /* now modify spell information to replace 'prepared' with 'favored' */ 
-    SheetCommon._prepareItems.call(this, data);
-  }
-
-  /* -------------------------------------------- */
-
-  _onToggleItem(event) {
-    /* purposefully not calling super */
-    return SheetCommon._onToggleItem.call(this, event);
-  }
-
-  /* -------------------------------------------- */
-
-  get template() {
-    if ( !game.user.isGM && this.actor.limited ) return `${COMMON.DATA.path}/templates/actors/syb5e-limited-sheet.html`;
-    return `${COMMON.DATA.path}/templates/actors/syb5e-npc-sheet.html`;
-  }
-
-  /* -------------------------------------------- */
-
-  static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
-      classes: ['syb5e', 'dnd5e', 'sheet', 'actor', 'npc'],
-      width: 625,
-      height: 705,
-      numFavored: 0, // hack: allows retrieval of data needed for replacement
-    });
-  }
-
-  /* -------------------------------------------- */
-
-  getData() {
-    let context = super.getData();
-    SheetCommon._getCommonData(this.actor, context);
-
-    /* NPCS also have 'manner' */
-    setProperty(context.data.details, 'manner', this.actor.manner);
-
-    logger.debug('getData#context:', context);
-    return context;
-  }
-
-  /* -------------------------------------------- */
-
-  /* supressing display of spell slot counts */
-  async _render(...args) {
-    await super._render(...args);
-
-    /* call the common _render by binding (pretend its our own method) */
-    const boundRender = await SheetCommon._render.bind(this);
-    boundRender(...args);
+    Syb5eActorSheetNPC.register();
   }
 }
+
+
+

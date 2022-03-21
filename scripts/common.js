@@ -1,9 +1,3 @@
-/* DND5E Class Imports */
-import { DND5E } from '../../../systems/dnd5e/module/config.js';
-import ActorSheet5eCharacter from '../../../systems/dnd5e/module/actor/sheets/character.js'
-import ActorSheet5eNPC from '../../../systems/dnd5e/module/actor/sheets/npc.js'
-import Item5e from '../../../systems/dnd5e/module/item/entity.js'
-
 /* Common operations and utilities for all
  * core submodules
  */
@@ -22,19 +16,11 @@ export class COMMON {
     dndPath: `${PATH}/../../systems/dnd5e`
   };
 
-  static CLASSES = {
-    DND5E,
-    ActorSheet5eCharacter,
-    ActorSheet5eNPC,
-    Item5e,
-  };
-
   static NAME = this.name;
   /** \CONSTANTS **/
 
-  /* runtime construction of basic information about this module */
+  /* pre-setup steps */
   static build() {
-
   }
 
   static register() {

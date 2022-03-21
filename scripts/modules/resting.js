@@ -1,16 +1,3 @@
-import {
-    SheetCommon
-} from './actor-sheet.js';
-import {
-    COMMON
-} from '../common.js'
-import {
-    logger
-} from '../logger.js';
-
-import { SybRestDialog } from './apps/syb-rest-dialog.js'
-
-
 /******************* SHORT REST ******************************
  * Short rests require one hour of light effort, no more than
  * sitting and talking, tending to wounds and the like. You gain
@@ -70,13 +57,6 @@ export class Resting {
 
   static register() {
   }
-
-  static patch() {
-  }
-
-  static hooks() {
-  }
-
 
 /* -------------------------------------------- */
 

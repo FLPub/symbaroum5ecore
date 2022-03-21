@@ -14,62 +14,56 @@ export class ActorSyb5e {
     this.hooks();
   }
 
-  static parent = {};
-
   static patch() {
 
-    /* original super function information */
-    const superFn = {
+    const target = 'game.dnd5e.entities.Actor5e.prototype'
+
+    const patches = {
       getRollData: {
-        value: ActorSyb5e.getRollData
-      },
-      convertSybCurrency: {
-        value: ActorSyb5e.convertSybCurrency
-      },
-      isSybActor: {
-        value: ActorSyb5e.isSybActor
+        value: ActorSyb5e.getRollData,
+        mode: 'WRAPPER'
       },
       prepareBaseData: {
-        value: ActorSyb5e.prepareBaseData
+        value: ActorSyb5e.prepareBaseData,
+        mode: 'WRAPPER'
       },
       prepareDerivedData: {
-        value: ActorSyb5e.prepareDerivedData
-      },
-      extendedRest: {
-        value: ActorSyb5e.extendedRest
+        value: ActorSyb5e.prepareDerivedData,
+        mode: 'WRAPPER'
       },
       longRest: {
-        value: ActorSyb5e.longRest
+        value: ActorSyb5e.longRest,
       },
       shortRest: {
-        value: ActorSyb5e.shortRest
+        value: ActorSyb5e.shortRest,
+      },
+      convertSybCurrency: {
+        value: ActorSyb5e.convertSybCurrency,
+        enumerable: true,
+      },
+      isSybActor: {
+        value: ActorSyb5e.isSybActor,
+        enumerable: true,
+      },
+      extendedRest: {
+        value: ActorSyb5e.extendedRest,
+        enumerable: true,
       },
       corruption: {
-        get: ActorSyb5e.getCorruption
+        get: ActorSyb5e.getCorruption,
+        enumerable: true,
       },
       shadow: {
-        get: ActorSyb5e.getShadow
+        get: ActorSyb5e.getShadow,
+        enumerable: true,
       },
       manner: {
-        get: ActorSyb5e.getManner
+        get: ActorSyb5e.getManner,
+        enumerable: true,
       }
-
     }
 
-    Object.entries(superFn).forEach( ([fn, override]) => {
-
-      /* get the current version */
-      const original = Object.getOwnPropertyDescriptor(game.dnd5e.entities.Actor5e.prototype, fn)
-
-      /* if our copy already has a value here, we dont want to overwrite */
-      if ( original && !Object.hasOwn(this.parent, fn) ){ 
-        Object.defineProperty(this.parent, fn, original);
-      }
-
-      /* set the replacement function */
-      Object.defineProperty(game.dnd5e.entities.Actor5e.prototype, fn, mergeObject(original ?? {}, override));
-
-    })
+    COMMON.patch(target, patches);
   }
 
   /* -------------------------------------------- */
@@ -81,8 +75,8 @@ export class ActorSyb5e {
   /* -------------------------------------------- */
 
   /* @override */
-  static getRollData(...args) {
-    let data = ActorSyb5e.parent.getRollData.call(this, ...args);
+  static getRollData(wrapped, ...args) {
+    let data = wrapped(...args);
 
     if (this.isSybActor()) {
       data.attributes.corruption = this.corruption;
@@ -97,8 +91,8 @@ export class ActorSyb5e {
   /* -------------------------------------------- */
 
   /* @override */
-  static prepareBaseData(...args) {
-    ActorSyb5e.parent.prepareBaseData.call(this, ...args);
+  static prepareBaseData(wrapped, ...args) {
+    wrapped(...args);
 
     if (this.isSybActor()) {
       ActorSyb5e._prepareCommonData(this);
@@ -115,10 +109,10 @@ export class ActorSyb5e {
   /* -------------------------------------------- */
 
   /* @override */
-  static prepareDerivedData(...args) {
+  static prepareDerivedData(wrapped, ...args) {
 
     /* perform normal steps */
-    ActorSyb5e.parent.prepareDerivedData.call(this, ...args); 
+    wrapped(...args); 
 
     if (this.isSybActor()){
       logger.debug('core derived data:', this.data)
@@ -134,14 +128,14 @@ export class ActorSyb5e {
   /* -------------------------------------------- */
 
   /* @override */
-  static async longRest({dialog=true, chat=true, newDay=true} = {}) {
+  static async longRest(wrapped, {dialog=true, chat=true, newDay=true} = {}, ...args) {
 
     const initHd = this.data.data.attributes.hd;
     const initHp = this.data.data.attributes.hp.value;
     const initCorr = this.corruption.temp;
 
     if(!this.isSybActor()){
-      return ActorSyb5e.parent.longRest.call(this, {dialog, chat, newDay}); 
+      return wrapped({dialog, chat, newDay}, ...args); 
     }
 
     // Maybe present a confirmation dialog
@@ -159,14 +153,14 @@ export class ActorSyb5e {
 
   /* -------------------------------------------- */
 
-  static async shortRest({dialog=true, chat=true, autoHD=false, autoHDThreshold=3} = {}) {
+  static async shortRest(wrapped, {dialog=true, chat=true, autoHD=false, autoHDThreshold=3} = {}, ...args) {
 
     const initHd = this.data.data.attributes.hd;
     const initHp = this.data.data.attributes.hp.value;
     const initCorr = this.corruption.temp;
 
     if(!this.isSybActor()){
-      return ActorSyb5e.parent.shortRest.call(this, {dialog, chat, autoHD, autoHDThreshold}); 
+      return wrapped({dialog, chat, autoHD, autoHDThreshold}, ...args);
     }
 
     // Maybe present a confirmation dialog

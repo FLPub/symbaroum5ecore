@@ -8,7 +8,8 @@
  */
 import { COMMON } from './common.js';
 import { logger } from './logger.js';
-import { SheetCommon, Syb5eActorSheetCharacter, Syb5eActorSheetNPC } from './modules/actor-sheet.js'
+import { LibWrapperShim } from './libraries/LibWrapper/shim.js'
+import { SheetCommon } from './modules/actor-sheet.js'
 import { Syb5eItemSheet } from './modules/item-sheet.js'
 import { SYB5E } from './config.js'
 import { Spellcasting } from './modules/spellcasting.js'
@@ -29,16 +30,14 @@ import { SybConfigApp } from './modules/apps/config-app.js'
 /**
  * Sub Apps
  */
-
 const SUB_MODULES = {
+  LibWrapperShim,
   COMMON,
   SYB5E,
   logger,
+  SheetCommon,
   ActorSyb5e,
   ItemSyb5e,
-  SheetCommon,
-  Syb5eActorSheetCharacter,
-  Syb5eActorSheetNPC,
   Syb5eItemSheet,
   Spellcasting,
   Resting,
@@ -60,7 +59,7 @@ COMMON.build();
 /*
   Initialize all Sub Modules
 */
-Hooks.on('setup', () => {
+Hooks.on('init', () => {
   Object.values(SUB_MODULES).forEach( (cl) => {
     logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: cl.NAME}));
     cl.register();
