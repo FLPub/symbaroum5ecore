@@ -1,5 +1,8 @@
 {
   "SYB5E" : {
+    "Error": {
+      "SpellLevelExceedsMax": "Base spell level exceeds maximum spell level of this actor."
+    },
     "setting": {
       "debug": {
         "name": "Log Debug Output",
