@@ -16,7 +16,7 @@ export class ModuleImportDialog extends Dialog {
   static get postImportJournalName() { return '**NONE**' };
   static get importedStateKey() { return 'imported' };
   static get migratedVersionKey() { return 'migrationVersion' };
-  static get migrationVersions() { return [] };
+  static get migrationVersions() { return Object.keys(this.migrationData).sort() };
 
   /** OVERRIDE FOR IMPORTER SPECIFIC MIGRATION VERSIONS *
    * updateData parameters.
@@ -47,7 +47,6 @@ export class ModuleImportDialog extends Dialog {
   static get requiredDnDCoreVersion() {return '1.5.6'};
   static get manifestPath() {return `modules/${this.moduleName}/manifests/manifest.json`};
   static get folderNameDict() { return {} };
-  static get dialogContent() { return '' };
 
   constructor({
     moduleName,
@@ -63,13 +62,12 @@ export class ModuleImportDialog extends Dialog {
     requiredDnDCoreVersion,
     manifestPath,
     folderNameDict,
-    dialogContent,
   } = ModuleImportDialog) {
 
     
 
     super({
-      content: dialogContent,
+      content: "",
       buttons: {},
     });
 
@@ -99,17 +97,24 @@ export class ModuleImportDialog extends Dialog {
     /* latch current module/core version */
     this.moduleVersion = game.modules.get(this.moduleName).data.version;
     this.coreVersion = game.modules.get('symbaroum5ecore').data.version;
+  }
+  
+  async render(...args) {
+    this.data.content = this.generateDialogHeader();
+    const needsImport = !ModuleImportDialog.isImported(this);
+    if (needsImport) {
+      this.data.content += this.generateDialogContent();
+    } else {
+      const initialMigrationVersion = ModuleImportDialog.neededMigration(this);
+      this.data.content += this.generatePatchNotes(initialMigrationVersion);
+    } 
 
     /* append our current module version to the provided content */
-    this.data.content += `
-    <br><a href="https://frialigan.se/">Free League</a> <br><br>
-      Module Version: ${this.moduleVersion}
-      <br><br>`;
+    this.data.content += this.generateDialogFooter();
 
-    this.data.title = `Import ${this.moduleTitle}`
+    const mode = needsImport ? 'Import' : 'Upgrade';
+    this.data.title = `${mode} ${this.moduleName}`
 
-    const needsImport = !ModuleImportDialog.isImported(this);
-    const needsMigration = !ModuleImportDialog.isMigrated(this);
 
     const importCallback = async () => {
       await this.checkVersion().catch(() => {
@@ -133,7 +138,7 @@ export class ModuleImportDialog extends Dialog {
       });
       
       let migrationVersion = false;
-      while( migrationVersion = ModuleImportDialog.needsMigration(this.moduleName, this.migratedVersionKey, this.migrationVersions) ) {
+      while( migrationVersion = ModuleImportDialog.neededMigration(this) ) {
         await this.moduleUpdate(migrationVersion).catch((e) => {
           let error = console.error(`Failed to upgrade module to ${migrationVersion}`, e);
           throw error;
@@ -141,20 +146,18 @@ export class ModuleImportDialog extends Dialog {
 
         ui.notifications.notify(`Upgrade to ${migrationVersion} complete. No Issues.`);
       }
-
-
-      //await this.renderWelcome();
     }
 
     const buttons = {
       initialize: {
-        label: needsMigration ? 'Upgrade' : 'Import',
-        callback: needsMigration ? migrateCallback : importCallback,
+        label: mode,
+        callback: needsImport ? importCallback : migrateCallback,
       }
     }
 
     this.data.buttons = buttons;
 
+    return super.render(...args);
   }
 
   static register() {
@@ -199,7 +202,7 @@ export class ModuleImportDialog extends Dialog {
   }
 
   static isMigrated({moduleName = this.moduleName, migratedVersionKey = this.migratedVersionKey, migrationVersions = this.migrationVersions}) {
-    return !ModuleImportDialog.needsMigration(moduleName, migratedVersionKey, migrationVersions);
+    return !ModuleImportDialog.neededMigration({moduleName, migratedVersionKey, migrationVersions});
   }
 
   /* OVERRIDE FOR INITIALIZATION TASKS */
@@ -228,28 +231,43 @@ export class ModuleImportDialog extends Dialog {
     return settingsData;
   }
 
-  /** OVERRIDE FOR IMPORTER SPECIFIC MIGRATION VERSIONS *
-   * updateData parameters.
-   * @param {Text} assetType - Type of asset journal, scenes, actors, items
-   * @param {Text} oldAsset - Name of the asset you want removed
-   * @param {Text} newAsset - Name of the asset you want replaced
-   * @param {Text} packName - Name of the pack (from the module.js)
-   * @param {Text} folder - Name of the folder to put the asset in
-   */
-  /** example *
-  {'1.0.0': packs: ['Core Rules - Book 1'],
-          data: [{ assetType: 'folders', oldAsset: '1. The Promised Land - Artifacts', newAsset: 'N/A', packName: 'N/A', folder: 'Symbaroum - APG - Actors' },
-  { assetType: 'folders', oldAsset: `GM Aids`, newAsset: 'N/A', packName: 'N/A', folder: `GM Aids` }]}
-*/
-  static migrationData = {};
+  generateDialogContent() { return '' };
 
-  static needsMigration(moduleName = this.moduleName, migratedVersionSetting = this.migratedVersionKey, migrationVersions = this.migrationVersions) {
+  generateDialogHeader() {
+    return `<img src="modules/symbaroum5ecore/images/journal/symbaroum_onelayer.webp" style="height:127px; width:384px; border:0;" alt="" />`
+  }
+
+  generateDialogFooter() {
+    return `<br><br>No part of this publication may be reproduced, distributed, stored in a retrieval system, or transmitted in any form by any means, electronic, mechanical, photocopying, recording or otherwise without the prior permission of the publishers.<br><br>
+            Published by: <b>Free League Publishing</b><br>
+            Foundry Conversion by <b>Matthew Haentschke and Paul Watson</b><br>
+            <a href="https://frialigan.se/">Free League</a> <br><br>
+      Module Version: ${this.moduleVersion}
+      <br><br>`
+  }
+
+  generatePatchNotes(migrationVersion) {
+    return `
+      <h2> <b>${this.moduleTitle} Update v${migrationVersion}</b></h2>
+      This script will correct the following issues:
+      <ul>
+      ${this.migrationData[migrationVersion].notes.reduce( (acc, curr) => {
+        acc += `<li>${curr}</li>` 
+        return acc;
+      },"")}
+      </ul>
+      <br>
+      If maps are active or contain tokens,lights or notes they will not be replaced as I don't want to overwrite any work you have done. <br>
+      You will need to import these manually when convenient.`
+  }
+
+  static neededMigration({moduleName = this.moduleName, migratedVersionSetting = this.migratedVersionKey, migrationVersions = this.migrationVersions}) {
     const lastMigratedVersion = game.settings.get(moduleName, migratedVersionSetting);
     const neededMigrationVersions = migrationVersions;
 
     const needsMigration = neededMigrationVersions.find( version => isNewerVersion(version, lastMigratedVersion) )
     logger.debug(`${moduleName} ${!!needsMigration ? 'requires migration to '+needsMigration : 'does not require migration'} (last migrated version: ${lastMigratedVersion})`)
-    return needsMigration;
+    return needsMigration ?? false;
   }
 
   static async _init() {
@@ -268,14 +286,15 @@ export class ModuleImportDialog extends Dialog {
   }
 
   async prepareModule() {
-    const manifest = await this.readManifest();
-    const modulePacks = await game.modules.get(this.moduleName)?.packs ?? []
     console.warn('Starting import of: ', this.moduleTitle);
     ui.notifications.notify('Starting import of: ' + this.moduleTitle + '. Hold on, this could take a while...');
-    await this.importModule(manifest, modulePacks);
+    await this.importModule(this.folderNameDict);
   }
 
-  async importModule(manifest, modulePacks) {
+  async importModule(folderMapping) {
+    const manifest = await this.readManifest();
+    const modulePacks = await game.modules.get(this.moduleName)?.packs ?? []
+
     return Promise.all(
       modulePacks.map(async (p) => {
         let moduleFolderId = '';
@@ -283,7 +302,7 @@ export class ModuleImportDialog extends Dialog {
         const pack = await game.packs.get(`${this.moduleName}.${p.name}`).getDocuments();
 
         if (type !== 'Playlist' && type !== 'Macro') {
-          const moduleFolderName = this.folderNameDict[p.label];
+          const moduleFolderName = folderMapping[p.label] ?? 'skipimport';
           if (moduleFolderName === 'skipimport') {
             return;
           }
@@ -408,7 +427,7 @@ export class ModuleImportDialog extends Dialog {
   }
   
   async moduleUpdate(toMigrationVersion) {
-    const thisMigration = this.migrationData[toMigrationVersion] ?? {packs: [], data: []};
+    const thisMigration = this.migrationData[toMigrationVersion] ?? {dict: [], data: []};
     for( const { assetType, oldAsset, newAsset, packName, folder } of thisMigration.data ) {
       switch (assetType) {
         case 'journal':
@@ -491,7 +510,7 @@ export class ModuleImportDialog extends Dialog {
           } catch (error) {
             console.warn(`${oldAsset} already deleted`);
           }
-          await importModule(manifest, modulePacks, moduleUpdateNameDict);
+          await this.importModule(thisMigration.dict);
           break;
         default:
           break;
@@ -504,8 +523,8 @@ export class ModuleImportDialog extends Dialog {
     await this.updateLastMigratedVersion(toVersion);
     return new Promise( (resolve) => {
       Dialog.prompt({
-        title: `Symbaroum Core Rules Update`,
-        content: `<p>The update to migration version ${toVersion} has completed.</p>`,
+        title: `Ruins of Symbaroum 5e Updater`,
+        content: this.generatePatchNotes(toVersion),
         label: 'Okay!',
         callback: () => {
           resolve(console.log('All Done'));

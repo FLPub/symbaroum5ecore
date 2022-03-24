@@ -36,10 +36,9 @@ export class CoreImporter {
         };
       }
 
-      static get dialogContent() {
+      generateDialogContent() {
         return `
-        <img src="modules/symbaroum5ecore/images/journal/symbaroum_onelayer.webp" style="height:127px; width:384px; border:0;" />
-        <p><b>Initialize Symbaroum RPG - Symbaroum 5E Ruins of Symbaroum - Core System?</b><br><br>
+        <p><b>Initialize ${this.moduleTitle}?</b><br><br>
         This will import the RoS - Core - How To Use This Module user guide</p>
         <p>
         No part of this publication may be reproduced, distributed, stored in a retrieval system, or transmitted in any form by any means, electronic, mechanical, photocopying, recording or otherwise without the prior permission of the publishers.<br><br>
@@ -54,7 +53,7 @@ export class CoreImporter {
       }
 
       static shouldShow() {
-        return (!COMMON.setting(this.importedStateKey) || this.needsMigration(COMMON.DATA.name, this.migratedVersionKey)) && COMMON.isFirstGM();
+        return (!COMMON.setting(this.importedStateKey) || this.neededMigration(COMMON.DATA.name, this.migratedVersionKey)) && COMMON.isFirstGM();
       }
 
       /* @override */
