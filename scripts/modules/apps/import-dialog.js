@@ -183,8 +183,10 @@ export class ModuleImportDialog extends Dialog {
     COMMON.applySettings(this.getSettingsData(), this.moduleName);
     const callerClass = this;
     class formAppWrapper extends FormApplication {
-      render() {
-        new callerClass().render(true);
+      async render() {
+        const importer = new callerClass()
+        await importer.setImportedState(false);
+        return importer.render(true);
       }
     }
 
