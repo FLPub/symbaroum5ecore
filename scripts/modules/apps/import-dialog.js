@@ -292,7 +292,16 @@ export class ModuleImportDialog extends Dialog {
     await game.settings.set(this.moduleName, this.importedStateKey, bool);
   }
 
-  async updateLastMigratedVersion(version = this.moduleVersion) {
+  async updateLastMigratedVersion(version = undefined) {
+
+    if (!version) {
+      /* find the most recent migration version in the data and use that */
+      version = this.migrationVersions.reduce( (acc, current) => {
+        if(isNewerVersion(current, acc)) acc = current;
+        return acc;
+      },'0.0.0');
+    }
+
     await game.settings.set(this.moduleName, this.migratedVersionKey, version);
   }
 
