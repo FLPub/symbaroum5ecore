@@ -18,8 +18,9 @@ export class ItemSyb5e {
 
     const patches = {
       properties: {
-        value: ItemSyb5e.getProperties,
-        mode: 'WRAPPER'
+        //value: ItemSyb5e.getProperties,
+        get: ItemSyb5e.getProperties,
+        //mode: 'WRAPPER'
       },
       getRollData: {
         value: ItemSyb5e.getRollData,
@@ -82,8 +83,8 @@ export class ItemSyb5e {
     
   }
 
-  static getProperties(wrapped, ...args) {
-    let props = wrapped(...args);
+  static getProperties() {
+    let props = {};
     /* Armor will also have item properties similar to Weapons */
 
     /* is armor type? return syb armor props or the default object
@@ -93,7 +94,7 @@ export class ItemSyb5e {
     }
 
     /* all others, fall back to core data */
-    return props ?? {}
+    return props;
   }
 
   static getRollData(wrapped, ...args) {
