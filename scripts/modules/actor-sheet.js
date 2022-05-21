@@ -337,7 +337,7 @@ export class SheetCommon {
 
         /* Inject the extended rest button and listener ( TODO should the whole sheet be injected like this?) */
         const footer = this.element.find('.hit-dice .attribute-footer');
-        footer.append(`<a class="rest extended-rest" title="${COMMON.localize('SYB5E.Rest.ExtRest')}">${COMMON.localize('SYB5E.Rest.ExtendedAbbr')}</a>`);
+        footer.append(`<a class="rest extended-rest" title="${COMMON.localize('SYB5E.Rest.Extended')}">${COMMON.localize('SYB5E.Rest.ExtendedAbbr')}</a>`);
 
         /* activate listener for Extended Rest Button */
         this.element.find('.extended-rest').click(this._onExtendedRest.bind(this));
