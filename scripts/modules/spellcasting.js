@@ -276,7 +276,6 @@ export class Spellcasting {
     /* mirror core dnd5e structure */
     const actorUpdates = {};
     const itemUpdates = {};
-    const resourceUpdates = {};
 
     if (consumeCorruption) {
 
@@ -321,7 +320,7 @@ export class Spellcasting {
       item.data.update({[game.syb5e.CONFIG.PATHS.delete.corruption]: null});
     }
 
-    return {actorUpdates, itemUpdates, resourceUpdates};
+    return {actorUpdates, itemUpdates};
 
   }
 
