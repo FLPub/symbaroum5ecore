@@ -121,7 +121,7 @@ export class ActorSyb5e {
       setProperty(this.data, game.syb5e.CONFIG.PATHS.corruption.root,this.corruption);
       
       /* check for half caster and "fix" for syb5e half-caster progression */
-      Spellcasting._modifyDerivedProgression(this.data);
+      Spellcasting._modifyDerivedProgression(this);
     }
   }
 
@@ -274,7 +274,7 @@ export class ActorSyb5e {
     const usesSpellcasting = corruptionAbility === 'spellcasting';
 
     /* otherwise determine corruption calc -- full casters get a special one */
-    const {fullCaster} = actor.type === 'character' ? Spellcasting._maxSpellLevelByClass(Object.values(actor.classes).map( item => item.data.data )) : Spellcasting._maxSpellLevelNPC(actor.data.data);
+    const {fullCaster} = actor.type === 'character' ? Spellcasting._maxSpellLevelByClass(Object.values(actor.classes)) : Spellcasting._maxSpellLevelNPC(actor.data.data);
 
     const prof = actor.data.data.attributes.prof ?? actor.data.data.prof?.flat ?? currentMax;
     if (prof == null) {

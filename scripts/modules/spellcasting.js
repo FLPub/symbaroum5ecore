@@ -41,7 +41,7 @@ export class Spellcasting {
 
       /* only modify the spell data if this is an syb actor */
       if (actor?.isSybActor() ?? false){
-        Spellcasting._getSpellData(actorData, itemData, returnData);
+        Spellcasting._getSpellData(actor, itemData, returnData);
       }
      
       logger.debug("_getSpellData result:", returnData);
@@ -88,7 +88,7 @@ export class Spellcasting {
       const progression = cls.spellcasting.progression;
       const progressionArray = SYB5E.CONFIG.SPELL_PROGRESSION[progression] ?? false;
       if(progressionArray){
-        const spellLevel = SYB5E.CONFIG.SPELL_PROGRESSION[progression][cls.levels] ?? 0;
+        const spellLevel = SYB5E.CONFIG.SPELL_PROGRESSION[progression][cls.data.data.levels] ?? 0;
 
         return spellLevel > acc.level ? {level: spellLevel, fullCaster: progression == 'full'} : acc;
       }
@@ -141,26 +141,26 @@ export class Spellcasting {
     return favored > 0;
   }
 
-  static spellProgression(actorData) {
+  static spellProgression(actor5e) {
 
-    const result = actorData.type == 'character' ? Spellcasting._maxSpellLevelByClass(Object.values(actorData.data.classes)) : Spellcasting._maxSpellLevelNPC(actorData.data)
+    const result = actor5e.data.type == 'character' ? Spellcasting._maxSpellLevelByClass(Object.values(actor5e.classes)) : Spellcasting._maxSpellLevelNPC(actor5e.data.data)
 
     return result;
 
   }
 
-  static _modifyDerivedProgression(actorData) {
+  static _modifyDerivedProgression(actor5e) {
 
-    const progression = Spellcasting.spellProgression(actorData);
+    const progression = Spellcasting.spellProgression(actor5e);
 
     /* insert our maximum spell level into the spell object */
-    actorData.data.spells.maxLevel = progression.level;
+    actor5e.data.data.spells.maxLevel = progression.level;
 
     /* ensure that all spell levels <= maxLevel have a non-zero max */
     const levels = Array.from({length:progression.level}, (_, index) => `spell${index+1}`)
 
     for( const slot of levels ){
-      actorData.data.spells[slot].max = Math.max(actorData.data.spells[slot].max, 1)
+      actor5e.data.data.spells[slot].max = Math.max(actor5e.data.data.spells[slot].max, 1)
     }
   }
 
@@ -227,7 +227,7 @@ export class Spellcasting {
 
   /** PATCH FUNCTIONS **/
 
-  static _getSpellData(actorData, itemData, returnData) {
+  static _getSpellData(actor5e, itemData, returnData) {
     
     let errors = [];
     /****************
@@ -239,7 +239,7 @@ export class Spellcasting {
      * - canUse: {boolean}: always true? exceeding max corruption is a choice
      */
 
-    const maxLevel = actorData.details.cr == undefined ? Spellcasting._maxSpellLevelByClass(Object.values(actorData.classes)) : Spellcasting._maxSpellLevelNPC(actorData)
+    const maxLevel = actor5e.data.data.details.cr == undefined ? Spellcasting._maxSpellLevelByClass(Object.values(actor5e.classes)) : Spellcasting._maxSpellLevelNPC(actor5e.data.data)
     let spellLevels = [];
 
     const addSpellLevel = (level) => {
@@ -264,7 +264,7 @@ export class Spellcasting {
     }
 
     /* generate current corruption status as a reminder */
-    const {value, max} = returnData.item.document.actor.corruption;
+    const {value, max} = actor5e.corruption;
     const note = COMMON.localize('SYB5E.Corruption.ShortDesc',{value, max});
 
     const sybData = {note, errors, spellLevels, consumeSpellSlot: true, canUse: true}
