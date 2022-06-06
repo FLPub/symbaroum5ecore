@@ -51,15 +51,19 @@ const SUB_APPS = {
   SybConfigApp
 }
 
-/*
-  Initialize Module
-*/
-COMMON.build();
 
-/*
-  Initialize all Sub Modules
-*/
 Hooks.on('init', () => {
+
+  /*
+  Initialize Module
+  */
+  const validBuild = COMMON.build();
+
+  if (!validBuild) return;
+
+  /*
+  Initialize all Sub Modules
+  */
   Object.values(SUB_MODULES).forEach( (cl) => {
     logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: cl.NAME}));
     cl.register();

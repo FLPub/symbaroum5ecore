@@ -13,14 +13,47 @@ export class COMMON {
     name: NAME,
     path: PATH,
     title: TITLE,
-    dndPath: `${PATH}/../../systems/dnd5e`
+    dndPath: `${PATH}/../../systems/dnd5e`,
+    systemCompat: ['1.6.2',], //compat with 1.6.2+
   };
+
+  static isValidSystem() {
+    const current = game.system.data.version;
+
+    const lowValid = !isNewerVersion(COMMON.DATA.systemCompat[0], current);
+    const highValid = !isNewerVersion(current, COMMON.DATA.systemCompat[1]);
+
+    return {lowValid, highValid}
+  }
+
+  static buildNotification(type, message) {
+    Hooks.once('ready', () => {
+      ui.notifications[type](message);
+    })
+  }
 
   static NAME = this.name;
   /** \CONSTANTS **/
 
   /* pre-setup steps */
   static build() {
+    let validBuild = true;
+    const results = COMMON.isValidSystem();
+    if (!results.lowValid) {
+      const msg = `${COMMON.DATA.name}: Detected dnd5e system version as "${game.system.data.version}". Minimum supported dnd5e system version: "${COMMON.DATA.systemCompat[0]}".`
+      console.error(msg);
+      COMMON.buildNotification('error', msg);
+      validBuild = false;
+    }
+
+    if (!results.highValid) {
+      const msg = `${COMMON.DATA.name}: Detected dnd5e system version as "${game.system.data.version}". Maximum supported dnd5e system version: "${COMMON.DATA.systemCompat[1]}".`
+      console.error(msg);
+      COMMON.buildNotification('error', msg);
+      validBuild = false;
+    }
+
+    return validBuild;
   }
 
   static register() {
