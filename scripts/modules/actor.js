@@ -276,7 +276,7 @@ export class ActorSyb5e {
     /* otherwise determine corruption calc -- full casters get a special one */
     const {fullCaster} = actor.type === 'character' ? Spellcasting._maxSpellLevelByClass(Object.values(actor.classes)) : Spellcasting._maxSpellLevelNPC(actor.data.data);
 
-    const prof = actor.data.data.attributes.prof ?? actor.data.data.prof?.flat ?? currentMax;
+    const prof = actor.data.data.attributes.prof ?? currentMax;
     if (prof == null) {
       logger.error('SYB5E.Error.NoProf');
     }

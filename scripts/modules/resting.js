@@ -62,7 +62,7 @@ export class Resting {
 
   static _getCorruptionRecovery(actor, type) {
     const currCorr = actor.corruption.temp;
-    const proficiency = actor.data.data.prof.flat;
+    const proficiency = actor.data.data.attributes.prof;
 
     const restTypes = game.syb5e.CONFIG.REST_TYPES;
 
