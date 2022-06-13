@@ -301,18 +301,21 @@ export class Spellcasting {
 
       logger.debug('Cached rolled corruption:', itemUpdates);
 
-      /* field name shortcuts */
-      const fieldKey = corruptionInfo.type;
+      /* only update actor if we actually gain corruption */
+      if (gainedCorruption != 0) {
+        /* field name shortcuts */
+        const fieldKey = corruptionInfo.type;
 
-      /* get the current corruption values */
-      let corruption = item.actor.corruption;
+        /* get the current corruption values */
+        let corruption = item.actor.corruption;
 
-      /* add in our gained corruption to the temp corruption */
-      corruption[fieldKey] = corruption[fieldKey] + gainedCorruption;
+        /* add in our gained corruption to the temp corruption */
+        corruption[fieldKey] = corruption[fieldKey] + gainedCorruption;
 
-      /* insert this update into the actorUpdates */
-      const corruptionFieldPath = `flags.${COMMON.DATA.name}.corruption.${fieldKey}`;
-      actorUpdates[corruptionFieldPath] = corruption[fieldKey];
+        /* insert this update into the actorUpdates */
+        const corruptionFieldPath = `flags.${COMMON.DATA.name}.corruption.${fieldKey}`;
+        actorUpdates[corruptionFieldPath] = corruption[fieldKey];
+      }
       
     } else {
       /* clear out the previously stored corruption results, if any */
@@ -320,7 +323,8 @@ export class Spellcasting {
       item.data.update({[game.syb5e.CONFIG.PATHS.delete.corruption]: null});
     }
 
-    return {actorUpdates, itemUpdates};
+    /* some "fake" items dont have an ID, try to handle this... */
+    return {actorUpdates, itemUpdates: !!item.data._id ? itemUpdates : {}};
 
   }
 
