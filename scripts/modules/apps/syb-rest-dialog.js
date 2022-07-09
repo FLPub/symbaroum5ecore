@@ -108,7 +108,7 @@ export class SybRestDialog extends Dialog {
     event.preventDefault();
     const button = event.currentTarget;
     this._denom = button.form.hd.value;
-    await Resting.corruptionHeal(this.actor, this.actor.data.data.prof.flat);
+    await Resting.corruptionHeal(this.actor, this.actor.data.data.attributes.prof);
     await Resting.expendHitDie(this.actor, this._denom);
     this.render();
   }

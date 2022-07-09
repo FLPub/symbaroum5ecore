@@ -14,15 +14,21 @@ export class ItemSyb5e {
 
   static patch() {
 
-    const superFn = {
+    const target = 'game.dnd5e.entities.Item5e.prototype'
+
+    const patches = {
       properties: {
-        get: ItemSyb5e.getProperties
+        //value: ItemSyb5e.getProperties,
+        get: ItemSyb5e.getProperties,
+        //mode: 'WRAPPER'
       },
       getRollData: {
-        value: ItemSyb5e.getRollData
+        value: ItemSyb5e.getRollData,
+        mode: 'WRAPPER'
       },
       _getUsageUpdates: {
-        value: ItemSyb5e._getUsageUpdates
+        value: ItemSyb5e._getUsageUpdates,
+        mode: 'WRAPPER'
       },
       corruption: {
         get: ItemSyb5e.getCorruption
@@ -34,34 +40,20 @@ export class ItemSyb5e {
         get: ItemSyb5e.getIsFavored
       },
       getChatData: {
-        value: ItemSyb5e.getChatData
+        value: ItemSyb5e.getChatData,
+        mode: 'WRAPPER'
       },
       hasDamage: {
-        get: ItemSyb5e.hasDamage
+        value: ItemSyb5e.hasDamage,
+        mode: 'WRAPPER'
       }
     }
 
-    Object.entries(superFn).forEach( ([fn, override]) => {
-
-      /* get the current version */
-      const original = Object.getOwnPropertyDescriptor(game.dnd5e.entities.Item5e.prototype, fn)
-
-      /* if our copy already has a value here, we dont want to overwrite */
-      if ( original && !Object.hasOwn(this.parent, fn) ){ 
-        Object.defineProperty(this.parent, fn, original);
-      }
-
-      /* set the replacement function */
-      Object.defineProperty(game.dnd5e.entities.Item5e.prototype, fn, mergeObject(original ?? {}, override));
-
-    })
-
-     
+    COMMON.patch(target, patches);
   }
 
   static getCorruption() {
     return Spellcasting._corruptionExpression(this.data);
-    
   }
 
   static getCorruptionOverride() {
@@ -75,10 +67,10 @@ export class ItemSyb5e {
   }
 
   /* @override */
-  static getChatData(...args) {
+  static getChatData(wrapped, ...args) {
 
     /* should insert 2 labels -- level and components */
-    let data = ItemSyb5e.parent.getChatData.call(this, ...args);
+    let data = wrapped(...args);
 
     /* add ours right after if we are consuming corruption */
     const corruptionUse = getProperty(this.data, game.syb5e.CONFIG.PATHS.corruption.root);
@@ -92,20 +84,21 @@ export class ItemSyb5e {
   }
 
   static getProperties() {
+    let props = {};
     /* Armor will also have item properties similar to Weapons */
 
     /* is armor type? return syb armor props or the default object
      * if no flag data exists yet */
     if (this.isArmor) {
-      return this.getFlag(COMMON.DATA.name, 'armorProps') ?? game.syb5e.CONFIG.DEFAULT_ITEM.armorProps
+      return mergeObject(props, this.getFlag(COMMON.DATA.name, 'armorProps') ?? game.syb5e.CONFIG.DEFAULT_ITEM.armorProps);
     }
 
     /* all others, fall back to core data */
-    return this.data.data.properties ?? {}
+    return props;
   }
 
-  static getRollData() {
-    const data = ItemSyb5e.parent.getRollData.call(this);
+  static getRollData(wrapped, ...args) {
+    let data = wrapped(...args);
 
     /* Patch for core dnd5e - items without attacks do not get ammo damage added
      * -> insert needed information here. Resource reduction handled by above getUsageUpdates call
@@ -139,11 +132,13 @@ export class ItemSyb5e {
     return data;
   }
 
-  static hasDamage() {
+  static hasDamage(wrapped, ...args) {
     /* core logic */
-    const coreHasDamage = !!(this.data.data.damage && this.data.data.damage.parts.length)
-    const consumesAmmo = this.data.data.consume.type === 'ammo';
-    const consumedItem = this.actor?.items.get(this.data.data.consume.target);
+    //const coreHasDamage = !!(this.data.data.damage && this.data.data.damage.parts.length)
+    const coreHasDamage = wrapped(...args);
+
+    const consumesAmmo = this.data.data.consume?.type === 'ammo';
+    const consumedItem = this.actor?.items.get(this.data.data.consume?.target);
     let consumedDamage = false;
 
     if(consumesAmmo && !!consumedItem && consumedItem?.id !== this.id ) consumedDamage = consumedItem.hasDamage;
@@ -152,7 +147,7 @@ export class ItemSyb5e {
 
   }
 
-  static _getUsageUpdates(usageInfo) {
+  static _getUsageUpdates(wrapped, usageInfo, ...args) {
     const sybActor = this.actor.isSybActor()
 
     /* if we are an syb, modify the current usage updates as to not
@@ -167,7 +162,7 @@ export class ItemSyb5e {
       usageInfo.consumeSpellLevel = null;
     }
 
-    let updates = ItemSyb5e.parent._getUsageUpdates.call(this, usageInfo);
+    let updates = wrapped(usageInfo, ...args);
 
     /* now insert our needed information into the changes to be made to the actor */
     if (sybActor) {

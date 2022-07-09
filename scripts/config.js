@@ -164,34 +164,10 @@ export class SYB5E {
   }
 
   static hooks() {
-    
+    Hooks.on('i18nInit', SYB5E._preTranslateConfig); 
   }
 
-  /* setting our global config data */
-  static globals() {
-    globalThis.game.syb5e.CONFIG = {};
-
-    /* Spell Level translations (unfortunately dnd5e does not provide these) */
-    globalThis.game.syb5e.CONFIG.LEVEL_SHORT = [
-      'SYB5E.Level.Zeroth',
-      'SYB5E.Level.First',
-      'SYB5E.Level.Second',
-      'SYB5E.Level.Third',
-      'SYB5E.Level.Fourth',
-      'SYB5E.Level.Fifth',
-      'SYB5E.Level.Sixth',
-      'SYB5E.Level.Seventh',
-      'SYB5E.Level.Eighth',
-      'SYB5E.Level.Nineth',
-    ];
-
-    /* 3 rest types for syb */
-    globalThis.game.syb5e.CONFIG.REST_TYPES = {
-      short: 'short',
-      long: 'long',
-      extended: 'ext',
-    };
-
+  static _preTranslateConfig() {
     globalThis.game.dnd5e.config.limitedUsePeriods.er = COMMON.localize('SYB5E.Rest.Extended');
 
     /* Add in "Greater Artifact" rarity for items */
@@ -202,9 +178,6 @@ export class SYB5E {
 
     /* Add in "Alchemical" as a weapon proficiency */
     globalThis.game.dnd5e.config.weaponProficiencies.alc = COMMON.localize('SYB5E.Proficiency.WeaponAlchemical');
-
-    /* Map the weapon type key (alchemical) to the proficiency key (alc) */
-    globalThis.game.dnd5e.config.weaponProficienciesMap.alchemical = 'alc';
 
     /* Extend dnd5e weapon properties */
     mergeObject(
@@ -250,14 +223,11 @@ export class SYB5E {
       wei: 'SYB5E.Item.ArmorProps.Weighty',
     });
 
-    /* add 'abomination' and 'phenomenon' to creature types */
-    mergeObject(
-      globalThis.game.dnd5e.config.creatureTypes,
-      COMMON.translateObject({
-        abomination: 'SYB5E.Creature.Abomination',
-        phenomenon: 'SYB5E.Creature.Phenomenon',
-      })
-    );
+    /* insert translated keys into our default item properties */
+    globalThis.game.syb5e.CONFIG.DEFAULT_ITEM.armorProps = Object.keys(globalThis.game.syb5e.CONFIG.ARMOR_PROPS).reduce((acc, key) => {
+        acc[key] = false;
+        return acc;
+      }, {});
 
     /* Replace currency names */
     globalThis.game.syb5e.CONFIG.CURRENCY = COMMON.translateObject({
@@ -265,6 +235,43 @@ export class SYB5E {
       sp: 'SYB5E.Currency.Shilling',
       cp: 'SYB5E.Currency.Orteg',
     });
+  }
+
+  /* setting our global config data */
+  static globals() {
+    globalThis.game.syb5e.CONFIG = {};
+
+    /* Spell Level translations (unfortunately dnd5e does not provide these) */
+    globalThis.game.syb5e.CONFIG.LEVEL_SHORT = [
+      'SYB5E.Level.Zeroth',
+      'SYB5E.Level.First',
+      'SYB5E.Level.Second',
+      'SYB5E.Level.Third',
+      'SYB5E.Level.Fourth',
+      'SYB5E.Level.Fifth',
+      'SYB5E.Level.Sixth',
+      'SYB5E.Level.Seventh',
+      'SYB5E.Level.Eighth',
+      'SYB5E.Level.Nineth',
+    ];
+
+    /* 3 rest types for syb */
+    globalThis.game.syb5e.CONFIG.REST_TYPES = {
+      short: 'short',
+      long: 'long',
+      extended: 'ext',
+    };
+
+    /* Map the weapon type key (alchemical) to the proficiency key (alc) */
+    globalThis.game.dnd5e.config.weaponProficienciesMap.alchemical = 'alc';
+
+    /* add 'abomination' and 'phenomenon' to creature types */
+    mergeObject(
+      globalThis.game.dnd5e.config.creatureTypes, {
+        abomination: 'SYB5E.Creature.Abomination',
+        phenomenon: 'SYB5E.Creature.Phenomenon',
+      }
+    );
 
     /* redefine used currencies (only cp, sp, gp) */
     globalThis.game.syb5e.CONFIG.CURRENCY_CONVERSION = {
@@ -281,6 +288,7 @@ export class SYB5E {
         permanent: 0,
         value: 0,
         max: 0,
+        bonus: 0
       },
       manner: '',
       shadow: '',
@@ -289,10 +297,7 @@ export class SYB5E {
     /* The default values for syb5e item data */
     globalThis.game.syb5e.CONFIG.DEFAULT_ITEM = {
       favored: 0,
-      armorProps: Object.keys(game.syb5e.CONFIG.ARMOR_PROPS).reduce((acc, key) => {
-        acc[key] = false;
-        return acc;
-      }, {}),
+      armorProps: {}, //populated after translations are loaded
       corruptionOverride: {
         type: 'none',
         mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM, //custom = use stock items values (i.e. "none")
@@ -316,6 +321,7 @@ export class SYB5E {
         permanent: `${root}.corruption.permanent`,
         value: undefined, //getter only for actors
         max: `${root}.corruption.max`,
+        bonus: `${root}.corruption.bonus`,
         last: {
           total: `${root}.corruption.total`, //last rolled corruption value (items)
           expression: `${root}.corruption.expression`, //last roll corruption expression (items)

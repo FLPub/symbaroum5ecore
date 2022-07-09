@@ -1,8 +1,6 @@
 import { COMMON } from '../common.js'
 import { logger } from '../logger.js';
 import { SYB5E } from '../config.js'
-import { Spellcasting } from './spellcasting.js'
-import { SheetCommon } from './actor-sheet.js'
 
 
 /* Initial attempt is via injection only */
@@ -26,7 +24,7 @@ export class Syb5eItemSheet {
     const item = sheet.item;
 
     const commonData = {
-      edit: item.isEditable ?? true ? "" : "disabled"
+      edit: sheet.isEditable ?? false ? "" : "disabled"
     }
     /* if this is an owned item, owner needs to be a SYB sheet actor
      * if this is an unowned item, show always

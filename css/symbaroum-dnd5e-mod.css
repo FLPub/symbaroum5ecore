@@ -78,6 +78,7 @@
   border-image: var(--syb5e-pc-border-image);
   border-image-slice: 50%;
   border-image-width: 100%;
+  min-width: 764px;
 }
 .syb5e.sheet.actor.character .window-content {
   /* background: chartreuse; */
@@ -286,6 +287,7 @@ a.inline-roll {
   border-image: var(--syb5e-npc-border-image);
   border-image-slice: 50%;
   border-image-width: 100%;
+  min-width: 625px;
 }
 
 .syb5e.sheet.actor.npc .window-content {

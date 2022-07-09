@@ -166,8 +166,8 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('switchNpcBGColour', '#dad8cc');
     await COMMON.setting('npcTextColour', '#000000');
     await COMMON.setting('npcBorder', 'none');
-    await COMMON.setting('charFontFamily', 'none');
-    await COMMON.setting('npcFontFamily', 'none');
+    await COMMON.setting('charFontFamily', '"Modesto Condensed", "Palatino Linotype", serif');
+    await COMMON.setting('npcFontFamily', '"Modesto Condensed", "Palatino Linotype", serif');
     await COMMON.setting('charItemLink', '#000000');
     await COMMON.setting('npcItemLink', '#000000');
     await COMMON.setting('charTag', '#000000');
@@ -182,7 +182,7 @@ export class SybConfigApp extends FormApplication {
         await COMMON.setting('switchCharBGColour', '#dad8cc');
         await COMMON.setting('charTextColour', '#000000');
         await COMMON.setting('charBorder', 'none');
-        await COMMON.setting('charFontFamily', 'none');
+        await COMMON.setting('charFontFamily', '"Modesto Condensed", "Palatino Linotype", serif');
         await COMMON.setting('charItemLink', '#000000');
         await COMMON.setting('charTag', '#000000');
         location.reload();
@@ -211,7 +211,7 @@ export class SybConfigApp extends FormApplication {
         await COMMON.setting('switchNpcBGColour', '#dad8cc');
         await COMMON.setting('npcTextColour', '#000000');
         await COMMON.setting('npcBorder', 'none');
-        await COMMON.setting('npcFontFamily', 'none');
+        await COMMON.setting('npcFontFamily', '"Modesto Condensed", "Palatino Linotype", serif');
         await COMMON.setting('npcItemLink', '#000000');
         await COMMON.setting('npcTag', '#000000');
         location.reload();

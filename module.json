@@ -1,9 +1,9 @@
 {
     "name": "symbaroum5ecore",
-    "title": "Symbaroum 5E Ruins of Symbaroum - Core System",
-    "description": "Implements the core rules mechanics of the Ruins of Symbaroum conversion.",
+    "title": "Ruins of Symbaroum 5E - Core",
+    "description": "Implements the core rules mechanics of the Ruins of Symbaroum conversion for 5th Edition.",
     "author": "Matthew Haentschke, Paul Watson",
-    "version": "0.5.!2",
+    "version": "1.0.0",
     "minimumCoreVersion": "9",
     "compatibleCoreVersion": "9",
     "system": [
@@ -25,7 +25,7 @@
     "packs": [
       {
         "name": "ros-core-user-guide-journal",
-        "label": "Symbaroum RoS - How to",
+        "label": "RoS CORE - How to",
         "path": "packs/ros-core-user-guide-journal.db",
         "entity": "JournalEntry",
         "module": "symbaroum5ecore",
@@ -33,7 +33,7 @@
       },
       {
         "name": "ros-core-scenes",
-        "label": "Symbaroum RoS - GM Aids",
+        "label": "RoS CORE - GM Aids",
         "path": "packs/ros-core-scenes.db",
         "entity": "Scene",
         "module": "symbaroum5ecore"
@@ -41,6 +41,6 @@
     
     ],  
     "url": "https://frialigan.se/",
-    "manifest": "https://foundrymodulesbucket.s3.eu-north-1.amazonaws.com/symbaroum5ecore/module.json",
-    "download":""
+    "manifest": "https://github.com/FLPub/symbaroum5ecore/releases/latest/download/module.json",
+    "download": "https://github.com/FLPub/symbaroum5ecore/releases/latest/download/module.zip"
   }

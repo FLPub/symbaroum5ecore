@@ -1,5 +1,8 @@
 {
   "SYB5E" : {
+    "Error": {
+      "SpellLevelExceedsMax": "Base spell level exceeds maximum spell level of this actor."
+    },
     "setting": {
       "debug": {
         "name": "Log Debug Output",
@@ -48,7 +51,14 @@
       "config-npc-text-selector":{
         "name": "Select NPC Text Color"
       }
-    }, 
+    },
+    "menu": {
+      "forceImport": {
+        "name": "Re-run Module Initial Import",
+        "label": "Import Module Content",
+        "hint": "Forces a reimport to occur as if this is the module's initial launch."
+      }
+    },
     "Never": "Never",
     "Init" : {
       "SubModule": "Initializing Sub-Module: {name}"
