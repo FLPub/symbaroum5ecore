@@ -544,7 +544,7 @@ a.inline-roll {
   border-image-width: 100%;
   text-overflow: ellipsis;
   width: min(100%, 900px);
-  min-height: 65px;
+  height: 65px;
   margin: auto;
   color: hsl(39, 77%, 83%);
 }
