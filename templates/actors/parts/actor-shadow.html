@@ -2,14 +2,14 @@
 <ul class="attributes characteristics flexrow">
   <li class="flexcol">
     <h4 class="attribute-name box-title">{{ localize "SYB5E.Manner.Label" }}</h4>
-    <textarea name="{{sybPaths.manner}}">{{data.details.manner}}</textarea>
+    <textarea name="{{sybPaths.manner}}">{{system.details.manner}}</textarea>
   </li>
   <li class="flexcol">
     <h4 class="attribute-name box-title">{{ localize "SYB5E.Shadow.Label" }}</h4>
     {{else}}
     <label>{{ localize "SYB5E.Shadow.Label" }}</label>
     {{/if}}
-    <textarea name="{{sybPaths.shadow}}">{{data.details.shadow}}</textarea>
+    <textarea name="{{sybPaths.shadow}}">{{system.details.shadow}}</textarea>
     {{#if isNPC}}
   </li>
 </ul>

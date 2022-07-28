@@ -14,7 +14,8 @@ export class ItemSyb5e {
 
   static patch() {
 
-    const target = 'game.dnd5e.entities.Item5e.prototype'
+    const target = dnd5e.documents.Item5e.prototype
+    const targetPath = 'dnd5e.documents.Item5e.prototype'
 
     const patches = {
       properties: {
@@ -49,21 +50,21 @@ export class ItemSyb5e {
       }
     }
 
-    COMMON.patch(target, patches);
+    COMMON.patch(target, targetPath, patches);
   }
 
   static getCorruption() {
-    return Spellcasting._corruptionExpression(this.data);
+    return Spellcasting._corruptionExpression(this);
   }
 
   static getCorruptionOverride() {
-    const override = getProperty(this.data, game.syb5e.CONFIG.PATHS.corruptionOverride.root) ?? duplicate(game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride);
+    const override = getProperty(this, game.syb5e.CONFIG.PATHS.corruptionOverride.root) ?? duplicate(game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride);
     override.mode = parseInt(override.mode);
     return override;
   }
   
   static getIsFavored() {
-    return Spellcasting._isFavored(this.data);
+    return Spellcasting._isFavored(this);
   }
 
   /* @override */
@@ -73,7 +74,7 @@ export class ItemSyb5e {
     let data = wrapped(...args);
 
     /* add ours right after if we are consuming corruption */
-    const corruptionUse = getProperty(this.data, game.syb5e.CONFIG.PATHS.corruption.root);
+    const corruptionUse = getProperty(this, game.syb5e.CONFIG.PATHS.corruption.root);
     if(this.actor.isSybActor && corruptionUse && corruptionUse.total != 0){
       logger.debug('Retrieving last rolled corruption:', corruptionUse);
       data.properties.push(corruptionUse.summary);
@@ -105,7 +106,7 @@ export class ItemSyb5e {
      */
 
     /* if this item is consuming ammo, but does not have an attack roll insert ammo info */
-    const consumptionInfo = this.data.data.consume
+    const consumptionInfo = this.system.consume
     if (consumptionInfo?.type === 'ammo' && !this.hasAttack) {
       this._ammo = this.actor.items.get(consumptionInfo.target);
     }
@@ -123,7 +124,7 @@ export class ItemSyb5e {
 
       /* populate most up to date corruption use information */
       const lastCorruptionField = game.syb5e.CONFIG.PATHS.corruption;
-      const lastCorruptionData = getProperty(this.data, lastCorruptionField.root) ?? {expression: this.corruption.expression, total: 0, summary: '- (-)'};
+      const lastCorruptionData = getProperty(this, lastCorruptionField.root) ?? {expression: this.corruption.expression, total: 0, summary: '- (-)'};
 
       data.item.corruption = lastCorruptionData;
       
@@ -134,11 +135,11 @@ export class ItemSyb5e {
 
   static hasDamage(wrapped, ...args) {
     /* core logic */
-    //const coreHasDamage = !!(this.data.data.damage && this.data.data.damage.parts.length)
+    //const coreHasDamage = !!(this.system.damage && this.system.damage.parts.length)
     const coreHasDamage = wrapped(...args);
 
-    const consumesAmmo = this.data.data.consume?.type === 'ammo';
-    const consumedItem = this.actor?.items.get(this.data.data.consume?.target);
+    const consumesAmmo = this.system.consume?.type === 'ammo';
+    const consumedItem = this.actor?.items.get(this.system.consume?.target);
     let consumedDamage = false;
 
     if(consumesAmmo && !!consumedItem && consumedItem?.id !== this.id ) consumedDamage = consumedItem.hasDamage;
@@ -156,7 +157,7 @@ export class ItemSyb5e {
 
       /* if we are consuming a spell slot, treat it as adding corruption instead */
       /* Note: consumeSpellSlot only valid for _leveled_ spells. All others MUST add corruption if a valid expression */
-      usageInfo.consumeCorruption = !!usageInfo.consumeSpellLevel || ((parseInt(this.data.data?.level ?? 0) < 1) && this.corruption.expression != game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride.expression);
+      usageInfo.consumeCorruption = !!usageInfo.consumeSpellLevel || ((parseInt(this.system?.level ?? 0) < 1) && this.corruption.expression != game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride.expression);
 
       /* We are _never_ consuming spell slots in syb5e */
       usageInfo.consumeSpellLevel = null;

@@ -1,22 +1,22 @@
 {{#*inline "corruptionRow" }}
 <div class="attribute-value" style="height: unset;">
   <label class="flexcol">
-    <input type="text" data-dtype="Number" name="{{sybPaths.corruption.temp}}" value="{{data.attributes.corruption.temp}}" />
+    <input type="text" data-dtype="Number" name="{{sybPaths.corruption.temp}}" value="{{system.attributes.corruption.temp}}" />
     <span class="attribute-footer">{{ localize "SYB5E.Corruption.Temporary"}}</span>
   </label>
   <span> + </span>
   <label class="flexcol">
-    <input type="text" data-dtype="Number"  name="{{sybPaths.corruption.permanent}}" value="{{data.attributes.corruption.permanent}}" />
+    <input type="text" data-dtype="Number"  name="{{sybPaths.corruption.permanent}}" value="{{system.attributes.corruption.permanent}}" />
     <span class="attribute-footer">{{ localize "SYB5E.Corruption.Permanent"}}</span>
   </label>
   <span> = </span>
   <label class="flexcol">
-    <input type="text" data-dtype="Number" name="{{sybPaths.corruption.value}}" value="{{data.attributes.corruption.value}}" disabled />
+    <input type="text" data-dtype="Number" name="{{sybPaths.corruption.value}}" value="{{system.attributes.corruption.value}}" disabled />
     <span class="attribute-footer">{{ localize "SYB5E.Corruption.Current"}}</span>
   </label>
   <span> / </span>
   <label class="flexcol">
-    <input type="text" data-dtype="Number" name="{{sybPaths.corruption.max}}" value="{{data.attributes.corruption.max}}" {{corruptionAbilities.disabled}} />
+    <input type="text" data-dtype="Number" name="{{sybPaths.corruption.max}}" value="{{system.attributes.corruption.max}}" {{corruptionAbilities.disabled}} />
 
     <span class="attribute-footer">{{ localize "SYB5E.Corruption.Threshold"}}</span>
   </label>

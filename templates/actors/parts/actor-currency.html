@@ -8,6 +8,6 @@
   </h3>
   {{#each labels as |label denom|}}
   <label class="denomination {{denom}}">{{ label }}</label>
-  <input type="text" name="data.currency.{{denom}}" value="{{ lookup ../currency denom}}" data-dtype="Number"/>
+  <input type="text" name="system.currency.{{denom}}" value="{{ lookup ../currency denom}}" data-dtype="Number"/>
   {{/each}}
 </ol>
