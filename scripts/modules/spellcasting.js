@@ -45,15 +45,15 @@ export class Spellcasting {
     COMMON.patch(targetCls, targetPath, patch);
   }
 
-  static getSpellData(wrapped, actorData, itemData, returnData) {
+  static async getSpellData(wrapped, actorData, itemData, returnData) {
       
-    wrapped(actorData, itemData, returnData);
+    await wrapped(actorData, itemData, returnData);
 
-    const actor = returnData.item?.document?.actor;
+    const actor = returnData.item?.actor;
 
     /* only modify the spell data if this is an syb actor */
     if (actor?.isSybActor() ?? false){
-      Spellcasting._getSpellData(actor, itemData, returnData);
+      await Spellcasting._getSpellData(actor, itemData, returnData);
     }
 
     logger.debug("_getSpellData result:", returnData);
@@ -199,7 +199,7 @@ export class Spellcasting {
 
   }
 
-  static _corruptionExpression(itemData, level = itemData.data.level) {
+  static _corruptionExpression(itemData, level = itemData.system.level) {
 
     /* get default expression */
     let expression = itemData.type === 'spell' ? Spellcasting._generateCorruptionExpression(level, Spellcasting._isFavored(itemData)) : '0';
@@ -238,7 +238,7 @@ export class Spellcasting {
 
   /** PATCH FUNCTIONS **/
 
-  static _getSpellData(actor5e, itemData, returnData) {
+  static async _getSpellData(actor5e, itemData, returnData) {
     
     let errors = [];
     /****************

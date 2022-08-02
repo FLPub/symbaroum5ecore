@@ -68,10 +68,10 @@ export class ItemSyb5e {
   }
 
   /* @override */
-  static getChatData(wrapped, ...args) {
+  static async getChatData(wrapped, ...args) {
 
     /* should insert 2 labels -- level and components */
-    let data = wrapped(...args);
+    let data = await wrapped(...args);
 
     /* add ours right after if we are consuming corruption */
     const corruptionUse = getProperty(this, game.syb5e.CONFIG.PATHS.corruption.root);

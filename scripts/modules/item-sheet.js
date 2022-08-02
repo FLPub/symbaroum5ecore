@@ -41,7 +41,7 @@ export class Syb5eItemSheet {
         ...commonData,
         isFavored: item.isFavored,
         favoredPath: SYB5E.CONFIG.PATHS.favored,
-        favoredValue: getProperty(item.data, SYB5E.CONFIG.PATHS.favored) ?? 0,
+        favoredValue: getProperty(item, SYB5E.CONFIG.PATHS.favored) ?? 0,
         favoredStates: {
           [COMMON.localize("SYB5E.Spell.Favored")]: 1,
           [COMMON.localize("SYB5E.Spell.NotFavored")]: 0,
@@ -65,7 +65,7 @@ export class Syb5eItemSheet {
       itemPropBadges.last().after(favoredBadge);
 
       /* find the "Cost (GP)" label (if it exists) */
-      const costLabel = html.find('[name="data.materials.cost"]').prev();
+      const costLabel = html.find('[name="system.materials.cost"]').prev();
       if(costLabel.length > 0) {
         costLabel.text(COMMON.localize("SYB5E.Currency.CostThaler"));
       }
@@ -75,7 +75,7 @@ export class Syb5eItemSheet {
     if (item.type == 'class') {
 
       /* get the subclass text field entry */
-      const subclassLabel = html.find('[name="data.subclass"]').parent().prev('label');
+      const subclassLabel = html.find('[name="system.subclass"]').parent().prev('label');
       if (subclassLabel.length > 0) {
         subclassLabel.text(COMMON.localize("SYB5E.Item.Class.Approach"));
       } else {
@@ -94,7 +94,7 @@ export class Syb5eItemSheet {
         return acc
 
       }, "");
-      const progressionSelect = html.find('[name="data.spellcasting.progression"]');
+      const progressionSelect = html.find('[name="system.spellcasting.progression"]');
       progressionSelect.children().not(filterList).remove();
 
     }
@@ -110,13 +110,13 @@ export class Syb5eItemSheet {
 
       const propCheckboxes = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/armor-properties.html`, data);
 
-      const equipmentDetails = html.find('[name="data.proficient"]').parents('.form-group').last();
+      const equipmentDetails = html.find('[name="system.proficient"]').parents('.form-group').last();
 
       equipmentDetails.after(propCheckboxes);
     }
 
     /* we want to add a custom corruption field if there is a general resource consumption field */
-    const consumeGroup = html.find('[name="data.consume.type"]').parents('.uses-per').last();
+    const consumeGroup = html.find('[name="system.consume.type"]').parents('.uses-per').last();
     if(consumeGroup.length > 0) {
       const currentOverrides = item.corruptionOverride;
       let data = {
