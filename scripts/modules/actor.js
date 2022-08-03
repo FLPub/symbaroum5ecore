@@ -352,9 +352,9 @@ export class ActorSyb5e {
     const {scope, key} = game.syb5e.CONFIG.PATHS.sybSoulless;
     if(actor.getFlag(scope, key)) {
       logger.debug('Soulless Initial Values:', actor, update);
-      const hpPath = 'data.attributes.hp';
+      const hpPath = 'system.attributes.hp';
 
-      let {value: currentHp, tempmax: currentMaxDelta, max: currentMax} = getProperty(actor.data, hpPath);
+      let {value: currentHp, tempmax: currentMaxDelta, max: currentMax} = getProperty(actor, hpPath);
       currentMaxDelta = (currentMaxDelta ?? 0) - gainedCorruption;
 
       /* clamp current HP between max HP and 0 */
