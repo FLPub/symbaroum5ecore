@@ -1,14 +1,7 @@
 {
-    "name": "symbaroum5ecore",
     "title": "Ruins of Symbaroum 5E - Core",
     "description": "Implements the core rules mechanics of the Ruins of Symbaroum conversion for 5th Edition.",
-    "author": "Matthew Haentschke, Paul Watson",
-    "version": "1.0.-1",
-    "minimumCoreVersion": "9",
-    "compatibleCoreVersion": "9",
-    "system": [
-        "dnd5e"
-    ],
+    "version": "2.0.!0",
     "styles": [
         "/css/symbaroum-dnd5e-mod.css"
     ],
@@ -19,7 +12,8 @@
         {
             "lang": "en",
             "name": "English",
-            "path": "lang/en.json"
+            "path": "lang/en.json",
+            "flags": {}
         }
     ],
     "packs": [
@@ -27,19 +21,33 @@
             "name": "ros-core-user-guide-journal",
             "label": "RoS CORE - How to",
             "path": "packs/ros-core-user-guide-journal.db",
-            "entity": "JournalEntry",
-            "module": "symbaroum5ecore",
-            "private": false
+            "private": false,
+            "type": "JournalEntry",
+            "flags": {}
         },
         {
             "name": "ros-core-scenes",
             "label": "RoS CORE - GM Aids",
             "path": "packs/ros-core-scenes.db",
-            "entity": "Scene",
-            "module": "symbaroum5ecore"
+            "type": "Scene",
+            "private": false,
+            "flags": {}
         }
     ],
     "url": "https://github.com/FLPub/symbaroum5ecore",
     "manifest": "https://raw.githubusercontent.com/FLPub/symbaroum5ecore/next/module.json",
-    "download": "https://github.com/FLPub/symbaroum5ecore/releases/download/1.0.-1/module.zip"
+    "download": "https://github.com/FLPub/symbaroum5ecore/releases/download/2.0.!0/module.zip",
+    "id": "symbaroum5ecore",
+    "authors": [
+        {
+            "name": "Matthew Haentschke, Paul Watson",
+            "flags": {}
+        }
+    ],
+    "compatibility": {
+        "minimum": "10",
+        "verified": "10"
+    },
+    "name": "symbaroum5ecore",
+    "minimumCoreVersion": "10"
 }
