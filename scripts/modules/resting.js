@@ -62,7 +62,7 @@ export class Resting {
 
   static _getCorruptionRecovery(actor, type) {
     const currCorr = actor.corruption.temp;
-    const proficiency = actor.data.data.attributes.prof;
+    const proficiency = actor.system.attributes.prof;
 
     const restTypes = game.syb5e.CONFIG.REST_TYPES;
 
@@ -86,7 +86,7 @@ export class Resting {
     const {hitPointUpdates, hpGain} = Resting._getRestHitPointUpdate(actor, type);
 
     /* get hit die recovery (full recovery ONLY on extended rest) */
-    const {updates: hitDiceUpdates, hitDiceRecovered} = type === restTypes.extended ? actor._getRestHitDiceRecovery({maxHitDice: actor.data.data.details.level}) : {updates: [], hitDiceRecovered: 0}
+    const {updates: hitDiceUpdates, hitDiceRecovered} = type === restTypes.extended ? actor._getRestHitDiceRecovery({maxHitDice: actor.system.details.level}) : {updates: [], hitDiceRecovered: 0}
 
     /* get corruption recovery 1x, 2x, full (short, long, ext) */
     const recovery = Resting._getCorruptionRecovery(actor, type);
@@ -196,8 +196,8 @@ export class Resting {
     /* collect any item with 'er' type recharge */
     const type = 'er';
 
-    const erItems = items.filter( i => i.data.data.uses?.per === type );
-    const updates = erItems.map( item => { return { _id: item.id, 'data.uses.value': item.data.data.uses.max } } );
+    const erItems = items.filter( i => i.system.uses?.per === type );
+    const updates = erItems.map( item => { return { _id: item.id, 'system.uses.value': item.system.uses.max } } );
 
     return updates;
   }
@@ -207,7 +207,7 @@ export class Resting {
   static _restHpGain( actor, type ) {
 
     const restTypes = game.syb5e.CONFIG.REST_TYPES;
-    const actor5eData = actor.data.data;
+    const actor5eData = actor.system;
 
     switch (type) {
       case restTypes.short:
@@ -219,7 +219,7 @@ export class Resting {
          * despite the fact that none should exist)
          */
         const hitDieSize = actor.itemTypes.class.reduce( (acc, item) => {
-          const dieSize = parseInt(item.data.data.hitDice.slice(1))
+          const dieSize = parseInt(item.system.hitDice.slice(1))
           return dieSize > acc ? dieSize : acc;
         }, 0);
 
@@ -240,11 +240,11 @@ export class Resting {
   static _getRestHitPointUpdate(actor, type) {
 
     const rawHpGain = Resting._restHpGain(actor, type);
-    const clampedFinalHp = Math.min(rawHpGain + actor.data.data.attributes.hp.value, actor.data.data.attributes.hp.max);
-    const hpGain = clampedFinalHp - actor.data.data.attributes.hp.value;
+    const clampedFinalHp = Math.min(rawHpGain + actor.system.attributes.hp.value, actor.system.attributes.hp.max);
+    const hpGain = clampedFinalHp - actor.system.attributes.hp.value;
 
     const hitPointUpdates = {
-      "data.attributes.hp.value": clampedFinalHp
+      "system.attributes.hp.value": clampedFinalHp
     }
 
     return {hitPointUpdates, hpGain}
@@ -279,15 +279,15 @@ export class Resting {
     // If no denomination was provided, choose the first available
     let cls = null;
     if (!denomination) {
-      cls = actor.itemTypes.class.find(c => c.data.data.hitDiceUsed < c.data.data.levels);
+      cls = actor.itemTypes.class.find(c => c.system.hitDiceUsed < c.system.levels);
       if (!cls) return null;
-      denomination = cls.data.data.hitDice;
+      denomination = cls.system.hitDice;
     }
 
     // Otherwise locate a class (if any) which has an available hit die of the requested denomination
     else {
       cls = actor.items.find(i => {
-        const d = i.data.data;
+        const d = i.system
         return (d.hitDice === denomination) && ((d.hitDiceUsed || 0) < (d.levels || 1));
       });
     }
@@ -303,7 +303,7 @@ export class Resting {
 
     // Adjust actor data
     await cls.update({
-      "data.hitDiceUsed": cls.data.data.hitDiceUsed + 1
+      "system.hitDiceUsed": cls.system.hitDiceUsed + 1
     });
   }
 }

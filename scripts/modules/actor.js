@@ -144,7 +144,8 @@ export class ActorSyb5e {
       try {
         newDay = await SybRestDialog.restDialog({actor: this, type: game.syb5e.CONFIG.REST_TYPES.long});
       } catch(err) {
-        return;
+        if (err == 'cancelled') logger.debug('Rest dialog cancelled.');
+        return false;
       }
     }
 
@@ -169,7 +170,8 @@ export class ActorSyb5e {
       try {
         await SybRestDialog.restDialog({actor: this, type: game.syb5e.CONFIG.REST_TYPES.short});
       } catch(err) {
-        return;
+        if (err == 'cancelled') logger.debug('Rest dialog cancelled.');
+        return false;
       }
     }
 
@@ -323,7 +325,8 @@ export class ActorSyb5e {
       try {
         newDay = await SybRestDialog.restDialog({actor: this, type: game.syb5e.CONFIG.REST_TYPES.extended});
       } catch(err) {
-        return;
+        if (err == 'cancelled') logger.debug('Rest dialog cancelled.');
+        return false;
       }
     }
 
