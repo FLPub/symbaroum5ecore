@@ -228,15 +228,15 @@ export class SheetCommon {
     const item = this.actor.items.get(itemId);
 
     /* change from dnd5e source -- modifying FAVORED rather than prepared */
-    if (item.data.type === 'spell') {
-      if( (getProperty(item.data, game.syb5e.CONFIG.PATHS.favored) ?? 0) < 0 ) {
+    if (item.type === 'spell') {
+      if( (getProperty(item, game.syb5e.CONFIG.PATHS.favored) ?? 0) < 0 ) {
         /* "never favored" items are "locked" */
         return;
       }
       return item.update({[game.syb5e.CONFIG.PATHS.favored]: item.isFavored ? 0 : 1});
     } else {
-      const attr = "data.equipped";
-      return item.update({[attr]: !getProperty(item.data, attr)});
+      const attr = "system.equipped";
+      return item.update({[attr]: !getProperty(item, attr)});
     }
   }
 
@@ -397,13 +397,6 @@ export class SheetCommon {
 
       /* -------------------------------------------- */
 
-      async _onExtendedRest(event) {
-        event.preventDefault();
-        await this._onSubmit(event);
-        return this.actor.extendedRest();
-      }
-
-      /* -------------------------------------------- */
     }
 
     Syb5eActorSheetCharacter.register();
