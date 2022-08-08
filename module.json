@@ -1,7 +1,7 @@
 {
     "title": "Ruins of Symbaroum 5E - Core",
     "description": "Implements the core rules mechanics of the Ruins of Symbaroum conversion for 5th Edition.",
-    "version": "2.0.!0",
+    "version": "2.0.!1",
     "styles": [
         "/css/symbaroum-dnd5e-mod.css"
     ],
@@ -36,7 +36,7 @@
     ],
     "url": "https://github.com/FLPub/symbaroum5ecore",
     "manifest": "https://raw.githubusercontent.com/FLPub/symbaroum5ecore/next/module.json",
-    "download": "https://github.com/FLPub/symbaroum5ecore/releases/download/2.0.!0/module.zip",
+    "download": "https://github.com/FLPub/symbaroum5ecore/releases/download/2.0.!1/module.zip",
     "id": "symbaroum5ecore",
     "authors": [
         {
