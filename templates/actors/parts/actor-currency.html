@@ -2,12 +2,12 @@
 <ol class="currency flexrow">
   <h3>
     {{localize "DND5E.Currency"}}
-    <a class="currency-convert rollable" title="{{localize 'DND5E.CurrencyConvert'}}">
+    <a class="currency-convert rollable" data-action="convertCurrency" title="{{localize 'DND5E.CurrencyConvert'}}">
       <i class="fas fa-coins"></i>
     </a>
   </h3>
   {{#each labels as |label denom|}}
   <label class="denomination {{denom}}">{{ label }}</label>
-  <input type="text" name="system.currency.{{denom}}" value="{{ lookup ../currency denom}}" data-dtype="Number"/>
+  {{numberInput (lookup ../currency denom) name=(concat "system.currency." denom)}}
   {{/each}}
 </ol>

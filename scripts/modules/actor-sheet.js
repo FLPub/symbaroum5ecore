@@ -497,7 +497,7 @@ export class SheetCommon {
         SheetCommon._getCommonData(this.actor, context);
 
         /* NPCS also have 'manner' */
-        setProperty(context.data.details, 'manner', this.actor.manner);
+        setProperty(context.system.details, 'manner', this.actor.manner);
         
         context.enrichedBio = await TextEditor.enrichHTML(context.system.details.biography.value, {async: true, rollData: context.rollData});
         logger.debug('getData#context:', context);

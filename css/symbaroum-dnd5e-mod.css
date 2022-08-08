@@ -195,6 +195,10 @@
   font-size: medium;
 }
 
+.syb5e.sheet.actor.character .inventory-filters .currency h3 {
+  border-bottom:none;
+}
+
 .syb5e.sheet.actor.character .inventory-filters .currency label {
   color: var(--syb5e-pc-color);
 }
@@ -227,6 +231,7 @@
 .syb5e.sheet.actor.character .items-list .items-header h3 {
   color: var(--syb5e-pc-color);
   font-family: var(--syb5e-pc-font);
+  border-bottom: 0;
 }
 
 .syb5e.sheet.actor.character .items-list {
@@ -407,6 +412,10 @@ a.inline-roll {
   font-size: medium;
 }
 
+.syb5e.sheet.actor.npc .inventory-filters .currency h3 {
+  border-bottom: none;
+}
+
 .syb5e.sheet.actor.npc .inventory-filters .currency label {
   color: var(--syb5e-npc-color);
 }
@@ -436,6 +445,7 @@ a.inline-roll {
 .syb5e.sheet.actor.npc .items-list .items-header h3 {
   color: var(--syb5e-npc-color);
   font-family: var(--syb5e-npc-font);
+  border-bottom:none;
 }
 
 .syb5e.sheet.actor.npc .items-list {
