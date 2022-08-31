@@ -16,8 +16,8 @@ export class SheetCommon {
   /* -------------------------------------------- */
 
   static build() {
-    const charSheet = game.dnd5e.applications.ActorSheet5eCharacter;
-    const npcSheet = game.dnd5e.applications.ActorSheet5eNPC;
+    const charSheet = dnd5e.applications.actor.ActorSheet5eCharacter;
+    const npcSheet = dnd5e.applications.actor.ActorSheet5eNPC;
 
     this.buildCharSheet(charSheet);
     this.buildNpcSheet(npcSheet);
@@ -68,7 +68,7 @@ export class SheetCommon {
     }, []);
 
     /* if this actor has any spellcasting, allow it to be selected as corruption stat */
-    if (actor.data.data.attributes.spellcasting?.length > 0) {
+    if (actor.system.attributes.spellcasting?.length > 0) {
       corruptionAbilities.push({ ability: 'spellcasting', label: COMMON.localize('DND5E.Spellcasting') });
     }
 
@@ -98,12 +98,12 @@ export class SheetCommon {
   /* -------------------------------------------- */
 
   /* Common context data between characters and NPCs */
-  static _getCommonData(actor, context) {
+  static async _getCommonData(actor, context) {
     /* Add in our corruption values in 'data.attributes' */
     const commonData = {
       sybPaths: game.syb5e.CONFIG.PATHS,
-      corruptionAbilities: SheetCommon._getCorruptionAbilityData(actor, context.data.abilities),
-      data: {
+      corruptionAbilities: SheetCommon._getCorruptionAbilityData(actor, context.system.abilities),
+      system: {
         attributes: {
           corruption: actor.corruption,
         },
@@ -118,7 +118,7 @@ export class SheetCommon {
 
   static async renderCurrencyRow(actor) {
     const data = {
-      currency: actor.data.data.currency,
+      currency: actor.system.currency,
       labels: game.syb5e.CONFIG.CURRENCY,
     };
 
@@ -228,15 +228,15 @@ export class SheetCommon {
     const item = this.actor.items.get(itemId);
 
     /* change from dnd5e source -- modifying FAVORED rather than prepared */
-    if (item.data.type === 'spell') {
-      if( (getProperty(item.data, game.syb5e.CONFIG.PATHS.favored) ?? 0) < 0 ) {
+    if (item.type === 'spell') {
+      if( (getProperty(item, game.syb5e.CONFIG.PATHS.favored) ?? 0) < 0 ) {
         /* "never favored" items are "locked" */
         return;
       }
       return item.update({[game.syb5e.CONFIG.PATHS.favored]: item.isFavored ? 0 : 1});
     } else {
-      const attr = "data.equipped";
-      return item.update({[attr]: !getProperty(item.data, attr)});
+      const attr = "system.equipped";
+      return item.update({[attr]: !getProperty(item, attr)});
     }
   }
 
@@ -316,11 +316,13 @@ export class SheetCommon {
 
       /* -------------------------------------------- */
 
-      getData() {
-        let context = super.getData();
+      /** @override */
+      async getData() {
+        let context = await super.getData();
 
         SheetCommon._getCommonData(this.actor, context);
 
+        context.enrichedBio = await TextEditor.enrichHTML(context.system.details.biography.value, {async: true, rollData: context.rollData});
         logger.debug('getData#context:', context);
         return context;
       }
@@ -395,13 +397,6 @@ export class SheetCommon {
 
       /* -------------------------------------------- */
 
-      async _onExtendedRest(event) {
-        event.preventDefault();
-        await this._onSubmit(event);
-        return this.actor.extendedRest();
-      }
-
-      /* -------------------------------------------- */
     }
 
     Syb5eActorSheetCharacter.register();
@@ -497,13 +492,14 @@ export class SheetCommon {
 
       /* -------------------------------------------- */
 
-      getData() {
-        let context = super.getData();
+      async getData() {
+        let context = await super.getData();
         SheetCommon._getCommonData(this.actor, context);
 
         /* NPCS also have 'manner' */
-        setProperty(context.data.details, 'manner', this.actor.manner);
-
+        setProperty(context.system.details, 'manner', this.actor.manner);
+        
+        context.enrichedBio = await TextEditor.enrichHTML(context.system.details.biography.value, {async: true, rollData: context.rollData});
         logger.debug('getData#context:', context);
         return context;
       }

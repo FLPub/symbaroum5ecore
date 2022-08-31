@@ -7,7 +7,7 @@ export class SybRestDialog extends Dialog {
 
     /**
      * Store a reference to the Actor entity which is resting
-     * @type {Actor}
+     * @type {Actor5e}
      */
     this.actor = actor;
 
@@ -26,9 +26,9 @@ export class SybRestDialog extends Dialog {
      * Grab stock dnd5e rest functions we want to re-use
      * @type {function}
      */
-    this._onRollHitDie = game.dnd5e.applications.ShortRestDialog.prototype._onRollHitDie.bind(this);
+    this._onRollHitDie = dnd5e.applications.actor.ShortRestDialog.prototype._onRollHitDie.bind(this);
 
-    this._getCoreData = game.dnd5e.applications.ShortRestDialog.prototype.getData.bind(this);
+    this._getCoreData = dnd5e.applications.actor.ShortRestDialog.prototype.getData.bind(this);
   }
 
 /* -------------------------------------------- */
@@ -79,7 +79,7 @@ export class SybRestDialog extends Dialog {
      * to preview our totals so we dont have to do
      * mental math
      */
-    const actor5eData = this.actor.data.data;
+    const actor5eData = this.actor.system;
 
     const gain = Resting._restHpGain( this.actor, this.type );
 
@@ -108,7 +108,7 @@ export class SybRestDialog extends Dialog {
     event.preventDefault();
     const button = event.currentTarget;
     this._denom = button.form.hd.value;
-    await Resting.corruptionHeal(this.actor, this.actor.data.data.attributes.prof);
+    await Resting.corruptionHeal(this.actor, this.actor.system.attributes.prof);
     await Resting.expendHitDie(this.actor, this._denom);
     this.render();
   }
@@ -132,11 +132,11 @@ export class SybRestDialog extends Dialog {
         cancel: {
           icon: '<i class="fas fa-times"></i>',
           label: game.i18n.localize("Cancel"),
-          callback: reject
+          callback: () => reject('cancelled')
         }
       },
       default: "rest",
-      close: reject
+      close: () => reject('cancelled')
     };
 
     /* modify the stock data with rest specific information */

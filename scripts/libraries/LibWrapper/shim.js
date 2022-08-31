@@ -19,14 +19,14 @@ export class LibWrapperShim {
     COMMON.patch = (...args) => LibWrapperShim.patch(COMMON.DATA.name, ...args);
   }
 
-  static patch(moduleName, target, patches) {
+  static patch(moduleName, targetCls, targetPath, patches) {
 
     Object.entries(patches).forEach( ([fn, override]) => {
-      const original = Object.getOwnPropertyDescriptor(getProperty(globalThis, target), fn)
+      const original = Object.getOwnPropertyDescriptor(targetCls, fn)
       if (original) {
-        libWrapper.register(moduleName, `${target}.${fn}`, override.value, override.mode);
+        libWrapper.register(moduleName, `${targetPath}.${fn}`, override.value, override.mode);
       } else {
-        Object.defineProperty(getProperty(globalThis, target), fn, override);
+        Object.defineProperty(targetCls, fn, override);
       }
     }) 
 

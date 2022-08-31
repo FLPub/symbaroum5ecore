@@ -23,13 +23,7 @@ export class ImporterBase {
       logger.info(args);
     }
 
-    if ( !Hooks._hooks.hasOwnProperty(hook) ) return true;
-    const fns = new Array(...Hooks._hooks[hook]);
-    for ( let fn of fns ) {
-      let callAdditional = await Hooks._call(hook, fn, args);
-      if ( callAdditional === false ) return false;
-    }
-    return true;
+    return Hooks.callAll(hook, ...args);
   }
 
   static _callRegistrations() {

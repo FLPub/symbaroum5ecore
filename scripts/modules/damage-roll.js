@@ -13,7 +13,8 @@ export class DamageRollSyb5e {
 
   static patch() {
 
-    const target = 'CONFIG.Dice.DamageRoll.prototype'
+    const target = CONFIG.Dice.DamageRoll.prototype
+    const targetPath = 'CONFIG.Dice.DamageRoll.prototype'
 
     const patches = {
       configureDamage: {
@@ -22,7 +23,7 @@ export class DamageRollSyb5e {
       },
     }
 
-    COMMON.patch(target, patches);
+    COMMON.patch(target, targetPath, patches);
   }
 
   static configureDamage(wrapped, ...args) {
