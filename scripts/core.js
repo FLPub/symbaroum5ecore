@@ -19,6 +19,7 @@ import { ItemSyb5e } from './modules/item.js'
 import { DamageRollSyb5e } from './modules/damage-roll.js'
 import { ImporterBase } from './modules/importer-base.js'
 import { CoreImporter } from './modules/core-importer.js'
+import { SymbaroumWide } from './modules/journal.js';
 
 import { SybRestDialog } from './modules/apps/syb-rest-dialog.js'
 import { SybConfigApp } from './modules/apps/config-app.js'
@@ -64,10 +65,12 @@ Hooks.on('init', () => {
   /*
   Initialize all Sub Modules
   */
-  Object.values(SUB_MODULES).forEach( (cl) => {
-    logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: cl.NAME}));
+  Object.values(SUB_MODULES).forEach((cl) => {
+    logger.info(COMMON.localize('SYB5E.Init.SubModule', { name: cl.NAME }));
     cl.register();
   });
+
+  Journal.registerSheet('SYB5E', SymbaroumWide, { label: game.i18n.localize('SYB5E.journal.widejournal.name'), makeDefault: false });
 
   //GlobalTesting
   //Object.entries(SUB_MODULES).forEach(([key, cl])=> window[key] = cl);

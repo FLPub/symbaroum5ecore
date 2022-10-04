@@ -196,7 +196,7 @@
 }
 
 .syb5e.sheet.actor.character .inventory-filters .currency h3 {
-  border-bottom:none;
+  border-bottom: none;
 }
 
 .syb5e.sheet.actor.character .inventory-filters .currency label {
@@ -445,7 +445,7 @@ a.inline-roll {
 .syb5e.sheet.actor.npc .items-list .items-header h3 {
   color: var(--syb5e-npc-color);
   font-family: var(--syb5e-npc-font);
-  border-bottom:none;
+  border-bottom: none;
 }
 
 .syb5e.sheet.actor.npc .items-list {
@@ -509,31 +509,32 @@ a.inline-roll {
 /* End of NPC Sheet Styling  */
 /* ************************ */
 
-.journal-sheet form {
+.symbaroum-dnd5e-mod.journal-sheet form {
   display: flex;
   flex-direction: column;
   background-image: url(../images/journal/foreground2a.png);
   background-size: 100% 100%;
 }
-.journal-sheet form select {
+.symbaroum-dnd5e-mod.journal-sheet form select {
   display: none;
 }
-.app.window-app.sheet.journal-sheet {
+/* .app.window-app.sheet.journal-sheet { */
+.symbaroum-dnd5e-mod.app.window-app.sheet.journal-sheet.journal-entry {
   color: hsl(0, 0%, 0%);
   border: 9px solid transparent;
   border-image: url(../images/journal/sym-journal-border.webp) 108/3 repeat;
   border-image-outset: 2;
-  min-width: 900px !important;
+  /* min-width: 900px !important; */
 }
 
-.journal-sheet form .editor {
+.symbaroum-dnd5e-mod.journal-sheet form .editor {
   height: 100%;
 }
 
-.app.window-app.journal-sheet.sheet.journal-sheet .window-header {
+.symbaroum-dnd5e-mod.app.window-app.journal-sheet.sheet.journal-sheet .window-header {
   background-image: url(../images/journal/foreground.jpg);
 }
-.app.window-app.journal-sheet.sheet.journal-sheet.window-app.minimized .window-header {
+.symbaroum-dnd5e-mod.app.window-app.journal-sheet.sheet.journal-sheet.window-app.minimized .window-header {
   border: none;
   line-height: 14px;
   padding: 0 6px;
@@ -543,7 +544,7 @@ a.inline-roll {
 }
 
 /*Journal Entry Input Border*/
-.journal-sheet form input[name='name'] {
+.symbaroum-dnd5e-mod.journal-sheet form input[name='name'] {
   font-family: 'Primitive';
   font-size: 3rem;
   text-align: center;
@@ -553,32 +554,32 @@ a.inline-roll {
   border-image-slice: 50%;
   border-image-width: 100%;
   text-overflow: ellipsis;
-  width: min(100%, 900px);
+  /* width: min(100%, 900px); */
   height: 65px;
   margin: auto;
   color: hsl(39, 77%, 83%);
 }
 
-.journal-sheet form input[name='name']:focus {
+.symbaroum-dnd5e-mod.journal-sheet form input[name='name']:focus {
   box-shadow: none;
 }
 
-.window-app.sheet.minimized .window-header .window-title {
+.symbaroum-dnd5e-mod.window-app.sheet.minimized .window-header .window-title {
   overflow: hidden;
   white-space: pre;
 }
 
-::-webkit-scrollbar-thumb {
+.symbaroum-dnd5e-mod ::-webkit-scrollbar-thumb {
   background: hsl(0, 0%, 50%);
   border-color: hsl(180, 25%, 25%);
 }
 
-::-webkit-scrollbar-track {
+.symbaroum-dnd5e-mod ::-webkit-scrollbar-track {
   box-shadow: 0 0 3px hsl(0, 0%, 60%) inset;
   border-radius: 3px;
 }
 
-.journal-sheet form button[type='submit']:focus {
+.symbaroum-dnd5e-mod .journal-sheet form button[type='submit']:focus {
   opacity: 100%;
   box-shadow: 0 0 8px hsl(0, 0%, 50%);
 }
@@ -632,13 +633,17 @@ a.inline-roll {
   margin: 0px 20px 0px 10px;
 }
 
-.symbaroum-dnd5e-mod h1 {
-  /* font-family: 'Jim Nightshade'; */
+/* .symbaroum-dnd5e-mod h1 {
+  font-family: 'Primitive';
+  font-size: 68pt;
+} */
+
+.symbaroum-dnd5e-mod .h1mod {
   font-family: 'Primitive';
   font-size: 68pt;
 }
 
-.symbaroum-dnd5e-mod h1 .indexsheet {
+.symbaroum-dnd5e-mod .h1mod .indexsheet {
   color: hsl(0, 0%, 100%);
   text-align: center;
   font-size: 50pt;
@@ -648,25 +653,49 @@ a.inline-roll {
   font-family: 'Primitive';
   font-size: 25pt;
 }
-.symbaroum-dnd5e-mod h3 {
+/* .symbaroum-dnd5e-mod h3 {
   padding: 0;
   margin: 0;
   margin-top: 5px;
   font-size: 14pt;
-}
-.symbaroum-dnd5e-mod h4 {
-  font-family: 'Jim Nightshade';
-  font-size: 18pt;
-}
+} */
 
-.symbaroum-dnd5e-mod h5 {
+.symbaroum-dnd5e-mod h3 {
   font-weight: bold;
   font-family: 'Fondamento';
   font-size: 12pt;
   color: hsl(19, 70%, 37%);
   display: block;
   margin: 0px 20px 0px 10px;
+  border-bottom: none !important;
 }
+
+.symbaroum-dnd5e-mod h5 {
+  padding: 0;
+  margin: 0;
+  margin-top: 5px;
+  font-size: 14pt !important;
+  border-bottom: none !important;
+}
+
+.symbaroum-dnd5e-mod h4 {
+  font-family: 'Jim Nightshade';
+  font-size: 18pt;
+}
+
+.symbaroum-dnd5e-mod .h4mod {
+  font-family: 'Jim Nightshade';
+  font-size: 18pt;
+}
+
+/* .symbaroum-dnd5e-mod h5 {
+  font-weight: bold;
+  font-family: 'Fondamento';
+  font-size: 12pt;
+  color: hsl(19, 70%, 37%);
+  display: block;
+  margin: 0px 20px 0px 10px;
+} */
 
 .symbaroum-dnd5e-mod h6 {
   font-weight: bold;
