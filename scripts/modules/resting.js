@@ -96,7 +96,7 @@ export class Resting {
     const resourceUpdates = actor._getRestResourceRecovery({recoverShortRestResources: type === restTypes.short, recoverLongRestResources: type !== restTypes.short});
 
     /* get item uses recovery */
-    const itemUseUpdates = actor._getRestItemUsesRecovery({recoverLongRestUses: type !== restTypes.short, recoverDailyUses: newDay});
+    const itemUseUpdates = await actor._getRestItemUsesRecovery({recoverLongRestUses: type !== restTypes.short, recoverDailyUses: newDay});
 
     /* get extend rest item use recovery */
     const erItemUseUpdates = type === restTypes.extended ? Resting.getErItemUsesRecovery(actor.items) : [];

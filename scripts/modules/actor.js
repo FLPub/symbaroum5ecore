@@ -344,17 +344,18 @@ export class ActorSyb5e {
     /* if no corruption update, does not concern us */
     if(temp == null && permanent == null) return;
 
-    /* compute the total change in corruption */
-    const current = actor.corruption;
-    const gainedCorruption = (temp ?? current.temp) - current.temp + (permanent ?? current.permanent) - current.permanent;
-
     /* If the current actor has the 'soulless' trait, mirror this damage to current/max health */
     const {scope, key} = game.syb5e.CONFIG.PATHS.sybSoulless;
     if(actor.getFlag(scope, key)) {
+
+      /* compute the total change in corruption */
+      const current = actor.corruption;
+      const gainedCorruption = (temp ?? current.temp) - current.temp + (permanent ?? current.permanent) - current.permanent;
+
       logger.debug('Soulless Initial Values:', actor, update);
       const hpPath = 'system.attributes.hp';
 
-      let {value: currentHp, tempmax: currentMaxDelta, max: currentMax} = getProperty(actor, hpPath);
+      let {value: currentHp, tempmax: currentMaxDelta, max: currentMax} = foundry.utils.mergeObject(getProperty(actor, hpPath), getProperty(update, hpPath) ?? {}, {inplace: false});
       currentMaxDelta = (currentMaxDelta ?? 0) - gainedCorruption;
 
       /* clamp current HP between max HP and 0 */
