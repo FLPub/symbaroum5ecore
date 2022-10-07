@@ -14,18 +14,11 @@
   ],
   "packs": [
     {
-      "name": "ros-core-user-guide-journal",
-      "label": "RoS CORE - How to",
-      "path": "packs/ros-core-user-guide-journal.db",
-      "private": false,
-      "type": "JournalEntry",
-      "flags": {}
-    },
-    {
-      "name": "ros-core-scenes",
-      "label": "RoS CORE - GM Aids",
-      "path": "packs/ros-core-scenes.db",
-      "type": "Scene",
+      "name": "ruins-of-symbaroum-5e-core",
+      "label": "Ruins of Symbaroum Core Adventure",
+      "path": "packs/ruins-of-symbaroum-5e-core.db",
+      "type": "Adventure",
+      "module": "symbaroum5ecore",
       "private": false,
       "flags": {}
     }
