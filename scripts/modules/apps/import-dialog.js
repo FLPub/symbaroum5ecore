@@ -131,10 +131,6 @@ export class ModuleImportDialog extends Dialog {
         throw error;
       });
 
-      // await this.renderWelcome();
-
-      await this.updateLastMigratedVersion();
-      ui.notifications.notify('Import complete. No Issues.');
     };
 
     const migrateCallback = async () => {
@@ -316,13 +312,15 @@ export class ModuleImportDialog extends Dialog {
     const adventureId = pack.index.find(a => a.name === adventurePackName)?._id;
     logger.info(`For ${adventurePackName} the Id is: ${adventureId}`)
     const adventure = await pack.getDocument(adventureId);
-    debugger;
+    // debugger;
     // await checkVersion();
     await adventure.sheet.render(true);
     Hooks.on('importAdventure', (created, updated) => {
       if (created || updated) {
         this.setImportedState(true);
-        ui.notifications.notify("Import Complete");
+        this.updateLastMigratedVersion();
+        ui.notifications.notify('Import complete. No Issues.');
+        game.journal.getName(this.postImportJournalName).show()
         return
       } else {
         ui.notifications.warn("There was a problem with the Import");
