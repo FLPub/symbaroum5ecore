@@ -172,8 +172,7 @@ export class ModuleImportDialog extends Dialog {
 
   static settings() {
     COMMON.applySettings(this.getSettingsData(), this.moduleName);
-    const callerClass = this;
-    class formAppWrapper extends FormApplication {
+    const callerClass = this; class formAppWrapper extends FormApplication {
       async render() {
         const importer = new callerClass()
         await importer.setImportedState(false);
@@ -556,9 +555,6 @@ export class ModuleImportDialog extends Dialog {
     }
     logger.info(` Updated ${updated} Asset, Created ${created} Asset`);
 
-
-
-
     await this.migrationComplete(toMigrationVersion);
   }
 
@@ -613,6 +609,46 @@ export class ModuleImportDialog extends Dialog {
       });
     }
   }
+
+
+  async ReImport(adventurePack, adventurePackName) {
+    //
+    // Non distructive import that only imports assets missing in the world. 
+    //
+    const pack = game.packs.get(adventurePack);
+    const adventureId = pack.index.find(a => a.name === adventurePackName)?._id;
+    logger.info(`For ${adventurePackName} the Id is: ${adventureId}`)
+    const adventure = await pack.getDocument(adventureId);
+    const adventureData = adventure.toObject();
+    const toCreate = {};
+    let created = 0;
+
+    for (const [field, cls] of Object.entries(Adventure.contentFields)) {
+      const newUpdate = [];
+      const newAdd = [];
+      const collection = game.collections.get(cls.documentName);
+      const [c, u] = adventureData[field].partition(d => collection.has(d._id));
+      if (c.length) {
+        toCreate[cls.documentName] = c;
+        created += c.length;
+      }
+    }
+
+    //
+    // Now create any new assets
+    //
+
+    if (toCreate) {
+      for (const [documentName, createData] of Object.entries(toCreate)) {
+        const cls = getDocumentClass(documentName);
+        const c = await cls.createDocuments(createData, { keepId: true, keepEmbeddedId: true, renderSheet: false });
+        created++;
+      }
+    }
+    ui.notifications.warn(`Re-Import Completed Created ${created} Assets`);
+
+    logger.info(` Created ${created} Assets`);
+  };
 
   // async readManifest() {
   //   const r = await (await fetch(this.manifestPath)).json().catch((e) => console.warn('MANIFEST ERROR: \nYou likely have nothing in your manifest, or it may be improperly formatted.', e));
