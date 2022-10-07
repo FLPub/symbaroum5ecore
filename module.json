@@ -20,7 +20,8 @@
       "type": "Adventure",
       "module": "symbaroum5ecore",
       "private": false,
-      "flags": {}
+      "flags": {},
+      "system": "dnd5e"
     }
   ],
   "url": "https://github.com/FLPub/symbaroum5ecore",

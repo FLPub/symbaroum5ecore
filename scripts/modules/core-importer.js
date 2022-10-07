@@ -45,19 +45,25 @@ export class CoreImporter {
 
             notes: ['Test replacement of how to'],
           },
+          '2.0.0': {
+            data: [
+              { assetType: 'journal', assetName: 'RoS - Core - How To Use This Module', action: 'update' },
+
+            ],
+
+            notes: ['Test replacement of how to'],
+          },
+
+          '2.0.1': {
+            data: [
+              { assetType: 'journal', assetName: 'RoS - Core - How To Use This Module', action: 'update' },
+
+            ],
+
+            notes: ['Test replacement another asset for chained migrations'],
+          },
         };
       }
-
-      // generateDialogContent() {
-      //   return `
-      //   <p><b>Initialize ${this.moduleTitle}?</b><br><br>
-      //   This will import the RoS - Core - How To Use This Module user guide</p>
-      //   <p>
-      //   No part of this publication may be reproduced, distributed, stored in a retrieval system, or transmitted in any form by any means, electronic, mechanical, photocopying, recording or otherwise without the prior permission of the publishers.<br><br>
-      //         <br>
-      //   Published by: <b>Free League Publishing</b><br>
-      //   Foundry Conversion by <b>Matthew Haentschke and Paul Watson</b>`;
-      // }
 
       constructor() {
         /* give our module specific information to the importer app */
