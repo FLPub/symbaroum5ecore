@@ -155,8 +155,7 @@ export class ModuleImportDialog extends Dialog {
     class formAppWrapper extends FormApplication {
       async render() {
         const importer = new callerClass()
-        await importer.setImportedState(false);
-        return importer.render(true);
+        return importer.ReImport();
       }
     }
 
@@ -450,7 +449,7 @@ export class ModuleImportDialog extends Dialog {
     }
 
 
-    async ReImport(adventurePack, adventurePackName) {
+    async ReImport(adventurePack = this.adventurePack, adventurePackName = this.adventurePackName) {
       //
       // Non distructive import that only imports assets missing in the world. 
       //
