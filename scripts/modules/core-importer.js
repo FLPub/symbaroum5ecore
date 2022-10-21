@@ -37,31 +37,6 @@ export class CoreImporter {
 
       static get migrationData() {
         return {
-          '1.0.1': {
-            data: [
-              { assetType: 'journal', assetName: 'RoS - Core - How To Use This Module', action: 'update' },
-
-            ],
-
-            notes: ['Test replacement of how to'],
-          },
-          '2.0.0': {
-            data: [
-              { assetType: 'journal', assetName: 'RoS - Core - How To Use This Module', action: 'update' },
-
-            ],
-
-            notes: ['Test replacement of how to'],
-          },
-
-          '2.0.1': {
-            data: [
-              { assetType: 'journal', assetName: 'RoS - Core - How To Use This Module', action: 'update' },
-
-            ],
-
-            notes: ['Test replacement another asset for chained migrations'],
-          },
         };
       }
 
