@@ -319,14 +319,16 @@ export class ModuleImportDialog extends Dialog {
     // await checkVersion();
     await adventure.sheet.render(true);
     Hooks.on('importAdventure', (created, updated) => {
-      if (created || updated) {
-        this.setImportedState(true);
-        this.updateLastMigratedVersion();
-        ui.notifications.notify('Import complete. No Issues.');
-        game.journal.getName(this.postImportJournalName).show()
-        return
-      } else {
-        ui.notifications.warn("There was a problem with the Import");
+      if (adventure.name === adventurePackName) {
+        if (created || updated) {
+          this.setImportedState(true);
+          this.updateLastMigratedVersion();
+          ui.notifications.notify('Import complete. No Issues.');
+          game.journal.getName(this.postImportJournalName).show()
+          return
+        } else {
+          ui.notifications.warn("There was a problem with the Import");
+        }
       }
     });
 
