@@ -24,10 +24,9 @@
       "system": "dnd5e"
     }
   ],
-  "url": "https://github.com/FLPub/symbaroum5ecore",
+  "url": "https://frialigan.se/",
   "manifest": "https://github.com/FLPub/symbaroum5ecore/releases/latest/download/module.json",
-  "download": "https://github.com/FLPub/symbaroum5ecore/releases/download/2.0.1/module.zip",
-  "id": "symbaroum5ecore",
+  "download": "https://github.com/FLPub/symbaroum5ecore/releases/latest/download/module.zip",
   "authors": [
     {
       "name": "Matthew Haentschke, Paul Watson",
