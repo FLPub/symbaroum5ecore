@@ -305,6 +305,24 @@ export class ModuleImportDialog extends Dialog {
     await this.ModuleImport(adventurePack, adventurePackName);
   }
 
+  static importedHook (importDialog, adventureDoc, _, created, updated) {
+    if (importDialog.adventureId === adventureDoc.id) {
+      if (foundry.utils.isEmpty(created) && foundry.utils.isEmpty(updated)) {
+        logger.warn(`No new content added/updated during import of "${importDialog.moduleName}". Check results and re-import if neccessary.`);
+      }
+
+      /* record our import state */
+      (async () => {
+        await importDialog.setImportedState(true);
+        await importDialog.updateLastMigratedVersion();
+        ui.notifications.notify('Import complete. No Issues.');
+        game.journal.getName(importDialog.postImportJournalName).show()
+      })();
+
+      /* unregister self */
+      Hooks.off('importAdventure', importDialog.hookId);
+    }
+  }
 
   async ModuleImport(adventurePack, adventurePackName) {
     //
@@ -312,25 +330,15 @@ export class ModuleImportDialog extends Dialog {
     // Will overwrite existing assets. 
     //
     const pack = game.packs.get(adventurePack);
-    const adventureId = pack.index.find(a => a.name === adventurePackName)?._id;
-    logger.info(`For ${adventurePackName} the Id is: ${adventureId}`)
-    const adventure = await pack.getDocument(adventureId);
-    // debugger;
-    // await checkVersion();
+    this.adventureId = pack.index.find(a => a.name === adventurePackName)?._id;
+    logger.info(`For ${adventurePackName} the Id is: ${this.adventureId}`)
+    const adventure = await pack.getDocument(this.adventureId);
+    if(!adventure) {
+      logger.error(`Cannot locate adventure "${adventurePackName}" in "${pack.name}"`);
+      return;
+    }
     await adventure.sheet.render(true);
-    Hooks.on('importAdventure', (created, updated) => {
-      if (adventure.name === adventurePackName) {
-        if (created || updated) {
-          this.setImportedState(true);
-          this.updateLastMigratedVersion();
-          ui.notifications.notify('Import complete. No Issues.');
-          game.journal.getName(this.postImportJournalName).show()
-          return
-        } else {
-          ui.notifications.warn("There was a problem with the Import");
-        }
-      }
-    });
+    this.hookId = Hooks.on('importAdventure', (...args) => ModuleImportDialog.importedHook(this, ...args ));
 
 
   }
