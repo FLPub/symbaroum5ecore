@@ -13,6 +13,12 @@ export class SymbaroumJournalSheet extends JournalSheet {
 }
 
 export class SymbaroumWide extends SymbaroumJournalSheet {
+    static NAME = 'SymbaroumWide';
+    
+    static register() {
+      Journal.registerSheet('SYB5E', SymbaroumWide, { label: game.i18n.localize('SYB5E.journal.widejournal.name'), makeDefault: false });
+    }
+
     static get defaultOptions() {
         const options = super.defaultOptions;
         options.width = 1268
