@@ -12,6 +12,9 @@ export class ModuleImportDialog extends Dialog {
   static get moduleName() { return '**NONE**'; }
   static get moduleTitle() { return '**NONE**'; }
   static get sceneToActivate() { return '**NONE**'; }
+  static get adventurePack() { return '**NONE**'; }
+  static get adventurePackName() { return '**NONE**'; }
+
 
   static get postImportJournalName() { return '**NONE**' };
   static get importedStateKey() { return 'imported' };
@@ -19,32 +22,27 @@ export class ModuleImportDialog extends Dialog {
   static get migrationVersions() { return Object.keys(this.migrationData).sort() };
 
   /** OVERRIDE FOR IMPORTER SPECIFIC MIGRATION VERSIONS *
-   * updateData parameters.
-   * @param {Text} assetType - Type of asset journal, scenes, actors, items
-   * @param {Text} oldAsset - Name of the asset you want removed
-   * @param {Text} newAsset - Name of the asset you want replaced
-   * @param {Text} packName - Name of the pack (from the module.js)
-   * @param {Text} folder - Name of the folder to put the asset in (this can be diferent from the name specified in module label)
-   */
-  /** example *
-  {'1.0.0': packs: ['Core Rules - Book 1'],
-          data: [{ assetType: 'folders', oldAsset: '1. The Promised Land - Artifacts', newAsset: 'N/A', packName: 'N/A', folder: 'Symbaroum - APG - Actors' },
-  { assetType: 'folders', oldAsset: `GM Aids`, newAsset: 'N/A', packName: 'N/A', folder: `GM Aids` }]}
-  
-  
-  Added additional option to delete an individual asset:
-   * @param {Text} assetType - 'delete'
-   * @param {Text} oldAsset - Name of the asset you want removed
-   * @param {Text} newAsset - type of asset: tables, journal, items', actors, scenes
-   * @param {Text} packName - N/A
-   * @param {Text} folder - N/A
-   *
-   * This will delete all the objects then rerun the import
-  ** example *
-   { assetType: 'delete', oldAsset: '01.02e Events In The Spirit World', newAsset: 'tables', packName: 'N/A', folder: 'N/A' },
+   /**
+    * updateAssets
+    * Param for number of dice to roll for each die type/rolls
+    * @param {Text} assetType - Allowed Asset types : 'actors', 'items','journal' & 'scenes'
+    * @param {Text} assetName - The name of the asset
+    * @param {Text} action - Allowed Actions: 'update', 'delete' & 'add'
+    *
+    * NOTE: 'add' will not delete existing assets so they need to be deleted first if you want to replace.
+    * 
+    * Examples:
+    * { assetType: 'actors', assetName: 'Hannah Singleton', action: 'delete' },
+    * { assetType: 'actors', assetName: 'Hannah Singleton', action: 'add' },
+    * { assetType: 'actors', assetName: 'Holroyd', action: 'update' },
+    * { assetType: 'items', assetName: '20mm Gatling Gun', action: 'update' },
+    * { assetType: 'journal', assetName: 'ALIEN RPG GM RULES INDEX', action: 'update' },
+    * { assetType: 'scenes', assetName: 'Station Layout', action: 'update' },  
+    *
+    */
 
-  */
   static get migrationData() { return {} };
+  static get acFolderIDs() { return {} }
 
   static get menuData() {
     return {
@@ -57,14 +55,14 @@ export class ModuleImportDialog extends Dialog {
     };
   }
 
-  static get requiredSybCoreVersion() { return game.modules.get('symbaroum5ecore').data.version};
-  static get requiredDnDCoreVersion() { return '1.5.6'};
-  static get manifestPath() { return `modules/${this.moduleName}/manifests/manifest.json`};
-  static get folderNameDict() { return {} };
+  static get requiredSybCoreVersion() { return game.modules.get('symbaroum5ecore').version };
+  static get requiredDnDCoreVersion() { return '2.0.3' };
 
   constructor({
     moduleName,
     moduleTitle,
+    adventurePack,
+    adventurePackName,
     sceneToActivate,
     postImportJournalName,
     importedStateKey,
@@ -74,25 +72,18 @@ export class ModuleImportDialog extends Dialog {
     menuData,
     requiredSybCoreVersion,
     requiredDnDCoreVersion,
-    manifestPath,
-    folderNameDict,
+    acFolderIDs,
   } = ModuleImportDialog) {
     super({
       content: '',
       buttons: {},
     });
 
-    this.imported = {
-      Actor: {},
-      Item: {},
-      JournalEntry: {},
-      RollTable: {},
-      Scene: {},
-    };
-
     /* store provided identifying information */
     this.moduleName = moduleName;
     this.moduleTitle = moduleTitle;
+    this.adventurePack = adventurePack;
+    this.adventurePackName = adventurePackName;
     this.importedStateKey = importedStateKey;
     this.migratedVersionKey = migratedVersionKey;
     this.migrationVersions = migrationVersions;
@@ -102,72 +93,77 @@ export class ModuleImportDialog extends Dialog {
     this.postImportJournalName = postImportJournalName;
     this.requiredSybCoreVersion = requiredSybCoreVersion;
     this.requiredDnDCoreVersion = requiredDnDCoreVersion;
-    this.manifestPath = manifestPath;
-    this.folderNameDict = folderNameDict;
+    this.acFolderIDs = acFolderIDs;
 
     /* latch current module/core version */
-    this.moduleVersion = game.modules.get(this.moduleName).data.version;
-    this.coreVersion = game.modules.get('symbaroum5ecore').data.version;
+    this.moduleVersion = game.modules.get(this.moduleName).version;
+    this.coreVersion = game.modules.get('symbaroum5ecore').version;
   }
 
-  async render(...args) {
-    this.data.content = this.generateDialogHeader();
-    const needsImport = !ModuleImportDialog.isImported(this);
-    if (needsImport) {
-      this.data.content += this.generateDialogContent();
-    } else {
-      const initialMigrationVersion = ModuleImportDialog.neededMigration(this);
-      this.data.content += this.generatePatchNotes(initialMigrationVersion);
-    }
+  async importAdventure() {
 
-    /* append our current module version to the provided content */
-    this.data.content += this.generateDialogFooter();
+    await this.checkVersion().catch(() => {
+      throw console.warn('Version check failed.');
+    });
 
-    const mode = needsImport ? 'Import' : 'Upgrade';
-    this.data.title = `${mode} ${this.moduleName}`;
+    return await this.prepareModule(this.adventurePack, this.adventurePackName).catch((e) => {
+      const error = console.error('Failed to initialize module', e);
+      throw error;
+    });
 
-    const importCallback = async () => {
-      await this.checkVersion().catch(() => {
-        throw console.warn('Version check failed.');
-      });
 
-      await this.prepareModule().catch((e) => {
-        let error = console.error('Failed to initialize module', e);
-        throw error;
-      });
+  }
 
-      await this.renderWelcome();
-      await this.setImportedState(true);
-      await this.updateLastMigratedVersion();
-      ui.notifications.notify('Import complete. No Issues.');
-    };
+  async migrateAdventure() {
+    await this.checkVersion().catch(() => {
+      throw console.warn('Version check failed.');
+    });
 
-    const migrateCallback = async () => {
-      await this.checkVersion().catch(() => {
-        throw console.warn('Version check failed.');
-      });
-
-      let migrationVersion = false;
-      while ((migrationVersion = ModuleImportDialog.neededMigration(this))) {
-        await this.moduleUpdate(migrationVersion).catch((e) => {
-          let error = console.error(`Failed to upgrade module to ${migrationVersion}`, e);
-          throw error;
+    let migrationVersion = false;
+    if (migrationVersion = ModuleImportDialog.neededMigration(this)) {
+      this.confirmMigrate(migrationVersion, this.adventurePack, this.adventurePackName)
+        .then(async () => {
+          await this.moduleUpdate(migrationVersion, this.adventurePack, this.adventurePackName)
+          await this.migrateAdventure();
+        })
+        .catch((e) => {
+          //let error = new Error(`Failed to upgrade module to ${migrationVersion}`, e);
+          //throw error;
+          console.log(e);
         });
 
-        ui.notifications.notify(`Upgrade to ${migrationVersion} complete. No Issues.`);
-      }
-    };
+    }
+  }
 
-    const buttons = {
-      initialize: {
-        label: mode,
-        callback: needsImport ? importCallback : migrateCallback,
-      },
-    };
+  async migrateToV10() {
+    await this.checkVersion().catch(() => {
+      throw console.warn('Version check failed.');
+    });
+    let migrationVersion = false;
+    if (migrationVersion = ModuleImportDialog.neededMigration(this)) {
 
-    this.data.buttons = buttons;
+      this.confirmUpdate('2.0.0', this.adventurePack, this.adventurePackName)
+        .then(async () => {
+          await this.migrateFolders(this.moduleName, this.moduleTitle, this.adventurePack, this.adventurePackName);
+          await this.moduleUpdate(migrationVersion, this.adventurePack, this.adventurePackName);
+          await this.migrateAdventure();
+        })
+        .catch((e) => {
+          //let error = new Error(`Failed to upgrade module to ${updateVersion}`, e);
+          //throw error;
+          console.log(e);
+        });
+    }
+  }
 
-    return super.render(...args);
+  /** @todo no longer a render override */
+  async render() {
+    const needsImport = !ModuleImportDialog.isImported(this);
+
+    if (needsImport) return this.importAdventure();
+    else if (game.settings.get(this.moduleName, 'migrationVersion') < '2.0.0') {
+      return this.migrateToV10();
+    } else return this.migrateAdventure();
   }
 
   static register() {
@@ -185,8 +181,7 @@ export class ModuleImportDialog extends Dialog {
     class formAppWrapper extends FormApplication {
       async render() {
         const importer = new callerClass()
-        await importer.setImportedState(false);
-        return importer.render(true);
+        return importer.ReImport();
       }
     }
 
@@ -263,16 +258,16 @@ export class ModuleImportDialog extends Dialog {
       This script will correct the following issues:
       <ul>
       ${this.migrationData[migrationVersion].notes.reduce((acc, curr) => {
-        acc += `<li>${curr}</li>`;
-        return acc;
-      }, '')}
+      acc += `<li>${curr}</li>`;
+      return acc;
+    }, '')}
       </ul>
       <br>
       If maps are active or contain tokens,lights or notes they will not be replaced as I don't want to overwrite any work you have done. <br>
       You will need to import these manually when convenient.`;
   }
 
-  static neededMigration({ moduleName = this.moduleName, migratedVersionSetting = this.migratedVersionKey, migrationVersions = this.migrationVersions}) {
+  static neededMigration({ moduleName = this.moduleName, migratedVersionSetting = this.migratedVersionKey, migrationVersions = this.migrationVersions }) {
     const lastMigratedVersion = game.settings.get(moduleName, migratedVersionSetting);
     const neededMigrationVersions = migrationVersions;
 
@@ -296,282 +291,188 @@ export class ModuleImportDialog extends Dialog {
 
     if (!version) {
       /* find the most recent migration version in the data and use that */
-      version = this.migrationVersions.reduce( (acc, current) => {
-        if(isNewerVersion(current, acc)) acc = current;
+      version = this.migrationVersions.reduce((acc, current) => {
+        if (isNewerVersion(current, acc)) acc = current;
         return acc;
-      },'0.0.0');
+      }, '0.0.0');
     }
 
     await game.settings.set(this.moduleName, this.migratedVersionKey, version);
   }
 
-  async prepareModule() {
+  async prepareModule(adventurePack, adventurePackName) {
     console.warn('Starting import of: ', this.moduleTitle);
-    ui.notifications.notify('Starting import of: ' + this.moduleTitle + '. Hold on, this could take a while...');
-    await this.importModule(this.folderNameDict);
+    await this.ModuleImport(adventurePack, adventurePackName);
   }
 
-  async importModule(folderMapping) {
-    const manifest = await this.readManifest();
-    const modulePacks = (await game.modules.get(this.moduleName)?.packs) ?? [];
+  static importedHook (importDialog, adventureDoc, _, created, updated) {
+    if (importDialog.adventureId === adventureDoc.id) {
+      if (foundry.utils.isEmpty(created) && foundry.utils.isEmpty(updated)) {
+        logger.warn(`No new content added/updated during import of "${importDialog.moduleName}". Check results and re-import if neccessary.`);
+      }
 
-    return Promise.all(
-      modulePacks.map(async (p) => {
-        let moduleFolderId = '';
-        let type = p.type;
-        const pack = await game.packs.get(`${this.moduleName}.${p.name}`).getDocuments();
+      /* record our import state */
+      (async () => {
+        await importDialog.setImportedState(true);
+        await importDialog.updateLastMigratedVersion();
+        ui.notifications.notify('Import complete. No Issues.');
+        game.journal.getName(importDialog.postImportJournalName).show()
+      })();
 
-        if (type !== 'Playlist' && type !== 'Macro') {
-          const moduleFolderName = folderMapping[p.label] ?? 'skipimport';
-          if (moduleFolderName === 'skipimport') {
-            return;
+      /* unregister self */
+      Hooks.off('importAdventure', importDialog.hookId);
+    }
+  }
+
+  async ModuleImport(adventurePack, adventurePackName) {
+    //
+    // Imports all assets in the Adventure Collection.  
+    // Will overwrite existing assets. 
+    //
+    const pack = game.packs.get(adventurePack);
+    this.adventureId = pack.index.find(a => a.name === adventurePackName)?._id;
+    logger.info(`For ${adventurePackName} the Id is: ${this.adventureId}`)
+    const adventure = await pack.getDocument(this.adventureId);
+    if(!adventure) {
+      logger.error(`Cannot locate adventure "${adventurePackName}" in "${pack.name}"`);
+      return;
+    }
+    await adventure.sheet.render(true);
+    this.hookId = Hooks.on('importAdventure', (...args) => ModuleImportDialog.importedHook(this, ...args ));
+
+
+  }
+
+
+  async moduleUpdate(toMigrationVersion, adventurePack, adventurePackName) {
+    const thisMigration = this.migrationData[toMigrationVersion] ?? { data: [] };
+    const pack = game.packs.get(adventurePack);
+    const adventureId = pack.index.find(a => a.name === adventurePackName)?._id;
+    const tPack = await pack.getDocument(adventureId);
+    const aPack = tPack.toObject()
+    this.updateAssetIDs(thisMigration);
+
+    const toUpdate = {};
+    const toCreate = {};
+    let created = 0;
+    let updated = 0;
+
+    for (const [field, cls] of Object.entries(Adventure.contentFields)) {
+      const newUpdate = [];
+      const newAdd = [];
+      for (const { assetType, assetName, action, assetID, assetClass } of thisMigration.data) {
+        if (assetClass === cls.documentName || assetClass === 'new') {
+          switch (action) {
+            case 'delete':
+              try {
+                const isThere = game[assetType].getName(assetName);
+                if (isThere) {
+                  console.log('It Exists');
+                  await isThere.delete({ deleteSubfolders: true, deleteContents: true });
+                }
+              } catch (error) {
+                console.warn(`${assetName} already deleted`);
+              }
+              break;
+            case 'add':
+              if (!game[assetType].getName(assetName)) {
+                const [c] = aPack[field].partition(d => d.name != assetName);
+                if (c.length) {
+                  newAdd.push(c[0]);
+                }
+              } else {
+                console.warn(`${assetName} ${assetType} Exists so no overwrite.  Delete first!`);
+                // Uncomment the next line if you want a distructive add.
+                // await assetName.delete({ deleteSubfolders: true, deleteContents: true });
+              }
+
+              break;
+            case 'update':
+              const [u] = aPack[field].partition(d => d._id != assetID);
+              if (u.length) {
+                newUpdate.push(u[0]);
+              }
+              break;
+            default:
+              break;
           }
-          if (game.folders.getName(moduleFolderName)) {
-            moduleFolderId = game.folders.getName(moduleFolderName);
-          } else {
-            moduleFolderId = await Folder.create({
-              name: moduleFolderName,
-              type: type,
-              parent: null,
-              color: manifest[type][moduleFolderName].color || null,
-              sort: manifest[type][moduleFolderName].sort || null,
-              sorting: manifest[type][moduleFolderName].sorting || 'a',
-            });
-          }
-          const manifestEntity = manifest[type][moduleFolderName].content;
-          await this.importFromManifest(manifestEntity, pack, type, moduleFolderId.data._id);
-        } else if (type === 'Playlist') {
-          const uniquePlaylists = pack.filter((p) => {
-            if (!game.playlists.find((n) => n.data.name === p.data.name)) return p;
-          });
-          Playlist.create(uniquePlaylists.map((p) => p.data));
+        }
+      }
+      // Now create the update entries for that asset class.
+      if (newAdd.length) {
+        toCreate[cls.documentName] = newAdd;
+      }
+      if (newUpdate.length) {
+        toUpdate[cls.documentName] = newUpdate;
+      }
+    }
+
+
+    //
+    // Now update any assets.
+    //
+    if (toUpdate) {
+      for (const [documentName, updateData] of Object.entries(toUpdate)) {
+        const cls = getDocumentClass(documentName);
+        await cls.updateDocuments(updateData, { diff: false, recursive: false, noHook: true });
+        updated++;
+      }
+    }
+
+    //
+    // Now create any new assets
+    //
+
+    if (toCreate) {
+      for (const [documentName, createData] of Object.entries(toCreate)) {
+        const cls = getDocumentClass(documentName);
+        await cls.createDocuments(createData, { keepId: true, keepEmbeddedId: true, renderSheet: false });
+        created++;
+      }
+    }
+    logger.info(` Updated ${updated} Asset, Created ${created} Asset`);
+
+    await this.updateLastMigratedVersion(toMigrationVersion);
+    ui.notifications.info(`Migration to v${toMigrationVersion} complete`);
+    return;
+  }
+
+  async updateAssetIDs(updateAssets) {
+
+    for (let key in updateAssets.data) {
+      if (updateAssets.data.hasOwnProperty(key)) {
+        if (updateAssets.data[key].action === "update") {
+          const tempID = game[updateAssets.data[key].assetType].getName(updateAssets.data[key].assetName).id;
+          const tempClass = game[updateAssets.data[key].assetType].getName(updateAssets.data[key].assetName).documentName;
+          Object.assign(updateAssets.data[key], { assetID: tempID, assetClass: tempClass });
         } else {
-          const uniqueMacros = pack.filter((p) => {
-            if (!game.macros.find((n) => n.data.name === p.data.name)) return p;
-          });
-          Macro.create(uniqueMacros.map((p) => p.data));
+          Object.assign(updateAssets.data[key], { assetClass: 'new' });
         }
-        return true;
-      })
-    );
-  }
-
-  async importFromManifest(manifest, pack, type, parent) {
-    let folder = ';';
-    if (manifest.parent) {
-      parent = manifest.parent;
-      delete manifest.parent;
-    }
-    for await (const [key, item] of Object.entries(manifest)) {
-      if (key !== 'entities') {
-        if (game.folders.getName(key)) {
-          folder = game.folders.getName(key);
-        } else {
-          folder = await Folder.create({
-            name: key,
-            type: type,
-            color: item.color,
-            parent: parent || null,
-            sort: item.sort || null,
-            sorting: item.sorting || 'a',
-          });
-        }
-        const pushParent = Object.values(item);
-        await pushParent.forEach((child) => {
-          if (child && typeof child === 'object') child.parent = folder.data._id;
-        });
-        await this.importFromManifest(item.content, pack, type);
-      } else if (key === 'entities') {
-        try {
-          const entityData = Object.keys(item).reduce((result, identifier) => {
-            const entity = pack.filter((e) => e.data._id === identifier);
-            return [...result, entity[0].data];
-          }, []);
-
-          for (let index = entityData.length - 1; index >= 0; index--) {
-            let x = entityData[index];
-            let fred = x.document.collectionName;
-            if (game[fred].get(x._id) != undefined) {
-              console.log(x.name, ' Exists', fred);
-              delete entityData[index];
-            }
-          }
-          let newentityData = entityData.filter(() => true);
-
-          for await (const entry of newentityData) {
-            entry._source.folder = parent || null;
-          }
-
-          const cls = getDocumentClass(type);
-          const createdEntities = await cls.createDocuments(newentityData, { keepId: true });
-          if (Array.isArray(createdEntities)) {
-            for await (const entry of createdEntities) {
-              this.imported[type][entry.data.name] = entry;
-            }
-          } else {
-            this.imported[type][createdEntities.data.name] = createdEntities;
-          }
-        } catch (e) {
-          console.warn('Could not create entity: ', e);
-        }
-      } else {
-        console.error("I don't understand this key: ", key);
-      }
-    }
-  }
-  async performFlagUpdates() {
-    const entityTypes = ['actors', 'items', 'journal', 'scenes', 'tables'];
-    for await (const entityType of entityTypes) {
-      switch (entityType) {
-        case 'scenes':
-          // eslint-disable-next-line no-case-declarations
-          const sceneData = [];
-          for await (const entity of Object.values(this.imported.Scene)) {
-            sceneData.push({
-              _id: entity.data._id,
-              thumb: entity.data.thumb,
-            });
-          }
-          await Scene.updateDocuments(sceneData);
-          break;
-        case 'journal':
-          // eslint-disable-next-line no-case-declarations
-          const journalData = duplicate(Object.values(this.imported.JournalEntry));
-          for (const journalEntry of journalData) {
-            const flag = journalEntry.data?.flags[this.moduleName]?.folder.sort;
-            if (flag) await journalEntry.updateDocuments('sort', flag);
-          }
-          break;
       }
     }
   }
 
-  async moduleUpdate(toMigrationVersion) {
-    const thisMigration = this.migrationData[toMigrationVersion] ?? { dict: [], data: [] };
-    for (const { assetType, oldAsset, newAsset, packName, folder } of thisMigration.data) {
-      if (assetType === 'delete') {
-        try {
-          const isThere = game[newAsset].getName(oldAsset);
-          if (isThere) {
-            console.log('It Exists');
-            await isThere.delete({ deleteSubfolders: true, deleteContents: true });
-          }
-        } catch (error) {
-          console.warn(`${oldAsset} already deleted`);
-        }
-      }
-    }
-    // Now import just the deleted items
-    await this.importModule(thisMigration.dict);
 
-    // Process special instructions with checks (replace, rename remove entire folder)
-    for (const { assetType, oldAsset, newAsset, packName, folder } of thisMigration.data) {
-      switch (assetType) {
-        case 'journal':
-        case 'items':
-        case 'actors':
-        case 'tables':
-          try {
-            const isThere = game[assetType].getName(oldAsset);
-            if (isThere) await isThere.delete({ deleteSubfolders: true, deleteContents: true });
-          } catch (error) {
-            console.warn(`${oldAsset} already deleted`);
-          }
-          const pack = await game.packs.find((p) => p.metadata.name === packName);
-          await pack.getIndex();
-          const entry = pack.index.find((j) => j.name === newAsset);
-          const folderId = await game.folders.getName(folder)?.id;
-          const documents = await pack.getDocuments(entry);
-
-          const createData = documents.map((doc) => {
-            let data = doc.toObject();
-            data.folder = folderId;
-            return data;
-          });
-
-          await pack.documentClass.createDocuments(createData, { folder: folderId, keepId: true });
-
-          break;
-
-        case 'scenes':
-          let isActive = !!game.scenes.getName(newAsset)?.active;
-          let hasTokens = !!game.scenes.getName(newAsset)?.data.tokens.length;
-          let hasNotes = !!game.scenes.getName(newAsset)?.data.notes.length;
-          let hasLights = !!game.scenes.getName(newAsset)?.data.lights.length;
-          if (isActive || hasTokens || hasNotes || hasLights) {
-            let chatMessage = `<div class="chatBG">`;
-            chatMessage += `<h2 style="color:  #fff">The scene: <br> ${newAsset} <br> has not been imported as:</h2> `;
-            if (isActive) chatMessage += 'It is Active and in use.<br>';
-            if (hasTokens) chatMessage += `It has ${hasTokens} placed Tokens.<br>`;
-            if (hasNotes) chatMessage += `It has ${hasNotes} placed Notes.<br>`;
-            if (hasLights) chatMessage += `It has ${hasLights} placed Lights sources. <br>`;
-            chatMessage += '<br><h3>Import the new version manually from the Compendium when convenient.</h3> ';
-            await ChatMessage.create({
-              user: game.user.id,
-              content: chatMessage,
-              whisper: game.users.contents.filter((u) => u.isGM).map((u) => u.id),
-              rollMode: game.settings.get('core', 'rollMode'),
-            });
-            break;
-          } else {
-            try {
-              const scene = game.scenes.getName(oldAsset);
-              if (scene) await scene.delete({ deleteSubfolders: true, deleteContents: true });
-              console.warn(`${newAsset} has been deleted`);
-            } catch (error) {
-              console.warn(`${newAsset} already deleted`);
-            }
-            const pack = await game.packs.find((p) => p.metadata.name === packName);
-            const index = await pack.getIndex();
-            const entry = index.find((j) => j.name === newAsset);
-            const documents = await pack.getDocuments(entry);
-            const folderId = await game.folders.getName(folder).data._id;
-
-            const createData = documents.map((doc) => {
-              let data = doc.toObject();
-              data.folder = folderId;
-              return data;
-            });
-
-            const cls = getDocumentClass('Scene');
-            await cls.createDocuments(createData, { folder: folderId, keepId: true });
-          }
-          break;
-        case 'folders':
-          try {
-            const isThere = game[assetType].getName(oldAsset);
-            if (isThere) {
-              console.log('It Exists');
-              await isThere.delete({ deleteSubfolders: true, deleteContents: true });
-            }
-          } catch (error) {
-            console.warn(`${oldAsset} already deleted`);
-          }
-          await this.importModule(thisMigration.dict);
-          break;
-        default:
-          break;
-      }
-    }
-    await this.migrationComplete(toMigrationVersion);
+  async confirmMigrate() {
+    return Dialog.prompt({
+      title: `Ruins of Symbaroum 5e Updater`,
+      content: 'V9 to V10 Migration',
+      label: 'Okay!',
+      rejectClose: true,
+    });
   }
 
-  async migrationComplete(toVersion) {
-    await this.updateLastMigratedVersion(toVersion);
-    return new Promise( (resolve) => {
-      Dialog.prompt({
-        title: `Ruins of Symbaroum 5e Updater`,
-        content: this.generatePatchNotes(toVersion),
-        label: 'Okay!',
-        callback: () => {
-          resolve(console.log('All Done'));
-        },
-      });
+  async confirmUpdate(toVersion) {
+    return Dialog.prompt({
+      title: `Ruins of Symbaroum 5e Updater`,
+      content: this.generatePatchNotes(toVersion),
+      label: 'Okay!',
+      rejectClose: true,
     });
   }
 
   async checkVersion() {
-    const currentDnD = game.system.data.version;
+    const currentDnD = game.system.version;
     if (isNewerVersion(this.requiredDnDCoreVersion, currentDnD)) {
       throw Dialog.prompt({
         title: 'Version Check',
@@ -591,24 +492,151 @@ export class ModuleImportDialog extends Dialog {
     }
   }
 
-  async readManifest() {
-    const r = await (await fetch(this.manifestPath)).json().catch((e) => console.warn('MANIFEST ERROR: \nYou likely have nothing in your manifest, or it may be improperly formatted.', e));
-    return r;
-  }
 
-  async renderWelcome() {
-    setTimeout(() => {
-      try {
-        game.scenes.getName(this.sceneToActivate)?.activate();
-        Dialog.prompt({
-          title: `${this.moduleTitle} Importer`,
-          content: `<p>Welcome to the <strong>${this.moduleTitle}</strong> <br><br> All assets have been imported.`,
-          label: 'Okay!',
-          callback: () => game.journal.getName(this.postImportJournalName).show(),
-        });
-      } catch (e) {
-        console.error("Couldn't initialize welcome: ", e);
+  async ReImport(adventurePack = this.adventurePack, adventurePackName = this.adventurePackName) {
+    //
+    // Non distructive import that only imports assets missing in the world. 
+    //
+    const pack = game.packs.get(adventurePack);
+    const adventureId = pack.index.find(a => a.name === adventurePackName)?._id;
+    logger.info(`For ${adventurePackName} the Id is: ${adventureId}`)
+    const adventure = await pack.getDocument(adventureId);
+    const adventureData = adventure.toObject();
+    const toCreate = {};
+    let created = 0;
+
+    for (const [field, cls] of Object.entries(Adventure.contentFields)) {
+      const collection = game.collections.get(cls.documentName);
+      const [c] = adventureData[field].partition(d => collection.has(d._id));
+      if (c.length) {
+        toCreate[cls.documentName] = c;
+        created += c.length;
       }
-    }, 500);
+    }
+
+    //
+    // Now create any new assets
+    //
+
+    if (toCreate) {
+      for (const [documentName, createData] of Object.entries(toCreate)) {
+        const cls = getDocumentClass(documentName);
+        await cls.createDocuments(createData, { keepId: true, keepEmbeddedId: true, renderSheet: false });
+        created++;
+      }
+    }
+    ui.notifications.warn(`Re-Import Completed Created ${created} Assets`);
+
+    logger.info(` Created ${created} Assets`);
+  };
+
+  async migrateFolders(moduleName, moduleTitle, adventurePack = this.adventurePack, adventurePackName = this.adventurePackName, acFolderIDs = this.acFolderIDs) {
+
+    ui.notifications.warn(`PG Starting Upgrade`);
+
+    // Get the existing folder contents and save
+    let folderAssetIds = [];
+    let updateAsset;
+    let folderDeletes = [];
+
+    for (const { folderName, folderID } of acFolderIDs) {
+      game.folders.contents.filter(a => {
+        if (a.name === folderName && a.id !== folderID) {
+          // console.log(a);
+          folderAssetIds.push([a.name, a.id, a.contents, a.type]);
+        }
+      });
+    };
+    // Now work out what is installed and run the adventure import to get the proper folder structure and import deleted assets
+    await ReImportFolders(adventurePack, adventurePackName, moduleTitle);
+
+    // Now go through the old asset list and move the asssets to the correct new folders
+    folderAssetIds.forEach(fName => {
+      for (const { folderName, folderID } of acFolderIDs) {
+        if (folderName === fName[0]) {
+          fName[2].forEach(iName => {
+            switch (fName[3]) {
+              case 'JournalEntry':
+                updateAsset = game.journal.get(iName.id);
+                updateAsset.update({ folder: folderID });
+                break;
+              case 'Actor':
+                updateAsset = game.actors.get(iName.id);
+                updateAsset.update({ folder: folderID });
+                break;
+              case 'Item':
+                updateAsset = game.items.get(iName.id);
+                updateAsset.update({ folder: folderID });
+                break;
+              case 'Scene':
+                updateAsset = game.scenes.get(iName.id);
+                updateAsset.update({ folder: folderID });
+                break;
+              case 'RollTable':
+                updateAsset = game.tables.get(iName.id);
+                updateAsset.update({ folder: folderID });
+                break;
+              default:
+                break;
+            }
+          });
+        }
+      };
+      // store the old folder ID's we want to delete
+      folderDeletes.push(fName[1])
+    });
+
+    // delete the old folders
+    await Folder.deleteDocuments(folderDeletes);
+
+    logger.info(`Asset Moves Completed`);
+
+    // Cleanup old odd folders and journals if necessary
+    // await deleteCoreFolders()
+
+    // Refresh sidebar
+    ui.sidebar.render();
+    logger.warn('Status: Upgrade Completed');
+
+
+    async function ReImportFolders(adventurePack, adventurePackName, moduleTitle) {
+      //
+      // Non distructive import that only imports assets missing in the world. 
+      //
+      const pack = game.packs.get(adventurePack);
+      const adventureId = pack.index.find(a => a.name === adventurePackName)?._id;
+      logger.info(`For ${adventurePackName} the Id is: ${adventureId}`)
+      const adventure = await pack.getDocument(adventureId);
+      const adventureData = adventure.toObject();
+      const toCreate = {};
+      let created = 0;
+
+      for (const [field, cls] of Object.entries(Adventure.contentFields)) {
+        const newUpdate = [];
+        const newAdd = [];
+        const collection = game.collections.get(cls.documentName);
+        const [c, u] = adventureData[field].partition(d => collection.has(d._id));
+        if (c.length) {
+          toCreate[cls.documentName] = c;
+          created += c.length;
+        }
+      }
+
+      //
+      // Now create any new assets
+      //
+
+      if (toCreate) {
+        for (const [documentName, createData] of Object.entries(toCreate)) {
+          const cls = getDocumentClass(documentName);
+          const c = await cls.createDocuments(createData, { keepId: true, keepEmbeddedId: true, renderSheet: false });
+          created++;
+        }
+      }
+      ui.notifications.warn(`${moduleTitle} Upgrade Re-Import Completed Created ${created} Assets`);
+
+      logger.info(`Created ${created} Assets`);
+      return;
+    };
   }
 }

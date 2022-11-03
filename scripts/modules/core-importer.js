@@ -24,27 +24,20 @@ export class CoreImporter {
       static get sceneToActivate() {
         return 'System Cover';
       }
+      static get adventurePack() {
+        return 'symbaroum5ecore.ruins-of-symbaroum-5e-core';
+      }
+      static get adventurePackName() {
+        return 'Ruins of Symbaroum 5E - Core';
+      }
 
       static get postImportJournalName() {
         return 'RoS - Core - How To Use This Module';
       }
 
-      static get folderNameDict() { 
+      static get migrationData() {
         return {
-          'RoS CORE - How to': 'RoS CORE - How to',
-          'RoS CORE - GM Aids': 'RoS CORE - GM Aids',
         };
-      }
-
-      generateDialogContent() {
-        return `
-        <p><b>Initialize ${this.moduleTitle}?</b><br><br>
-        This will import the RoS - Core - How To Use This Module user guide</p>
-        <p>
-        No part of this publication may be reproduced, distributed, stored in a retrieval system, or transmitted in any form by any means, electronic, mechanical, photocopying, recording or otherwise without the prior permission of the publishers.<br><br>
-              <br>
-        Published by: <b>Free League Publishing</b><br>
-        Foundry Conversion by <b>Matthew Haentschke and Paul Watson</b>`;
       }
 
       constructor() {

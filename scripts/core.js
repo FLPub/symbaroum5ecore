@@ -19,9 +19,7 @@ import { ItemSyb5e } from './modules/item.js'
 import { DamageRollSyb5e } from './modules/damage-roll.js'
 import { ImporterBase } from './modules/importer-base.js'
 import { CoreImporter } from './modules/core-importer.js'
-
-import { SybRestDialog } from './modules/apps/syb-rest-dialog.js'
-import { SybConfigApp } from './modules/apps/config-app.js'
+import { SymbaroumWide } from './modules/journal.js';
 
 /**
  * Sub Modules
@@ -42,15 +40,10 @@ const SUB_MODULES = {
   Spellcasting,
   Resting,
   DamageRollSyb5e,
+  SymbaroumWide,
   ImporterBase,
   CoreImporter
 }
-
-const SUB_APPS = {
-  SybRestDialog,
-  SybConfigApp
-}
-
 
 Hooks.on('init', () => {
 
@@ -64,12 +57,9 @@ Hooks.on('init', () => {
   /*
   Initialize all Sub Modules
   */
-  Object.values(SUB_MODULES).forEach( (cl) => {
-    logger.info(COMMON.localize('SYB5E.Init.SubModule', {name: cl.NAME}));
+  Object.values(SUB_MODULES).forEach((cl) => {
+    logger.info(COMMON.localize('SYB5E.Init.SubModule', { name: cl.NAME }));
     cl.register();
   });
 
-  //GlobalTesting
-  //Object.entries(SUB_MODULES).forEach(([key, cl])=> window[key] = cl);
-  //Object.entries(SUB_APPS).forEach(([key, cl])=> window[key] = cl);
 });
