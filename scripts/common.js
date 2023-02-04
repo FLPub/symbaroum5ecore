@@ -13,8 +13,12 @@ export class COMMON {
     name: NAME,
     path: PATH,
     title: TITLE,
-    //dndPath: `${PATH}/../../systems/dnd5e`,
-    systemCompat: ['1.6.2',], //compat with 1.6.2+
+
+    /* expecting item expansion in 2.2.0 which 
+     * will surely mess with our operations. 
+     * This check is only a warning.
+     */
+    systemCompat: ['2.1.0','2.1.x'], 
   };
 
   static isValidSystem() {

@@ -69,8 +69,6 @@ export class Spellcasting {
     /* only modify spell use dialogs */
     if(app.item?.type !== 'spell') return;
 
-    const element = html.find('[name="consumeSpellSlot"]');
-
     /* get all text elements */
     const textNode = html[0].getElementsByTagName('input').consumeSpellSlot.nextSibling;
 
