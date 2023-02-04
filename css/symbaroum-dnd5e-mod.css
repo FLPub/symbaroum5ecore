@@ -62,6 +62,12 @@
   border-radius: 4px;
 }
 
+.syb5e.sheet.actor .sheet-header .attributes .health input,
+.syb5e.sheet.actor .sheet-header .attributes .health span:not(.sep) {
+  font-size:smaller;
+  min-width:4ch;
+}
+
 /* End Character/NPC Sheet Styling  */
 /* ************************ */
 
