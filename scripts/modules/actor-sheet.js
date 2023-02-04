@@ -175,16 +175,16 @@ export class SheetCommon {
   }
 
   /* -------------------------------------------- */
-  static _prepareItemToggleState(item) {
+  static _prepareItemToggleState(item, context) {
     if (item.type === 'spell') {
       const favoredState = getProperty(item, game.syb5e.CONFIG.PATHS.favored) ?? -1;
-      item.toggleClass = {
+      context.toggleClass = {
         '1': 'active',
         '0': '',
         '-1': 'fixed'
       }[favoredState]
 
-      item.toggleTitle = {
+      context.toggleTitle = {
         '1': [COMMON.localize("SYB5E.Spell.Favored")],
         '0': [COMMON.localize("SYB5E.Spell.NotFavored")],
         '-1': [COMMON.localize("SYB5E.Spell.NeverFavored")],
@@ -347,11 +347,11 @@ export class SheetCommon {
       }
       /* -------------------------------------------- */
 
-      _prepareItemToggleState(item) {
-        super._prepareItemToggleState(item);
+      _prepareItemToggleState(item, context) {
+        super._prepareItemToggleState(item, context);
 
         /* now modify toggle data related to spells */
-        SheetCommon._prepareItemToggleState.call(this, item);
+        SheetCommon._prepareItemToggleState(item, context);
       }
 
       /* -------------------------------------------- */
