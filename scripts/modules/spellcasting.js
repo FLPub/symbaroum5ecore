@@ -69,16 +69,14 @@ export class Spellcasting {
     /* only modify spell use dialogs */
     if(app.item?.type !== 'spell') return;
 
-    const element = html.find('[name="consumeSlot"]');
-
     /* get all text elements */
-    const textNodes = element.parent().contents().filter( function() {return this.nodeType === 3} )
+    const textNode = html[0].getElementsByTagName('input').consumeSpellSlot.nextSibling;
 
-    if(textNodes.length !== 1){
+    if(!textNode){
       logger.error(COMMON.localize('SYB5E.Error.HTMLParse'));
     }
 
-    textNodes[0].textContent = COMMON.localize('SYB5E.Corruption.GainQuestion');
+    textNode.textContent = COMMON.localize('SYB5E.Corruption.GainQuestion');
 
     return;
   }

@@ -157,10 +157,10 @@ export class ItemSyb5e {
 
       /* if we are consuming a spell slot, treat it as adding corruption instead */
       /* Note: consumeSpellSlot only valid for _leveled_ spells. All others MUST add corruption if a valid expression */
-      usageInfo.consumeCorruption = !!usageInfo.consumeSpellLevel || ((parseInt(this.system?.level ?? 0) < 1) && this.corruption.expression != game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride.expression);
+      usageInfo.consumeCorruption = !!usageInfo.consumeSpellSlot || ((parseInt(this.system?.level ?? 0) < 1) && this.corruption.expression != game.syb5e.CONFIG.DEFAULT_ITEM.corruptionOverride.expression);
 
       /* We are _never_ consuming spell slots in syb5e */
-      usageInfo.consumeSpellLevel = null;
+      usageInfo.consumeSpellSlot = false;
     }
 
     let updates = wrapped(usageInfo, ...args);
