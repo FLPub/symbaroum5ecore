@@ -63,7 +63,7 @@ export class SheetCommon {
   static _getCorruptionAbilityData(actor, contextAbilities) {
 
     const corruptionAbilities = Object.entries(contextAbilities).reduce((acc, [key, val]) => {
-      acc.push({ ability: key, label: val.label });
+      acc.push({ ability: key, label: game.i18n.localize(`DND5E.Ability${key.capitalize()}`)});
       return acc;
     }, []);
 
