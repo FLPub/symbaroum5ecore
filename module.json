@@ -1,7 +1,7 @@
 {
   "title": "Ruins of Symbaroum 5E - Core",
   "description": "Implements the core rules mechanics of the Ruins of Symbaroum conversion for 5th Edition.",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "styles": ["/css/symbaroum-dnd5e-mod.css"],
   "esmodules": ["/scripts/core.js"],
   "languages": [
@@ -35,7 +35,8 @@
   ],
   "compatibility": {
     "minimum": "10",
-    "verified": "10.291"
+    "verified": "11",
+    "maximum": "11"
   },
   "relationships": {
     "systems": [
@@ -43,13 +44,13 @@
         "id": "dnd5e",
         "type": "system",
         "compatibility": {
-          "minimum": "2.1.0",
-          "verified": "2.1.x",
+          "minimum": "2.2.2",
+          "verified": "2.2.x",
           "maximum": "2.x"
         }
       }
     ]
   },
-  "name": "symbaroum5ecore",
+  "id": "symbaroum5ecore",
   "minimumCoreVersion": "10"
 }
