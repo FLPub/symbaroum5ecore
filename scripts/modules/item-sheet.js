@@ -116,7 +116,7 @@ export class Syb5eItemSheet {
     }
 
     /* we want to add a custom corruption field if there is a general resource consumption field */
-    const consumeGroup = html.find('[name="system.consume.type"]').parents('.uses-per').last();
+    const consumeGroup = html.find('.form-group.consumption');
     if(consumeGroup.length > 0) {
       const currentOverrides = item.corruptionOverride;
       let data = {
