@@ -7,9 +7,17 @@ export class DamageRollSyb5e {
 
   static register() {
     this.patch()
+    this.hooks();
   }
 
   static parent = {}
+
+  static hooks() {
+    Hooks.on('dnd5e.preRollDamage', (item, rollConfig) => {
+      /* inject needed properties (deep impact) */
+      foundry.utils.mergeObject(rollConfig.data.item, {properties: {dim: item.system.properties.dim}});
+    });
+  }
 
   static patch() {
 
@@ -27,6 +35,7 @@ export class DamageRollSyb5e {
   }
 
   static configureDamage(wrapped, ...args) {
+
     /* if this is a deep impact weapon on a crit, add in an extra '@mod' term */
     if (this.isCritical && this.data.item?.properties?.dim) {
       this.terms.push(new OperatorTerm({operator: "+"}));
