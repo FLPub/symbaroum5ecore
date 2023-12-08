@@ -46,7 +46,7 @@
         "compatibility": {
           "minimum": "2.3.0",
           "verified": "2.3.1",
-          "maximum": "2.x"
+          "maximum": "2.9.9"
         }
       }
     ]

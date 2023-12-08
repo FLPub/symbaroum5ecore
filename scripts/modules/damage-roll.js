@@ -15,7 +15,7 @@ export class DamageRollSyb5e {
   static hooks() {
     Hooks.on('dnd5e.preRollDamage', (item, rollConfig) => {
       /* inject needed properties (deep impact) */
-      foundry.utils.mergeObject(rollConfig.data.item, {properties: {dim: item.system.properties.dim}});
+      foundry.utils.mergeObject(rollConfig.data.item, {properties: {dim: item.properties.dim}});
     });
   }
 
