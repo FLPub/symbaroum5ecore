@@ -305,8 +305,8 @@ export class Spellcasting {
         summary: summaryString
       }
 
-      /* hack: force a local update so we can use this data immediately */
-      item.updateSource({[lastCorruptionField]: itemUpdates[lastCorruptionField]});
+      /* temporarily set the gained corruption in the item data for use in damage roll expressions */
+      foundry.utils.setProperty(item, lastCorruptionField, itemUpdates[lastCorruptionField]);
 
       logger.debug('Cached rolled corruption:', itemUpdates);
 

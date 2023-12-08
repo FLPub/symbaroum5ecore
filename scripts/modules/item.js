@@ -85,7 +85,7 @@ export class ItemSyb5e {
   }
 
   static getProperties() {
-    let props = {};
+    let props = this.system.properties ?? {};
     /* Armor will also have item properties similar to Weapons */
 
     /* is armor type? return syb armor props or the default object

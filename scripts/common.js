@@ -13,22 +13,7 @@ export class COMMON {
     name: NAME,
     path: PATH,
     title: TITLE,
-
-    /* expecting item expansion in 2.2.0 which 
-     * will surely mess with our operations. 
-     * This check is only a warning.
-     */
-    systemCompat: ['2.1.0','2.1.x'], 
   };
-
-  static isValidSystem() {
-    const current = game.system.version;
-
-    const lowValid = !isNewerVersion(COMMON.DATA.systemCompat[0], current);
-    const highValid = !isNewerVersion(current, COMMON.DATA.systemCompat[1]);
-
-    return {lowValid, highValid}
-  }
 
   static buildNotification(type, message) {
     Hooks.once('ready', () => {
@@ -41,22 +26,11 @@ export class COMMON {
 
   /* pre-setup steps */
   static build() {
-    let validBuild = true;
-    const results = COMMON.isValidSystem();
-    if (!results.lowValid) {
-      const msg = `${COMMON.DATA.name}: Detected dnd5e system version as "${game.system.version}". Minimum supported dnd5e system version: "${COMMON.DATA.systemCompat[0]}". Disabling all module operations.`
-      console.error(msg);
-      COMMON.buildNotification('error', msg);
-      validBuild = false;
-    }
-
-    if (!results.highValid) {
-      const msg = `${COMMON.DATA.name}: Detected dnd5e system version as "${game.system.version}". Maximum supported dnd5e system version: "${COMMON.DATA.systemCompat[1]}". Full operation cannot be guaranteed.`
-      console.warn(msg);
-      COMMON.buildNotification('warn', msg);
-      validBuild = true;
-    }
-
+    /* prior to v11, we needed to check the system
+     * version manually. This is no longer needed.
+     * Leaving in-place for potential future use.
+     */
+    const validBuild = true;
     return validBuild;
   }
 
