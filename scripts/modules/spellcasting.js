@@ -292,6 +292,7 @@ export class Spellcasting {
       const corruptionInfo = item.corruption;
 
       /* roll for corruption (always round up)*/
+      // TODO this is gonna break very soon
       const gainedCorruption = new Roll(`ceil(${corruptionInfo.expression})`, item.getRollData()).evaluate({async:false}).total;
 
       /* cantrips and favored spells have a flat corruption value */
@@ -302,7 +303,8 @@ export class Spellcasting {
       itemUpdates[lastCorruptionField] = {
         total: gainedCorruption,
         expression: corruptionInfo.expression,
-        summary: summaryString
+        summary: summaryString,
+        type: corruptionInfo.type,
       }
 
       /* temporarily set the gained corruption in the item data for use in damage roll expressions */

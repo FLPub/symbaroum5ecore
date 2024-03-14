@@ -541,6 +541,31 @@ a.inline-roll {
   top: -3px;
 }
 
+/* Chat feedback */
+.symbaroum-dnd5e-mod.chat {
+  background-image: url(../images/journal/foreground.jpg);
+  border-radius: 6px;
+  border: 1px solid var(--dnd5e-color-gold);
+  margin: 0.375rem 0; 
+  & p {
+    margin: 0.375rem;
+  }
+
+  & h3 {
+    text-align:center;
+  }
+
+  & .roll-output {
+    display:flex;
+    justify-content: space-around;
+  }
+
+  & .roll-result {
+    font-weight: bolder;
+  }
+  
+}
+
 /*Journal Entry Input Border*/
 .symbaroum-dnd5e-mod.journal-sheet form input[name='name'] {
   font-family: 'Primitive';

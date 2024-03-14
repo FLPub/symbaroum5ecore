@@ -8,9 +8,14 @@ export class ItemSyb5e {
 
   static register() {
     this.patch()
+    this.hooks();
   }
 
   static parent = {}
+
+  static hooks() {
+    Hooks.on('dnd5e.preDisplayCard', this.getChatData);
+  }
 
   static patch() {
 
@@ -67,21 +72,27 @@ export class ItemSyb5e {
     return Spellcasting._isFavored(this);
   }
 
-  /* @override */
-  static async getChatData(wrapped, ...args) {
-
-    /* should insert 2 labels -- level and components */
-    let data = await wrapped(...args);
+  static getChatData(item, data) {
 
     /* add ours right after if we are consuming corruption */
-    const corruptionUse = getProperty(this, game.syb5e.CONFIG.PATHS.corruption.root);
-    if(this.actor.isSybActor && corruptionUse && corruptionUse.total != 0){
+    const corruptionUse = getProperty(item, game.syb5e.CONFIG.PATHS.corruption.root);
+    if(item.actor.isSybActor && corruptionUse && corruptionUse.total != 0){
       logger.debug('Retrieving last rolled corruption:', corruptionUse);
-      data.properties.push(corruptionUse.summary);
+      const header = {
+        'temp': 'SYB5E.Corruption.TempDamage',
+        'permanent': 'SYB5E.Corruption.PermDamage',
+      }[corruptionUse.type];
+
+      data.content += `
+  <div class="symbaroum-dnd5e-mod chat">
+  <h3>${game.i18n.localize(header)}</h3>
+
+  <p class="roll-output"><span class="roll-exp"><i class="fa-solid fa-dice"></i>${corruptionUse.expression}</span>
+<i class="fa-solid fa-right-long"></i>
+  <span class="roll-result">${corruptionUse.total}</span></p>
+  </div>`
     }
 
-    return data;
-    
   }
 
   static getProperties() {
