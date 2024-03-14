@@ -34,9 +34,9 @@
     }
   ],
   "compatibility": {
-    "minimum": "10",
-    "verified": "11.311",
-    "maximum": "11"
+    "minimum": "11",
+    "verified": "11.315",
+    "maximum": "12"
   },
   "relationships": {
     "systems": [
@@ -44,13 +44,12 @@
         "id": "dnd5e",
         "type": "system",
         "compatibility": {
-          "minimum": "2.3.0",
-          "verified": "2.3.1",
-          "maximum": "2.9.9"
+          "minimum": "3.0.0",
+          "verified": "3.0.4",
+          "maximum": "4"
         }
       }
     ]
   },
-  "id": "symbaroum5ecore",
-  "minimumCoreVersion": "10"
+  "id": "symbaroum5ecore"
 }

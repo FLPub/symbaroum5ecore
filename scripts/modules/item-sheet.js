@@ -99,22 +99,6 @@ export class Syb5eItemSheet {
 
     }
 
-    /* only concerned with adding armor props to armor type items */
-    if (item.isArmor){
-      const data = {
-        ...commonData,
-        armorProps: item.properties,
-        propRoot: game.syb5e.CONFIG.PATHS.armorProps,
-        propLabels: game.syb5e.CONFIG.ARMOR_PROPS
-      }
-
-      const propCheckboxes = await renderTemplate(`${COMMON.DATA.path}/templates/items/parts/armor-properties.html`, data);
-
-      const equipmentDetails = html.find('[name="system.proficient"]').parents('.form-group').last();
-
-      equipmentDetails.after(propCheckboxes);
-    }
-
     /* we want to add a custom corruption field if there is a general resource consumption field */
     const consumeGroup = html.find('.form-group.consumption');
     if(consumeGroup.length > 0) {
