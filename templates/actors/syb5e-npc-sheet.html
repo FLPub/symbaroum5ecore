@@ -29,22 +29,26 @@
             {{!-- Character Summary --}}
             <ul class="summary flexrow">
                 <li class="size">
-                    <span>{{lookup config.actorSizes system.traits.size}}</span>
+                    <span>{{lookup (lookup config.actorSizes system.traits.size) "label"}}</span>
                 </li>
-                <!--
-                <li>
-                    <input type="text" name="system.details.alignment" value="{{system.details.alignment}}" placeholder="{{ localize 'DND5E.Alignment' }}"/>
-                </li>
-                -->
                 <li class="creature-type">
                     <span data-tooltip="{{labels.type}}">{{labels.type}}</span>
                     <a class="config-button" data-action="type" data-tooltip="DND5E.CreatureTypeConfig">
                         <i class="fas fa-cog"></i>
                     </a>
                 </li>
-                <li>
-                    <input type="text" name="system.details.source" value="{{system.details.source}}"
-                           placeholder="{{ localize 'DND5E.Source' }}"/>
+                <li class="source">
+                    {{#if (eq system.details.source.custom system.details.source.label)}}
+                        <input type="text" name="system.details.source.custom" value="{{system.details.source.custom}}"
+                                     placeholder="{{ localize 'DND5E.Source' }}">
+                    {{else}}
+                        <span data-tooltip="{{system.details.source.label}}">{{system.details.source.label}}</span>
+                    {{/if}}
+                    {{#if editable}}
+                        <a class="config-button" data-action="source" data-tooltip="DND5E.SourceConfig">
+                            <i class="fas fa-cog"></i>
+                        </a>
+                    {{/if}}
                 </li>
             </ul>
 
@@ -59,8 +63,12 @@
                         <input name="system.attributes.hp.value" type="text" value="{{hp.value}}" placeholder="10"
                             data-tooltip="DND5E.HitPointsCurrent" data-dtype="Number">
                         <span class="sep"> / </span>
-                        <input name="system.attributes.hp.max" type="text" value="{{hp.max}}" placeholder="10"
-                            data-tooltip="DND5E.HitPointsMax" data-dtype="Number">
+                        {{#if system.details.level}}
+                        <span data-tooltip="DND5E.HitPointsMax">{{ hp.max }}</span>
+                        {{else}}
+                        <input name="system.attributes.hp.max" type="text" value="{{ hp.max }}" placeholder="10"
+                               data-tooltip="DND5E.HitPointsMax" data-dtype="Number">
+                        {{/if}}
                     </div>
                     <footer class="attribute-footer flexrow">
                         <input name="system.attributes.hp.temp" type="text" class="temphp"
@@ -135,7 +143,8 @@
                             {{numberFormat ability.save decimals=0 sign=true}}
                         </span>
                     </div>
-                    <a class="config-button" data-action="ability" data-tooltip="DND5E.AbilityConfigure">
+                    <a class="config-button" data-action="ability"
+                       data-tooltip="{{ localize "DND5E.AbilityConfigure" ability=ability.label }}">
                         <i class="fas fa-cog"></i>
                     </a>
                 </li>
@@ -210,6 +219,17 @@
                             <input name="system.resources.lair.initiative" type="number" step="any"
                                    value="{{system.resources.lair.initiative}}"
                                    placeholder="20" data-tooltip="DND5E.LairActionInitiative">
+                        </div>
+                    </div>
+                    <div class="counter flexrow death-saves">
+                        <h4 class="rollable" data-action="rollDeathSave">{{ localize "DND5E.DeathSave" }}</h4>
+                        <div class="counter-value">
+                            <i class="fa-solid fa-check"></i>
+                            {{ numberInput system.attributes.death.success name="system.attributes.death.success"
+                               min=0 step=1 placeholder=0 }}
+                            <i class="fa-solid fa-times"></i>
+                            {{ numberInput system.attributes.death.failure name="system.attributes.death.failure"
+                               min=0 step=1 placeholder=0 }}
                         </div>
                     </div>
                 </div>

@@ -93,7 +93,7 @@ export class ActorSyb5e {
 
   /* @override */
   static prepareBaseData(wrapped, ...args) {
-    wrapped(...args);
+    wrapped?.(...args);
 
     if (this.isSybActor()) {
       ActorSyb5e._prepareCommonData(this);

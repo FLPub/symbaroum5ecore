@@ -180,26 +180,41 @@ export class SYB5E {
     globalThis.game.dnd5e.config.weaponProficiencies.alc = COMMON.localize('SYB5E.Proficiency.WeaponAlchemical');
 
     /* Extend dnd5e weapon properties */
-    mergeObject(
-      globalThis.game.dnd5e.config.weaponProperties,
-      COMMON.translateObject({
-        are: 'SYB5E.Item.WeaponProps.AreaEffect',
-        bal: 'SYB5E.Item.WeaponProps.Balanced',
-        crw: 'SYB5E.Item.WeaponProps.Crewed',
-        con: 'SYB5E.Item.WeaponProps.Concealed',
-        dim: 'SYB5E.Item.WeaponProps.DeepImpact',
-        ens: 'SYB5E.Item.WeaponProps.Ensnaring',
-        imm: 'SYB5E.Item.WeaponProps.Immobile',
-        msv: 'SYB5E.Item.WeaponProps.Massive',
-        res: 'SYB5E.Item.WeaponProps.Restraining',
-        sge: 'SYB5E.Item.WeaponProps.Siege',
-      })
-    );
+    const weaProps = {
+        are: { label: 'SYB5E.Item.WeaponProps.AreaEffect' },
+        bal: { label: 'SYB5E.Item.WeaponProps.Balanced' },
+        crw: { label: 'SYB5E.Item.WeaponProps.Crewed' },
+        con: { label: 'SYB5E.Item.WeaponProps.Concealed' },
+        dim: { label: 'SYB5E.Item.WeaponProps.DeepImpact' },
+        ens: { label: 'SYB5E.Item.WeaponProps.Ensnaring' },
+        imm: { label: 'SYB5E.Item.WeaponProps.Immobile' },
+        msv: { label: 'SYB5E.Item.WeaponProps.Massive' },
+        res: { label: 'SYB5E.Item.WeaponProps.Restraining' },
+        sge: { label: 'SYB5E.Item.WeaponProps.Siege' },
+      }
+
+    Reflect.ownKeys(weaProps).forEach( prop => {
+      globalThis.game.dnd5e.config.validProperties.weapon.add(prop);
+      globalThis.game.dnd5e.config.itemProperties[prop] = COMMON.translateObject(weaProps[prop]);
+    });
+
+    /* Extend armor properties */
+    const armProps = {
+      con: { label: 'SYB5E.Item.ArmorProps.Concealable' },
+      cmb: { label: 'SYB5E.Item.ArmorProps.Cumbersome' },
+      noi: { label: 'SYB5E.Item.ArmorProps.Noisy' },
+      wei: { label: 'SYB5E.Item.ArmorProps.Weighty' },
+    }
+
+    Reflect.ownKeys(armProps).forEach( prop => {
+      globalThis.game.dnd5e.config.validProperties.equipment.add(prop);
+      globalThis.game.dnd5e.config.itemProperties[prop] = COMMON.translateObject(armProps[prop]);
+    });
 
     /* extend dnd5e damage types
      * -> This supports both the damage and healing types
      */
-    mergeObject(
+    foundry.utils.mergeObject(
       globalThis.game.dnd5e.config.damageTypes,
       COMMON.translateObject({
         permc: 'SYB5E.Corruption.PermDamage',
@@ -208,11 +223,15 @@ export class SYB5E {
     );
 
     /* add in "None" spell school (mainly for Troll Singer Songs) */
-    mergeObject(
+    foundry.utils.mergeObject(
       globalThis.game.dnd5e.config.spellSchools,
-      COMMON.translateObject({
-        non: 'None',
-      })
+      {  
+        non: {
+          fullKey: "none",
+          label: 'None',
+          icon: '/icons/svg/cancel.svg',
+        }
+      } 
     );
 
     /* Store new armor properties */
@@ -266,10 +285,18 @@ export class SYB5E {
     globalThis.game.dnd5e.config.weaponProficienciesMap.alchemical = 'alc';
 
     /* add 'abomination' and 'phenomenon' to creature types */
-    mergeObject(
+    foundry.utils.mergeObject(
       globalThis.game.dnd5e.config.creatureTypes, {
-        abomination: 'SYB5E.Creature.Abomination',
-        phenomenon: 'SYB5E.Creature.Phenomenon',
+        abomination: {
+          label: 'SYB5E.Creature.Abomination',
+          icon: '/icons/creatures/magical/spirit-undead-ghost-tan-teal.webp',
+          detectAlignment: true,
+        },
+        phenomenon: {
+          label: 'SYB5E.Creature.Phenomenon',
+          icon: '/icons/creatures/magical/spirit-undead-ghost-purple.webp',
+          detectAlignment: true,
+        }
       }
     );
 
