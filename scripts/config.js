@@ -214,7 +214,7 @@ export class SYB5E {
     /* extend dnd5e damage types
      * -> This supports both the damage and healing types
      */
-    mergeObject(
+    foundry.utils.mergeObject(
       globalThis.game.dnd5e.config.damageTypes,
       COMMON.translateObject({
         permc: 'SYB5E.Corruption.PermDamage',
@@ -223,11 +223,15 @@ export class SYB5E {
     );
 
     /* add in "None" spell school (mainly for Troll Singer Songs) */
-    mergeObject(
+    foundry.utils.mergeObject(
       globalThis.game.dnd5e.config.spellSchools,
-      COMMON.translateObject({
-        non: 'None',
-      })
+      {  
+        non: {
+          fullKey: "none",
+          label: 'None',
+          icon: '/icons/svg/cancel.svg',
+        }
+      } 
     );
 
     /* Store new armor properties */
@@ -281,10 +285,18 @@ export class SYB5E {
     globalThis.game.dnd5e.config.weaponProficienciesMap.alchemical = 'alc';
 
     /* add 'abomination' and 'phenomenon' to creature types */
-    mergeObject(
+    foundry.utils.mergeObject(
       globalThis.game.dnd5e.config.creatureTypes, {
-        abomination: 'SYB5E.Creature.Abomination',
-        phenomenon: 'SYB5E.Creature.Phenomenon',
+        abomination: {
+          label: 'SYB5E.Creature.Abomination',
+          icon: '/icons/creatures/magical/spirit-undead-ghost-tan-teal.webp',
+          detectAlignment: true,
+        },
+        phenomenon: {
+          label: 'SYB5E.Creature.Phenomenon',
+          icon: '/icons/creatures/magical/spirit-undead-ghost-purple.webp',
+          detectAlignment: true,
+        }
       }
     );
 
