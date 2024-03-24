@@ -1,7 +1,7 @@
 {
     "title": "Ruins of Symbaroum 5E - Core",
     "description": "Implements the core rules mechanics of the Ruins of Symbaroum conversion for 5th Edition.",
-    "version": "2.0.!1",
+    "version": "4.0+0",
     "styles": [
         "/css/symbaroum-dnd5e-mod.css"
     ],
@@ -18,26 +18,19 @@
     ],
     "packs": [
         {
-            "name": "ros-core-user-guide-journal",
-            "label": "RoS CORE - How to",
-            "path": "packs/ros-core-user-guide-journal.db",
+            "name": "ruins-of-symbaroum-5e-core",
+            "label": "Ruins of Symbaroum Core Adventure",
+            "path": "packs/ruins-of-symbaroum-5e-core.db",
+            "type": "Adventure",
+            "module": "symbaroum5ecore",
             "private": false,
-            "type": "JournalEntry",
-            "flags": {}
-        },
-        {
-            "name": "ros-core-scenes",
-            "label": "RoS CORE - GM Aids",
-            "path": "packs/ros-core-scenes.db",
-            "type": "Scene",
-            "private": false,
-            "flags": {}
+            "flags": {},
+            "system": "dnd5e"
         }
     ],
     "url": "https://github.com/FLPub/symbaroum5ecore",
     "manifest": "https://raw.githubusercontent.com/FLPub/symbaroum5ecore/next/module.json",
-    "download": "https://github.com/FLPub/symbaroum5ecore/releases/download/2.0.!1/module.zip",
-    "id": "symbaroum5ecore",
+    "download": "https://github.com/FLPub/symbaroum5ecore/releases/download/4.0+0/module.zip",
     "authors": [
         {
             "name": "Matthew Haentschke, Paul Watson",
@@ -46,8 +39,22 @@
     ],
     "compatibility": {
         "minimum": "10",
-        "verified": "10"
+        "verified": "11.311",
+        "maximum": "11"
     },
-    "name": "symbaroum5ecore",
+    "relationships": {
+        "systems": [
+            {
+                "id": "dnd5e",
+                "type": "system",
+                "compatibility": {
+                    "minimum": "2.3.0",
+                    "verified": "2.3.1",
+                    "maximum": "2.9.9"
+                }
+            }
+        ]
+    },
+    "id": "symbaroum5ecore",
     "minimumCoreVersion": "10"
 }
