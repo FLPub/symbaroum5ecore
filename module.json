@@ -1,55 +1,53 @@
 {
-  "title": "Ruins of Symbaroum 5E - Core",
-  "description": "Implements the core rules mechanics of the Ruins of Symbaroum conversion for 5th Edition.",
-  "version": "4.0+0",
-  "styles": ["/css/symbaroum-dnd5e-mod.css"],
-  "esmodules": ["/scripts/core.js"],
-  "languages": [
-    {
-      "lang": "en",
-      "name": "English",
-      "path": "lang/en.json",
-      "flags": {}
-    }
-  ],
-  "packs": [
-    {
-      "name": "ruins-of-symbaroum-5e-core",
-      "label": "Ruins of Symbaroum Core Adventure",
-      "path": "packs/ruins-of-symbaroum-5e-core.db",
-      "type": "Adventure",
-      "module": "symbaroum5ecore",
-      "private": false,
-      "flags": {},
-      "system": "dnd5e"
-    }
-  ],
-  "url": "https://frialigan.se/",
-  "manifest": "https://github.com/FLPub/symbaroum5ecore/releases/latest/download/module.json",
-  "download": "https://github.com/FLPub/symbaroum5ecore/releases/latest/download/module.zip",
-  "authors": [
-    {
-      "name": "Matthew Haentschke, Paul Watson",
-      "flags": {}
-    }
-  ],
-  "compatibility": {
-    "minimum": "11",
-    "verified": "11.315",
-    "maximum": "12"
-  },
-  "relationships": {
-    "systems": [
-      {
-        "id": "dnd5e",
-        "type": "system",
-        "compatibility": {
-          "minimum": "3.0.0",
-          "verified": "3.1.0",
-          "maximum": "4"
-        }
-      }
-    ]
-  },
-  "id": "symbaroum5ecore"
+	"title": "Ruins of Symbaroum 5E - Core",
+	"description": "Implements the core rules mechanics of the Ruins of Symbaroum conversion for 5th Edition.",
+	"version": "4.0.1",
+	"styles": ["/css/symbaroum-dnd5e-mod.css"],
+	"esmodules": ["/scripts/core.js"],
+	"languages": [
+		{
+			"lang": "en",
+			"name": "English",
+			"path": "lang/en.json",
+			"flags": {}
+		}
+	],
+	"packs": [
+		{
+			"name": "ruins-of-symbaroum-5e-core",
+			"label": "Ruins of Symbaroum Core Adventure",
+			"type": "Adventure",
+			"module": "symbaroum5ecore",
+			"flags": {},
+			"system": "dnd5e"
+		}
+	],
+	"url": "https://frialigan.se/",
+	"manifest": "https://github.com/FLPub/symbaroum5ecore/releases/latest/download/module.json",
+	"download": "https://github.com/FLPub/symbaroum5ecore/releases/latest/download/module.zip",
+	"authors": [
+		{
+			"name": "Matthew Haentschke, Paul Watson",
+			"flags": {}
+		}
+	],
+	"compatibility": {
+		"minimum": "11",
+		"verified": "12",
+		"maximum": "12"
+	},
+	"relationships": {
+		"systems": [
+			{
+				"id": "dnd5e",
+				"type": "system",
+				"compatibility": {
+					"minimum": "3.2.0",
+					"verified": "3.2.0",
+					"maximum": "4"
+				}
+			}
+		]
+	},
+	"id": "symbaroum5ecore"
 }

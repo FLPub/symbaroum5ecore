@@ -1,0 +1,9 @@
+{
+	"devDependencies": {
+		"@foundryvtt/foundryvtt-cli": "^1.0.2"
+	},
+	"scripts": {
+		"pushLDBtoJSON": "node ./tools/pushLDBtoJSON.mjs",
+		"pullJSONtoLDB": "node ./tools/pullJSONtoLDB.mjs"
+	}
+}

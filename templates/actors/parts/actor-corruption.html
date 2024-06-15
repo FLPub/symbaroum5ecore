@@ -1,46 +1,39 @@
 {{#*inline "corruptionRow" }}
-<div class="attribute-value" style="height: unset;">
-  <label class="flexcol">
-    <input type="text" data-dtype="Number" name="{{sybPaths.corruption.temp}}" value="{{system.attributes.corruption.temp}}" />
-    <span class="attribute-footer">{{ localize "SYB5E.Corruption.Temporary"}}</span>
-  </label>
-  <span> + </span>
-  <label class="flexcol">
-    <input type="text" data-dtype="Number"  name="{{sybPaths.corruption.permanent}}" value="{{system.attributes.corruption.permanent}}" />
-    <span class="attribute-footer">{{ localize "SYB5E.Corruption.Permanent"}}</span>
-  </label>
-  <span> = </span>
-  <label class="flexcol">
-    <input type="text" data-dtype="Number" name="{{sybPaths.corruption.value}}" value="{{system.attributes.corruption.value}}" disabled />
-    <span class="attribute-footer">{{ localize "SYB5E.Corruption.Current"}}</span>
-  </label>
-  <span> / </span>
-  <label class="flexcol">
-    <input type="text" data-dtype="Number" name="{{sybPaths.corruption.max}}" value="{{system.attributes.corruption.max}}" {{corruptionAbilities.disabled}} />
+<div class="attribute-value" style="height: unset">
+	<label class="flexcol">
+		<input type="text" data-dtype="Number" name="{{sybPaths.corruption.temp}}" value="{{system.attributes.corruption.temp}}" />
+		<span class="attribute-footer">{{ localize "SYB5E.Corruption.Temporary"}}</span>
+	</label>
+	<span> + </span>
+	<label class="flexcol">
+		<input type="text" data-dtype="Number" name="{{sybPaths.corruption.permanent}}" value="{{system.attributes.corruption.permanent}}" />
+		<span class="attribute-footer">{{ localize "SYB5E.Corruption.Permanent"}}</span>
+	</label>
+	<span> = </span>
+	<label class="flexcol">
+		<input type="text" data-dtype="Number" name="{{sybPaths.corruption.value}}" value="{{system.attributes.corruption.value}}" disabled />
+		<span class="attribute-footer">{{ localize "SYB5E.Corruption.Current"}}</span>
+	</label>
+	<span> / </span>
+	<label class="flexcol">
+		<input type="text" data-dtype="Number" name="{{sybPaths.corruption.max}}" value="{{system.attributes.corruption.max}}" {{corruptionAbilities.disabled}} />
 
-    <span class="attribute-footer">{{ localize "SYB5E.Corruption.Threshold"}}</span>
-  </label>
+		<span class="attribute-footer">{{ localize "SYB5E.Corruption.Threshold"}}</span>
+	</label>
 </div>
-{{/inline}}
-
-{{#*inline "corruptionSelection"}}
-<div class="flexrow {{#if corruptionAbilities.thorough}}dnd5e-border{{/if}}" style="border-bottom: solid var(--syb5e-pc-color) 1px;align-items:center;">
-  <h4 class="attribute-name" style="text-align:right;margin:0">{{ localize "SYB5E.Corruption.Label"}}</h4>
-  <div style="text-align:left;">
-    <select name="{{corruptionAbilities.path}}" data-type="String">
-      {{selectOptions corruptionAbilities.abilities selected=corruptionAbilities.current nameAttr="ability" labelAttr="label"}}
-    </select>
-  </div>
+{{/inline}} {{#*inline "corruptionSelection"}}
+<div class="flexrow {{#if corruptionAbilities.thorough}}dnd5e-border{{/if}}" style="border-bottom: solid var(--syb5e-pc-color) 1px; align-items: center">
+	<h4 class="attribute-name" style="text-align: right; margin: 0">{{ localize "SYB5E.Corruption.Label"}}</h4>
+	<div style="text-align: left">
+		<select name="{{corruptionAbilities.path}}" data-type="String">
+			{{selectOptions corruptionAbilities.abilities selected=corruptionAbilities.current valueAttr="ability" labelAttr="label"}}
+		</select>
+	</div>
 </div>
 {{/inline}}
 
 <ul class="attributes flexrow">
-  {{#unless corruptionAbilities.thorough }}
-  <li class="attribute resource" style="height:auto;">
-    {{> corruptionSelection}}    
-    {{> corruptionRow}} 
-  </li>
-  {{else}}
-  {{> corruptionSelection}}
-  {{/unless}}
+	{{#unless corruptionAbilities.thorough }}
+	<li class="attribute resource" style="height: auto">{{> corruptionSelection}} {{> corruptionRow}}</li>
+	{{else}} {{> corruptionSelection}} {{/unless}}
 </ul>

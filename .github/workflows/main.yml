@@ -7,13 +7,30 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v2
-      
+      # Each step runs a single command using the runners shell.
+      # 1. Checkout our repository so we can do things on it.
+      - name: Checkout
+        uses: actions/checkout@v4
+        # 2. Make sure node is set up. This may be an unecessary step.
+      - name: Node Setup
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+        # 3. Install the FoundryVTT CLI.
+      - run: npm install -g @foundryvtt/foundryvtt-cli
+        # 4. Configure the datapath as the github workspace variable.
+      - run: fvtt configure set "dataPath" ${GITHUB_WORKSPACE}
+        # 5. Tell the FVTT CLI that we are working on a "system" package.
+      - run: fvtt package workon fvtt package workon "symbaroum5ecore" --type "Module"
+        # 6-11. Package each folder of source json files into the appropriate LevelDB pack.
+      - run: fvtt package pack "ruins-of-symbaroum-5e-core" --in "src/packs/ruins-of-symbaroum-5e-core" --out "packs"
+
       # Substitute the Manifest and Download URLs in the module.json
       # for a FULL RELEASE
       - name: Substitute Manifest and Download Links For Versioned Ones
-        if: "!github.event.release.prerelease"
+        if: '!github.event.release.prerelease'
         id: sub_release_manifest_version
         uses: microsoft/variable-substitution@v1
         with:
@@ -23,12 +40,12 @@ jobs:
           url: https://github.com/${{github.repository}}
           manifest: https://github.com/${{github.repository}}/releases/latest/download/module.json
           download: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/module.zip
-          
+
       # Substitute the Manifest and Download URLs in the module.json
       # for a PRE RELEASE. Manifest pointing to live module.json on branch,
       # which is updated after tag.
       - name: Substitute Manifest and Download Links For Versioned Ones
-        if: "github.event.release.prerelease"
+        if: 'github.event.release.prerelease'
         id: sub_prerelease_manifest_version
         uses: microsoft/variable-substitution@v1
         with:
@@ -38,15 +55,13 @@ jobs:
           url: https://github.com/${{github.repository}}
           manifest: https://raw.githubusercontent.com/${{github.repository}}/next/module.json
           download: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/module.zip
-     
-
 
       # Create a zip file with all files required by the module to add to the release
       - run: zip -r ./module.zip module.json LICENSE css/ fonts/ images/ licenses/ scripts/ manifests/ packs/ lang/ styles/ templates/
 
       # Create a release for this specific version
       - name: Update Release with Files
-        if: "!github.event.release.prerelease"
+        if: '!github.event.release.prerelease'
         id: create_version_release
         uses: ncipollo/release-action@v1
         with:
@@ -58,10 +73,10 @@ jobs:
           artifacts: './module.json, ./module.zip'
           tag: ${{ github.event.release.tag_name }}
           body: ${{ github.event.release.body }}
-          
+
       #  OR create a pre-release for this specific version
       - name: Update Release with Files
-        if: "github.event.release.prerelease"
+        if: 'github.event.release.prerelease'
         id: create_version_prerelease
         uses: ncipollo/release-action@v1
         with:
@@ -73,19 +88,19 @@ jobs:
           artifacts: './module.json, ./module.zip'
           tag: ${{ github.event.release.tag_name }}
           body: ${{ github.event.release.body }}
-          
+
       #update next branch
       - name: Prepare repository
-        if: "github.event.release.prerelease"
+        if: 'github.event.release.prerelease'
         run: |
-         git config --global user.name '${{github.actor}}'
-         git config --global user.email '${{github.actor}}@users.noreply.github.com'
-         git add module.json
-         git stash
-         git clean -f
-         git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY"
-         git fetch origin "next"
-         git switch -c "next" "origin/next"
-         git checkout stash module.json    
-         git commit -m "${{github.event.release.tag_name}} manifest"
-         git push -f
+          git config --global user.name '${{github.actor}}'
+          git config --global user.email '${{github.actor}}@users.noreply.github.com'
+          git add module.json
+          git stash
+          git clean -f
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY"
+          git fetch origin "next"
+          git switch -c "next" "origin/next"
+          git checkout stash module.json    
+          git commit -m "${{github.event.release.tag_name}} manifest"
+          git push -f
