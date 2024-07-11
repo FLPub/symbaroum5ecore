@@ -273,58 +273,37 @@ export class Spellcasting {
 		foundry.utils.mergeObject(returnData, sybData);
 	}
 
-	static _getUsageUpdates(item, { consumeCorruption }) {
+	static _getUsageUpdates(item, { consumeCorruption }, chatData) {
 		/* mirror core dnd5e structure */
-		const actorUpdates = {};
+		//const actorUpdates = {};
 		const itemUpdates = {};
 
 		if (consumeCorruption) {
 			/* Does this item produce corruption? */
 			const corruptionInfo = item.corruption;
 
-			/* roll for corruption (always round up)*/
-			// TODO this is gonna break very soon
-			const gainedCorruption = new Roll(`ceil(${corruptionInfo.expression})`, item.getRollData()).evaluate({ async: false }).total;
+			/* Generate and simplify rolldata strings for final rollable formula post-render */
+			const expression = new Roll(`${corruptionInfo.expression}`, item.getRollData()).evaluateSync({ strict: false, allowStrings: true }).formula;
 
-			/* cantrips and favored spells have a flat corruption value */
-			const summaryString = `${corruptionInfo.expression} (${gainedCorruption})`;
-
-			/* store this most recently rolled corruption value in its flags */
-			const lastCorruptionField = game.syb5e.CONFIG.PATHS.corruption.root;
-			itemUpdates[lastCorruptionField] = {
-				total: gainedCorruption,
-				expression: corruptionInfo.expression,
-				summary: summaryString,
+			/* store this corruption expression */
+			const lastCorruptionField = game.syb5e.CONFIG.PATHS.corruption.root + '.last';
+      foundry.utils.setProperty(chatData, lastCorruptionField, {
+				expression,
 				type: corruptionInfo.type,
-			};
+			});
 
 			/* temporarily set the gained corruption in the item data for use in damage roll expressions */
-			foundry.utils.setProperty(item, lastCorruptionField, itemUpdates[lastCorruptionField]);
+			//foundry.utils.setProperty(item, lastCorruptionField, itemUpdates[lastCorruptionField]);
 
-			logger.debug('Cached rolled corruption:', itemUpdates);
+			logger.debug('Cached corruption roll:', chatData[lastCorruptionField]);
 
-			/* only update actor if we actually gain corruption */
-			if (gainedCorruption != 0) {
-				/* field name shortcuts */
-				const fieldKey = corruptionInfo.type;
-
-				/* get the current corruption values */
-				let corruption = item.actor.corruption;
-
-				/* add in our gained corruption to the temp corruption */
-				corruption[fieldKey] = corruption[fieldKey] + gainedCorruption;
-
-				/* insert this update into the actorUpdates */
-				const corruptionFieldPath = `flags.${COMMON.DATA.name}.corruption.${fieldKey}`;
-				actorUpdates[corruptionFieldPath] = corruption[fieldKey];
-			}
-		} else {
+    } else {
 			/* clear out the previously stored corruption results, if any */
 			itemUpdates[game.syb5e.CONFIG.PATHS.delete.corruption] = null;
-			item.updateSource({ [game.syb5e.CONFIG.PATHS.delete.corruption]: null });
+			//item.updateSource({ [game.syb5e.CONFIG.PATHS.delete.corruption]: null });
 		}
 
 		/* some "fake" items dont have an ID, try to handle this... */
-		return { actorUpdates, itemUpdates: !!item.id ? itemUpdates : {} };
+		return { itemUpdates: !!item.id ? itemUpdates : {} };
 	}
 }

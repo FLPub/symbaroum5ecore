@@ -350,9 +350,9 @@ export class SYB5E {
         max: `${root}.corruption.max`,
         bonus: `${root}.corruption.bonus`,
         last: {
-          total: `${root}.corruption.total`, //last rolled corruption value (items)
-          expression: `${root}.corruption.expression`, //last roll corruption expression (items)
-          summary: `${root}.corruption.summary`, //text output of results -- '${expression} (${total})
+          total: `${root}.corruption.total`, //last rolled corruption value (items/message)
+          expression: `${root}.corruption.expression`, //last roll corruption expression (items/message)
+          type: `${root}.corruption.type`, //last rolled corruption type (items/message)
         },
       },
       corruptionOverride: {
