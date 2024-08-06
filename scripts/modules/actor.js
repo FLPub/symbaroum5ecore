@@ -269,7 +269,7 @@ export class ActorSyb5e {
 		/* if we are in a custom max mode, just return the current stored max */
 		const currentMax = foundry.utils.getProperty(actor, paths.corruption.max) ?? game.syb5e.CONFIG.DEFAULT_FLAGS.corruption.max;
 		const currentBonus = dnd5e.utils.simplifyBonus(
-			(foundry.utils.getProperty(actor, paths.corruption.bonus) ?? 0) + foundry.utils.getProperty(actor, 'overrides.data.attributes.corruption.bonus') ?? 0
+			(foundry.utils.getProperty(actor, paths.corruption.bonus) ?? 0)
 		);
 
 		/* handle special cases */
@@ -296,12 +296,7 @@ export class ActorSyb5e {
 		}
 
 		const corrAbility = usesSpellcasting ? actor.system.attributes.spellcasting : corruptionAbility;
-		const corrMod = actor.system.abilities[corrAbility].mod;
-
-		if (corrMod == null) {
-			/* we havent prepped enough data; use the stored value */
-			return currentMax;
-		}
+		const corrMod = actor.system.abilities[corrAbility].mod ?? 0;
 
 		/* we can only apply a bonus to an automatically computed maximum (i.e. derived from attributes) */
 		const rawMax = fullCaster ? (prof + corrMod) * 2 : Math.max(corrMod + prof * 2, 2);
