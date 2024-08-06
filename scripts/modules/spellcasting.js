@@ -66,10 +66,11 @@ export class Spellcasting {
 		if (app.item?.type !== 'spell') return;
 
 		/* get all text elements */
-		const textNode = html[0].getElementsByTagName('input').consumeSpellSlot.nextSibling;
+		const textNode = html[0].getElementsByTagName('input')?.consumeSpellSlot?.nextSibling;
 
 		if (!textNode) {
-			logger.error(COMMON.localize('SYB5E.Error.HTMLParse'));
+			// logger.error(COMMON.localize('SYB5E.Error.HTMLParse'));
+      return;
 		}
 
 		textNode.textContent = COMMON.localize('SYB5E.Corruption.GainQuestion');

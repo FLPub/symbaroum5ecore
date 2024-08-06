@@ -16,6 +16,7 @@ export class ItemSyb5e {
     Hooks.on('dnd5e.preItemUsageConsumption', this.swapCorruptionConsumption);
     Hooks.on('dnd5e.itemUsageConsumption', this.generateCorruptionUsage);
     Hooks.on('dnd5e.renderChatMessage', this.applyCorruption);
+    //Hooks.on('renderChatLog', this.setChatListeners)
 	}
 
 	static patch() {
@@ -149,6 +150,23 @@ export class ItemSyb5e {
     foundry.utils.mergeObject(updates, sybUpdates);
 	}
 
+  // static _handleEventAction(ev) {
+  //   const target = ev.target.closest('[data-action]');
+  //   if (!target) return;
+
+  //   ev.preventDefault();
+  //   switch (target.dataset.action) {
+  //     case 'undo':
+  //       const {type = 'temp', total = 0} = target.dataset;
+  //     default: break;
+  //   }
+  // }
+
+  // static setChatListeners(app, [html]) {
+  //   const chatContainers = html.querySelectorAll('#chat-log .symbaroum-dnd5e-mod');
+  //   for( let container of chatContainers) container.addEventListener('click', this._handleEventAction);
+  // }
+
   static async applyCorruption(message, html) {
     const corruption = foundry.utils.getProperty(message, game.syb5e.CONFIG.PATHS.corruption.root + '.last') ?? {};
 
@@ -201,10 +219,11 @@ export class ItemSyb5e {
 				permanent: 'SYB5E.Corruption.PermDamage',
 			}[corruption.type];
 
+      // <i class="fa-solid fa-backward-fast" data-action="undo" data-type="${corruption.type}" data-total="${corruption.total}"></i>
       const corruptionContent = `
 <div class="symbaroum-dnd5e-mod chat">
   <h3>${game.i18n.localize(header)}</h3>
-  <p class="roll-output">
+  <p class="roll-output" >
     <span class="roll-exp">
       <i class="fa-solid fa-dice"></i>${corruption.expression}
     </span>
