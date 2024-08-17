@@ -302,7 +302,7 @@ export class SheetCommon {
 			static get defaultOptions() {
 				return foundry.utils.mergeObject(super.defaultOptions, {
 					classes: ['syb5e', 'dnd5e', 'sheet', 'actor', 'character'],
-					width: 780,
+					width: 768,
 					height: 749,
 					numFavored: 0, // hack: allows retrieval of data needed for replacement
 				});
@@ -473,7 +473,7 @@ export class SheetCommon {
 			static get defaultOptions() {
 				return foundry.utils.mergeObject(super.defaultOptions, {
 					classes: ['syb5e', 'dnd5e', 'sheet', 'actor', 'npc'],
-					width: 625,
+					width: 635,
 					height: 705,
 					numFavored: 0, // hack: allows retrieval of data needed for replacement
 				});

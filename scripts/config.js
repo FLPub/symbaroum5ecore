@@ -98,14 +98,14 @@ export class SYB5E {
         type: String,
         config: false,
         scope: 'client',
-        default: '13px solid transparent',
+        default: '8px solid transparent',
       },
       npcBorder: {
         restricted: false,
         type: String,
         config: false,
         scope: 'client',
-        default: '13px solid transparent',
+        default: '8px solid transparent',
       },
       charChanged: {
         restricted: false,

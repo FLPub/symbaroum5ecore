@@ -27,7 +27,7 @@
   --syb5e-pc-color: #ffffff;
   --syb5e-pc-background: none;
   --syb5e-pc-background-image: url(../images/background/bg-green.webp) repeat;
-  --syb5e-pc-sheet-border: 13px solid transparent;
+  --syb5e-pc-sheet-border: 8px solid transparent;
   --syb5e-pc-font: 'Fondamento';
   --syb5e-pc-border-image: url(../images/journal/sym-journal-border.webp);
   --syb5e-pc-item-link: #ffffff;
@@ -37,7 +37,7 @@
   --syb5e-npc-background-image: url(../images/background/bg-red.webp) repeat;
   --syb5e-npc-font: 'Fondamento';
   --syb5e-npc-border-image: url(../images/journal/sym-journal-header.webp);
-  --syb5e-npc-sheet-border: 13px solid transparent;
+  --syb5e-npc-sheet-border: 8px solid transparent;
   --syb5e-npc-item-link: #ffffff;
   --syb5e-npc-tag: #ffffff;
 }
@@ -47,6 +47,20 @@
 
 /* Character/NPC Sheet Styling  */
 /* ************************ */
+.syb5e.sheet {
+  & .window-header {
+    background-color: black;
+  }
+
+  & .sheet-navigation {
+    font-size: var(--font-size-18);
+  }
+
+  &.npc .sheet-body .skills-list {
+    flex-basis:190px;
+  }
+}
+
 .syb5e.sheet.actor .editor .tox-toolbar-overlord,
 .syb5e.sheet.actor .editor .tox-toolbar__primary {
   background-color: #fff;
@@ -129,7 +143,6 @@
 .syb5e.sheet.actor.character .sheet-header h1.charname input {
   color: var(--syb5e-pc-color);
   font-family: var(--syb5e-pc-font);
-  font-size: 40px;
 }
 
 .syb5e.sheet.actor.character .sheet-header .charlevel {
@@ -335,6 +348,7 @@ a.inline-roll {
 
 .syb5e.sheet.actor.npc .header-exp .cr {
   font-family: var(--syb5e-npc-font);
+  font-size: var(--font-size-16);
 }
 
 .syb5e.sheet.actor.npc input[type='text'],
@@ -346,7 +360,7 @@ a.inline-roll {
 .syb5e.sheet.actor.npc .sheet-header h1.charname input {
   color: var(--syb5e-npc-color);
   font-family: var(--syb5e-npc-font);
-  font-size: 40px;
+  font-size: 36px;
 }
 
 .syb5e.sheet.actor.npc .sheet-header .charlevel {
@@ -520,9 +534,9 @@ a.inline-roll {
 }
 .symbaroum-dnd5e-mod.app.window-app.sheet.journal-sheet.journal-entry {
   color: hsl(0, 0%, 0%);
-  border: 9px solid transparent;
+  border: 6px solid transparent;
   border-image: url(../images/journal/sym-journal-border.webp) 108/3 repeat;
-  border-image-outset: 2;
+  border-image-outset: 1;
 }
 
 .symbaroum-dnd5e-mod.journal-sheet form .editor {
@@ -690,12 +704,12 @@ a.inline-roll {
 
 .symbaroum-dnd5e-mod h4 {
   font-family: 'Jim Nightshade';
-  font-size: 18pt;
+  font-size: 16pt;
 }
 
 .symbaroum-dnd5e-mod .h4mod {
   font-family: 'Jim Nightshade';
-  font-size: 18pt;
+  font-size: 16pt;
 }
 
 .symbaroum-dnd5e-mod h6 {
