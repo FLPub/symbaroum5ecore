@@ -120,7 +120,7 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('charBGChoice', 'url(../images/background/bg-paper.webp) repeat');
     await COMMON.setting('switchCharBGColour', 'url(../images/background/bg-paper.webp) repeat');
     await COMMON.setting('charTextColour', '#000000');
-    await COMMON.setting('charBorder', '13px solid transparent');
+    await COMMON.setting('charBorder', '8px solid transparent');
     await COMMON.setting('charItemLink', '#000000');
     await COMMON.setting('charTag', '#000000');
     await COMMON.setting('charFontFamily', 'Fondamento');
@@ -131,7 +131,7 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('npcBGChoice', 'url(../images/background/bg-paper.webp) repeat');
     await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-paper.webp) repeat');
     await COMMON.setting('npcTextColour', '#000000');
-    await COMMON.setting('npcBorder', '13px solid transparent');
+    await COMMON.setting('npcBorder', '8px solid transparent');
     await COMMON.setting('npcItemLink', '#000000');
     await COMMON.setting('npcTag', '#000000');
     await COMMON.setting('npcFontFamily', 'Fondamento');
@@ -145,8 +145,8 @@ export class SybConfigApp extends FormApplication {
     await COMMON.setting('npcBGChoice', 'url(../images/background/bg-paper.webp) repeat');
     await COMMON.setting('switchNpcBGColour', 'url(../images/background/bg-paper.webp) repeat');
     await COMMON.setting('npcTextColour', '#000000');
-    await COMMON.setting('charBorder', '13px solid transparent');
-    await COMMON.setting('npcBorder', '13px solid transparent');
+    await COMMON.setting('charBorder', '8px solid transparent');
+    await COMMON.setting('npcBorder', '8px solid transparent');
     await COMMON.setting('charItemLink', '#000000');
     await COMMON.setting('npcItemLink', '#000000');
     await COMMON.setting('charTag', '#000000');
