@@ -66,6 +66,7 @@ export class SheetCommon {
 		}, []);
 
 		/* if this actor has any spellcasting, allow it to be selected as corruption stat */
+		// DND5E_COMPATIBILITY: Verify actor.system.attributes.spellcasting path.
 		if (actor.system.attributes.spellcasting?.length > 0) {
 			corruptionAbilities.push({ ability: 'spellcasting', label: COMMON.localize('DND5E.Spellcasting') });
 		}
@@ -97,11 +98,14 @@ export class SheetCommon {
 	/* Common context data between characters and NPCs */
 	static async _getCommonData(actor, context) {
 		/* Add in our corruption values in 'data.attributes' */
+		// DND5E_COMPATIBILITY: actor.corruption and actor.shadow are custom data.
+		// Ensure actor.js patches correctly add this data to the actor for dnd5e 4.3.6.
 		const commonData = {
 			sybPaths: game.syb5e.CONFIG.PATHS,
 			corruptionAbilities: SheetCommon._getCorruptionAbilityData(actor, context.system.abilities),
 			system: {
 				attributes: {
+					// These are custom properties expected to be on the actor object.
 					corruption: actor.corruption,
 				},
 				details: {
@@ -115,6 +119,7 @@ export class SheetCommon {
 
 	static async renderCurrencyRow(actor) {
 		const data = {
+			// DND5E_COMPATIBILITY: Verify actor.system.currency path.
 			currency: actor.system.currency,
 			labels: game.syb5e.CONFIG.CURRENCY,
 		};
@@ -129,34 +134,51 @@ export class SheetCommon {
 	/* -------------------------------------------- */
 
 	static async _render() {
+		// DND5E_COMPATIBILITY & APPLICATION_V2_REFACTOR_NOTE:
+		// The following DOM manipulations are highly dependent on the dnd5e 4.3.6 sheet HTML structure.
+		// These selectors may break if the underlying dnd5e templates change.
+		// Consider data-driven approaches for visibility (e.g., modifying context in getData)
+		// or more robust injection methods if ApplicationV2 provides them.
+
 		/* suppress spell slot display */
-		this.element.find('.spell-slots').css('display', 'none');
+		// High Risk: '.spell-slots' class might change or be removed in dnd5e 4.3.6.
+		// A better approach might be to modify data in `getData` to prevent rendering,
+		// or use a more specific selector if possible.
+		this.element.find('.spell-slots')?.css('display', 'none'); // Added optional chaining for safety
 
 		const currencyRow = await SheetCommon.renderCurrencyRow(this.actor);
 
 		/* Replace the 'Prepared (N)' text with 'Favored (M)' */
+		// High Risk: '[data-filter="prepared"]' selector is dnd5e-specific and might change.
 		const preparedCounter = this.element.find('[data-filter="prepared"]');
-		preparedCounter.text(`${COMMON.localize('SYB5E.Spell.Favored')} (${this.options.numFavored})`);
-
-		/* swap its attribute to 'favored' */
-		//preparedCounter.attr('data-filter', 'favored');
+		if (preparedCounter.length) { // Check if element exists
+			preparedCounter.text(`${COMMON.localize('SYB5E.Spell.Favored')} (${this.options.numFavored})`);
+		}
+		// Note: Changing 'data-filter' attribute itself was commented out, which is good,
+		// as that would likely break dnd5e's own filtering.
 
 		switch (this.actor.type) {
 			case 'character':
 				/* characters have a currency row already that we need to replace */
-				this.element.find('.currency').replaceWith(currencyRow);
+				// High Risk: '.currency' class is dnd5e-specific.
+				const currencyElem = this.element.find('.currency');
+				if (currencyElem.length) currencyElem.replaceWith(currencyRow);
 				break;
 
 			/* NPCs have none and we want to put it at the top of features */
 			case 'npc':
-				this.element.find('.features .inventory-filters').prepend(currencyRow);
+				// High Risk: '.features .inventory-filters' selectors are dnd5e-specific.
+				const featuresInventoryFilters = this.element.find('.features .inventory-filters');
+				if (featuresInventoryFilters.length) featuresInventoryFilters.prepend(currencyRow);
 				break;
 		}
 
 		//if ( !this.isEditable ) return false;
 
 		//currency conversion
-		this.element.find('.currency-convert').click(SheetCommon._onSybCurrencyConvert.bind(this));
+		// Lower Risk: '.currency-convert' should be within this module's actor-currency.html template.
+		// Ensure this listener is correctly managed if the currency row can be re-rendered multiple times.
+		this.element.find('.currency-convert').off('click.symbaroum').on('click.symbaroum', SheetCommon._onSybCurrencyConvert.bind(this));
 	}
 
 	/* -------------------------------------------- */
@@ -299,7 +321,7 @@ export class SheetCommon {
 
 			/* -------------------------------------------- */
 
-			static get defaultOptions() {
+			get defaultOptions() {
 				return foundry.utils.mergeObject(super.defaultOptions, {
 					classes: ['syb5e', 'dnd5e', 'sheet', 'actor', 'character'],
 					width: 768,
@@ -324,19 +346,23 @@ export class SheetCommon {
 			/* -------------------------------------------- */
 
 			/* supressing display of spell slot counts */
-			async _render(...args) {
-				await super._render(...args);
+			async _render(force = false, options = {}) {
+				await super._render(force, options);
 
-				/* call the common _render by binding (pretend its our own method) */
-				const boundRender = await SheetCommon._render.bind(this);
-				boundRender(...args);
+				// Note: DOM manipulations after super._render might need adjustment for ApplicationV2.
+				// Consider using _replaceHTML or _injectHTML for more complex scenarios.
+				await SheetCommon._render.call(this, force, options);
 
-				/* Inject the extended rest button and listener ( TODO should the whole sheet be injected like this?) */
+				/* Inject the extended rest button and listener */
 				const footer = this.element.find('.hit-dice .attribute-footer');
-				footer.append(`<a class="rest extended-rest" title="${COMMON.localize('SYB5E.Rest.Extended')}">${COMMON.localize('SYB5E.Rest.ExtendedAbbr')}</a>`);
+				// Ensure button is not added multiple times on re-renders
+				if (footer.length && !footer.find('.extended-rest').length) {
+					const extendedRestButton = `<a class="rest extended-rest" title="${COMMON.localize('SYB5E.Rest.Extended')}">${COMMON.localize('SYB5E.Rest.ExtendedAbbr')}</a>`;
+					footer.append(extendedRestButton);
+				}
 
 				/* activate listener for Extended Rest Button */
-				this.element.find('.extended-rest').click(this._onExtendedRest.bind(this));
+				this.element.find('.extended-rest').off('click').on('click', this._onExtendedRest.bind(this));
 			}
 			/* -------------------------------------------- */
 
@@ -470,7 +496,7 @@ export class SheetCommon {
 
 			/* -------------------------------------------- */
 
-			static get defaultOptions() {
+			get defaultOptions() {
 				return foundry.utils.mergeObject(super.defaultOptions, {
 					classes: ['syb5e', 'dnd5e', 'sheet', 'actor', 'npc'],
 					width: 635,
@@ -496,11 +522,12 @@ export class SheetCommon {
 			/* -------------------------------------------- */
 
 			/* supressing display of spell slot counts */
-			async _render(...args) {
-				await super._render(...args);
+			async _render(force = false, options = {}) {
+				await super._render(force, options);
 
-				/* call the common _render by binding (pretend its our own method) */
-				return SheetCommon._render.call(this, ...args);
+				// Note: DOM manipulations after super._render might need adjustment for ApplicationV2.
+				// Consider using _replaceHTML or _injectHTML for more complex scenarios.
+				return SheetCommon._render.call(this, force, options);
 			}
 		}
 

@@ -46,6 +46,9 @@ export class ItemSyb5e {
 			},
 		};
 
+		// LIBWRAPPER_TARGET: Patches for dnd5e.documents.Item5e.prototype are registered below.
+		// Targets include: properties (getter override), getRollData (wrapper), hasDamage (wrapper).
+		// Other properties (corruption, corruptionOverride, isFavored) are new custom getters.
 		COMMON.patch(target, targetPath, patches);
 	}
 
@@ -66,12 +69,14 @@ export class ItemSyb5e {
 	}
 
 	static getProperties() {
+		// DND5E_COMPATIBILITY: Accessing item.system.properties.
 		let props = this.system.properties ?? {};
 		/* Armor will also have item properties similar to Weapons */
 
 		/* is armor type? return syb armor props or the default object
 		 * if no flag data exists yet */
 		if (this.isArmor) {
+			// FOUNDRY_API: Accessing item flags via this.getFlag().
 			return foundry.utils.mergeObject(props, this.getFlag(COMMON.DATA.name, 'armorProps') ?? game.syb5e.CONFIG.DEFAULT_ITEM.armorProps);
 		}
 
@@ -171,10 +176,14 @@ export class ItemSyb5e {
     const corruption = foundry.utils.getProperty(message, game.syb5e.CONFIG.PATHS.corruption.root + '.last') ?? {};
 
     /* Do not re-eval previously rolled corruption values */
+    // FOUNDRY_CHAT_DOM: This method directly manipulates the chat message HTML (html parameter).
+    // Its robustness depends on the stability of the chat message structure.
     if ( message.author.isSelf 
       && ('expression' in corruption)
       && !('total' in corruption)) {
 
+      // DND5E_COMPATIBILITY: Accessing message.getFlag('dnd5e', 'use') to get item UUID.
+      // This flag structure is specific to how dnd5e handles item usage in chat messages.
       const {itemUuid = null} = message.getFlag('dnd5e','use'); 
       const item = await fromUuid(itemUuid);
       const actor = item.actor;
@@ -231,7 +240,7 @@ export class ItemSyb5e {
     <span class="roll-result">${corruption.total}</span>
   </p>
 </div>`;
-
+      // FOUNDRY_CHAT_DOM: Injecting custom HTML content into the chat message.
       html.insertAdjacentHTML('beforeend', corruptionContent);
     }
   

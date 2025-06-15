@@ -40,6 +40,7 @@ export class Spellcasting {
 			},
 		};
 
+		// LIBWRAPPER_TARGET: dnd5e.applications.item.AbilityUseDialog.prototype._getSpellData (implicitly, as _getSpellData is an instance method)
 		COMMON.patch(targetCls, targetPath, patch);
 	}
 
@@ -66,14 +67,55 @@ export class Spellcasting {
 		if (app.item?.type !== 'spell') return;
 
 		/* get all text elements */
-		const textNode = html[0].getElementsByTagName('input')?.consumeSpellSlot?.nextSibling;
-
-		if (!textNode) {
-			// logger.error(COMMON.localize('SYB5E.Error.HTMLParse'));
-      return;
+		// DND5E_COMPATIBILITY_RISK DOM_SELECTOR: This selector is very fragile.
+		// It assumes a specific DOM structure within the AbilityUseDialog for spell consumption.
+		// `html[0].getElementsByTagName('input')?.consumeSpellSlot?.nextSibling` was the original.
+		// Attempting a slightly more robust selection for the text node next to the "Consume Slot" checkbox.
+		const consumeInput = html[0].querySelector('input[name="consumeSpellSlot"]');
+		if (consumeInput && consumeInput.nextSibling && consumeInput.nextSibling.nodeType === Node.TEXT_NODE) {
+			// This is the ideal case, directly found the text node.
+			consumeInput.nextSibling.textContent = COMMON.localize('SYB5E.Corruption.GainQuestion');
+		} else if (consumeInput && consumeInput.parentElement?.classList.contains('form-group')) {
+			// Fallback: If the direct nextSibling isn't it, try to find a label within the same form-group or change the main label.
+			// This part is more speculative as the exact structure might vary.
+			// Option 1: Change the label of the checkbox itself if it's wrapped by one.
+			const checkboxLabel = consumeInput.closest('label');
+			if (checkboxLabel) {
+				// This might replace the checkbox itself if not careful. Let's try to find a text part of the label.
+				// For now, let's assume the text is after the input. If a more complex structure exists, this needs refinement.
+				// This part is hard to make robust without live inspection.
+				// logger.warn("Could not find the exact text node for 'Consume Slot', attempting to modify checkbox label if simple structure.");
+			}
+			// Option 2: Change the form-group's main label text (if one exists clearly associated).
+			const formGroup = consumeInput.closest('.form-group');
+			const groupLabel = formGroup?.querySelector('label');
+			if (groupLabel && groupLabel !== checkboxLabel) { // Ensure it's not the checkbox's own label
+				// This is also risky as it might be a generic label for the group.
+				// groupLabel.textContent = COMMON.localize('SYB5E.Corruption.GainQuestion');
+				// logger.warn("Could not find the exact text node, and checkbox label modification is complex. Consider manual review of AbilityUseDialog template.");
+			}
+			// As a last resort for the original attempt, if the structure was input -> text, but it's wrapped in a label:
+			if (consumeInput?.parentElement?.nodeName === 'LABEL') {
+				let sibling = consumeInput.nextSibling;
+				while(sibling) {
+					if (sibling.nodeType === Node.TEXT_NODE && sibling.textContent.trim().length > 0) {
+						sibling.textContent = COMMON.localize('SYB5E.Corruption.GainQuestion');
+						break;
+					}
+					sibling = sibling.nextSibling;
+				}
+			}
+			// If none of the above worked, it means the structure is too different or complex.
+			// The original code had: textNode.textContent = ...
+			// We'll stick to trying to find the direct nextSibling text node primarily.
+			// The original `logger.error` is commented out, but this indicates a point of failure.
+			// logger.error(COMMON.localize('SYB5E.Error.HTMLParse') + " for AbilityUseDialog consumeSlot text.");
+			// No change made if the structure is not recognized to avoid breaking the dialog.
+      return; // Return if no safe modification can be made.
+		} else {
+			// logger.error(COMMON.localize('SYB5E.Error.HTMLParse') + " for AbilityUseDialog consumeSlot text (input not found or no nextSibling).");
+			return;
 		}
-
-		textNode.textContent = COMMON.localize('SYB5E.Corruption.GainQuestion');
 
 		return;
 	}
@@ -90,9 +132,11 @@ export class Spellcasting {
 	static _maxSpellLevelByClass(classData = []) {
 		const maxLevel = classData.reduce(
 			(acc, cls) => {
+				// DND5E_COMPATIBILITY: cls.spellcasting.progression (e.g., "full", "half") from a class item.
 				const progression = cls.spellcasting.progression;
 				const progressionArray = SYB5E.CONFIG.SPELL_PROGRESSION[progression] ?? false;
 				if (progressionArray) {
+					// DND5E_COMPATIBILITY: cls.system.levels is the number of levels in this class.
 					const spellLevel = SYB5E.CONFIG.SPELL_PROGRESSION[progression][cls.system.levels] ?? 0;
 
 					return spellLevel > acc.level ? { level: spellLevel, fullCaster: progression == 'full' } : acc;
@@ -121,6 +165,7 @@ export class Spellcasting {
 	 * @param actor5eData {Object} (i.e. actor.system)
 	 */
 	static _maxSpellLevelNPC(actor5eData) {
+		// DND5E_COMPATIBILITY: actor5eData.details.spellLevel is the NPC's caster level.
 		const casterLevel = actor5eData.details.spellLevel ?? 0;
 
 		/* has caster levels, assume full caster */
@@ -157,12 +202,18 @@ export class Spellcasting {
 		const progression = Spellcasting.spellProgression(actor5e);
 
 		/* insert our maximum spell level into the spell object */
+		// DND5E_COMPATIBILITY: Modifying actor5e.system.spells.maxLevel. Standard dnd5e might calculate this differently or not use this specific path.
 		actor5e.system.spells.maxLevel = progression.level;
 
 		/* ensure that all spell levels <= maxLevel have a non-zero max */
+		// DND5E_COMPATIBILITY_RISK: This loop modifies actor5e.system.spells[slot].max.
+		// Forcing slot max to be at least 1 if progression.level says so might conflict with how dnd5e
+		// handles spell slots for certain classes (e.g., pact magic, or if a character shouldn't have slots for a level).
+		// Standard dnd5e derives slot maximums based on class levels and specific spellcasting features.
 		const levels = Array.from({ length: progression.level }, (_, index) => `spell${index + 1}`);
 
 		for (const slot of levels) {
+			// DND5E_COMPATIBILITY: Accessing actor5e.system.spells[slot].max.
 			actor5e.system.spells[slot].max = Math.max(actor5e.system.spells[slot].max, 1);
 		}
 	}
@@ -240,6 +291,8 @@ export class Spellcasting {
 		 * - canUse: {boolean}: always true? exceeding max corruption is a choice
 		 */
 
+		// DND5E_COMPATIBILITY: actor5e.system.details.cr for NPC CR.
+		// DND5E_COMPATIBILITY: actor5e.classes for character classes.
 		const maxLevel =
 			actor5e.system.details.cr == undefined
 				? Spellcasting._maxSpellLevelByClass(Object.values(actor5e.classes))

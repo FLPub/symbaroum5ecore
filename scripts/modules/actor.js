@@ -29,11 +29,15 @@ export class ActorSyb5e {
 				value: ActorSyb5e.prepareDerivedData,
 				mode: 'WRAPPER',
 			},
+			// LIBWRAPPER_TARGET: dnd5e.documents.Actor5e.prototype.longRest
 			longRest: {
 				value: ActorSyb5e.longRest,
+				mode: 'WRAPPER', // Added mode: 'WRAPPER'
 			},
+			// LIBWRAPPER_TARGET: dnd5e.documents.Actor5e.prototype.shortRest
 			shortRest: {
 				value: ActorSyb5e.shortRest,
+				mode: 'WRAPPER', // Added mode: 'WRAPPER'
 			},
 			convertSybCurrency: {
 				value: ActorSyb5e.convertSybCurrency,
@@ -61,6 +65,9 @@ export class ActorSyb5e {
 			},
 		};
 
+		// LIBWRAPPER_TARGET: Patches for dnd5e.documents.Actor5e.prototype are registered below.
+		// Targets include: getRollData, prepareBaseData, prepareDerivedData, longRest, shortRest.
+		// Other properties are effectively new additions or direct overrides if they happen to exist.
 		COMMON.patch(target, targetPath, patches);
 	}
 
@@ -280,6 +287,7 @@ export class ActorSyb5e {
 				return 0;
 			case 'spellcasting': {
 				/* if corruption is set to use spellcasting, ensure we have a spellcasting stat as well */
+				// DND5E_COMPATIBILITY: actor.system.attributes.spellcasting is the key for the primary spellcasting ability.
 				corruptionAbility = !!actor.system.attributes.spellcasting ? corruptionAbility : defaultAbility;
 			}
 		}
@@ -287,15 +295,21 @@ export class ActorSyb5e {
 		const usesSpellcasting = corruptionAbility === 'spellcasting';
 
 		/* otherwise determine corruption calc -- full casters get a special one */
+		// DND5E_COMPATIBILITY: actor.classes is used to determine character's spellcasting progression.
+		// DND5E_COMPATIBILITY: actor.system (specifically actor.system.details.spellLevel for NPCs) is used.
+		// Relies on Spellcasting._maxSpellLevelByClass and Spellcasting._maxSpellLevelNPC from spellcasting.js.
 		const { fullCaster } =
 			actor.type === 'character' ? Spellcasting._maxSpellLevelByClass(Object.values(actor.classes)) : Spellcasting._maxSpellLevelNPC(actor.system);
 
+		// DND5E_COMPATIBILITY: actor.system.attributes.prof is the proficiency bonus.
 		const prof = actor.system.attributes.prof ?? currentMax;
 		if (prof == null) {
 			logger.error('SYB5E.Error.NoProf');
 		}
 
+		// DND5E_COMPATIBILITY: actor.system.attributes.spellcasting (if used) or a specific ability key.
 		const corrAbility = usesSpellcasting ? actor.system.attributes.spellcasting : corruptionAbility;
+		// DND5E_COMPATIBILITY: actor.system.abilities[abilityKey].mod is the ability modifier.
 		const corrMod = actor.system.abilities[corrAbility].mod ?? 0;
 
 		/* we can only apply a bonus to an automatically computed maximum (i.e. derived from attributes) */
